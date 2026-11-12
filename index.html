@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Complejo Policial Almudena — Sistema de Gestión (Prototipo)</title>
+<script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+<style>
+:root{--azul:#0f2a4a;--azul2:#1d4f86;--celeste:#e8f0fa;--verde:#1f9d55;--verdeb:#e3f6ea;--amarillo:#b7791f;--amarillob:#fdf3dc;--rojo:#c53030;--rojob:#fde8e8;--gris:#6b7280;--borde:#dde3ea;--fondo:#f4f6f9}
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--fondo);color:#1f2937;font-size:15px}
+h2{margin:6px 0 14px;font-size:22px;color:var(--azul)}
+h3{margin:0 0 10px;font-size:16px;color:var(--azul)}
+.sec{margin:22px 0 10px}
+.muted{color:var(--gris)}.small{font-size:13px}
+button{font:inherit;cursor:pointer}
+input,select,textarea{font:inherit;width:100%;padding:10px 12px;border:1px solid var(--borde);border-radius:8px;background:#fff}
+textarea{min-height:90px;resize:vertical}
+label{display:block;font-weight:600;font-size:13px;margin:10px 0 4px;color:#374151}
+.btn{background:var(--azul2);color:#fff;border:0;border-radius:8px;padding:10px 16px;font-weight:600}
+.btn:hover{background:var(--azul)}
+.btn.ghost{background:#fff;color:var(--azul2);border:1px solid var(--azul2)}
+.btn.rojo{background:var(--rojo)}
+.btn-sm{padding:6px 10px;font-size:13px;border-radius:6px;border:1px solid var(--borde);background:#fff;color:var(--azul2);font-weight:600}
+.btn-sm.rojo{color:var(--rojo);border-color:#f3b4b4}
+.btn-sm.ghost{background:transparent;color:#fff;border-color:rgba(255,255,255,.5)}
+.full{width:100%}
+.card{background:#fff;border:1px solid var(--borde);border-radius:12px;padding:16px;margin-bottom:14px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.grid2>.card{margin-bottom:0}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px}
+.kpi{background:#fff;border:1px solid var(--borde);border-radius:12px;padding:14px}
+.kpi b{display:block;font-size:26px;color:var(--azul)}
+.kpi span{font-size:13px;color:var(--gris)}
+@media(max-width:760px){.grid2{grid-template-columns:1fr}.kpis{grid-template-columns:1fr 1fr}}
+/* header */
+.top{background:var(--azul);color:#fff;display:flex;align-items:center;justify-content:space-between;padding:10px 16px;gap:10px;flex-wrap:wrap}
+.marca{display:flex;align-items:center;gap:10px}
+.marca small{display:block;opacity:.8;font-size:12px}
+.logo{width:40px;height:40px;border-radius:50%;background:#fff;color:var(--azul);display:grid;place-items:center;font-weight:800;font-size:13px;flex:none}
+.who{display:flex;align-items:center;gap:10px;font-size:14px}
+.badge-proto{background:#f6c445;color:#3b2a00;font-size:11px;font-weight:700;padding:2px 8px;border-radius:99px;margin-left:6px;vertical-align:middle}
+.tabs{background:#fff;border-bottom:1px solid var(--borde);display:flex;overflow-x:auto;padding:0 8px;position:sticky;top:0;z-index:5}
+.tab{background:none;border:0;padding:13px 14px;white-space:nowrap;color:var(--gris);font-weight:600;border-bottom:3px solid transparent}
+.tab.on{color:var(--azul2);border-bottom-color:var(--azul2)}
+main{max-width:1100px;margin:0 auto;padding:18px 14px 60px}
+/* acceso */
+.acceso{min-height:100vh;display:grid;place-items:center;padding:20px;background:linear-gradient(160deg,var(--azul),var(--azul2))}
+.acceso .box{background:#fff;border-radius:16px;padding:26px;width:100%;max-width:420px;box-shadow:0 20px 50px rgba(0,0,0,.25)}
+.acceso .marca{color:var(--azul);margin-bottom:16px}
+.acceso .logo{background:var(--azul);color:#fff}
+.links{display:flex;justify-content:space-between;margin-top:14px;font-size:14px}
+.links a{color:var(--azul2);cursor:pointer;text-decoration:underline}
+.demo{background:var(--celeste);border-radius:10px;padding:12px;margin-top:18px;font-size:13px}
+.demo .chips{margin-top:8px}
+.err{background:var(--rojob);color:var(--rojo);padding:10px;border-radius:8px;margin-top:10px;font-size:14px}
+.ok{background:var(--verdeb);color:var(--verde);padding:10px;border-radius:8px;margin-top:10px;font-size:14px}
+/* chips */
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1px solid var(--borde);background:#fff;border-radius:99px;padding:7px 12px;font-size:13px;color:#374151}
+.chip.on{background:var(--azul2);border-color:var(--azul2);color:#fff}
+.grupo-tit{font-size:12px;color:var(--gris);font-weight:700;text-transform:uppercase;margin:10px 0 6px}
+/* calendario */
+.cal-head{display:flex;align-items:center;justify-content:space-between;margin:6px 0 10px}
+
+.cal-head button{border:1px solid var(--borde);background:#fff;border-radius:8px;width:36px;height:36px;font-size:18px}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+.dow{text-align:center;font-size:12px;color:var(--gris);font-weight:700}
+.dia{aspect-ratio:1;border:1px solid var(--borde);border-radius:8px;background:#fff;font-weight:600}
+.dia.libre{background:var(--verdeb);border-color:#a7e0bd}
+.dia.parcial{background:var(--amarillob);border-color:#f0d58c}
+.dia.lleno{background:var(--rojob);border-color:#f3b4b4;color:var(--rojo)}
+.dia:disabled{background:#f3f4f6;color:#c0c4cc;cursor:default}
+.dia.sel{outline:3px solid var(--azul2);outline-offset:1px}
+.leyenda{display:flex;gap:12px;flex-wrap:wrap;font-size:12px;margin-top:10px;color:var(--gris)}
+.leyenda i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:4px;vertical-align:-1px}
+.turnos{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px}
+.turno{border:1px solid #a7e0bd;background:var(--verdeb);border-radius:10px;padding:10px;text-align:left}
+.turno b{display:block}.turno span{font-size:12px;color:var(--verde)}
+.turno.no{background:#f3f4f6;border-color:var(--borde);cursor:default}
+.turno.no span{color:var(--gris)}
+.instinfo{margin-top:12px;font-size:14px;color:#374151}
+/* badges */
+.badge{display:inline-block;padding:2px 9px;border-radius:99px;font-size:12px;font-weight:700}
+.b-verde{background:var(--verdeb);color:var(--verde)}
+.b-amarillo{background:var(--amarillob);color:var(--amarillo)}
+.b-rojo{background:var(--rojob);color:var(--rojo)}
+.b-azul{background:var(--celeste);color:var(--azul2)}
+.b-gris{background:#eef0f3;color:var(--gris)}
+/* listas */
+.item{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid var(--borde);flex-wrap:wrap}
+.item:last-child{border-bottom:0}
+.item .acc{display:flex;gap:6px;flex-wrap:wrap}
+.noticia{border-left:4px solid var(--azul2)}
+.noticia p{margin:6px 0 0;white-space:pre-line}
+.noticia.Mantenimiento,.noticia.Clima{border-left-color:var(--amarillo)}
+.noticia.Evento,.noticia.Promoción{border-left-color:var(--verde)}
+/* tablas */
+.tabla{width:100%;border-collapse:collapse;font-size:14px}
+.tabla th{text-align:left;font-size:12px;color:var(--gris);text-transform:uppercase;padding:8px;border-bottom:2px solid var(--borde);white-space:nowrap}
+.tabla td{padding:8px;border-bottom:1px solid var(--borde);vertical-align:middle}
+.scroll{overflow-x:auto}
+.kv{width:100%;border-collapse:collapse;font-size:14px;margin:10px 0}
+.kv td{padding:6px 4px;border-bottom:1px solid var(--borde)}
+.kv td:first-child{color:var(--gris);width:40%}
+.filtros{display:grid;grid-template-columns:repeat(5,1fr) auto;gap:8px;align-items:end}
+.filtros label{margin-top:0}
+@media(max-width:760px){.filtros{grid-template-columns:1fr 1fr}}
+.row{display:flex;gap:8px;margin-top:10px}
+.row input{flex:1}
+/* barras */
+.barra{display:grid;grid-template-columns:150px 1fr 40px;gap:8px;align-items:center;font-size:13px;margin:6px 0}
+.barra .bg{background:#eef0f3;border-radius:6px;height:14px;overflow:hidden}
+.barra .fg{background:var(--azul2);height:100%;border-radius:6px}
+.barra b{text-align:right}
+/* chat */
+.chat{display:flex;flex-direction:column}
+.msgs{height:420px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;padding:4px}
+.msg{max-width:85%;padding:10px 13px;border-radius:14px;font-size:14px;line-height:1.45}
+.msg.bot{background:var(--celeste);align-self:flex-start;border-bottom-left-radius:4px}
+.msg.yo{background:var(--azul2);color:#fff;align-self:flex-end;border-bottom-right-radius:4px}
+.msg ul{margin:6px 0;padding-left:18px}
+.msg .btn{margin-top:8px;padding:7px 12px;font-size:13px}
+.sugs{display:flex;gap:6px;overflow-x:auto;padding:10px 0}
+.sugs .chip{white-space:nowrap}
+.chatform{display:flex;gap:8px}
+/* portería */
+.cam{position:relative;background:#111;border-radius:10px;aspect-ratio:4/3;overflow:hidden;margin-bottom:10px}
+.cam video{width:100%;height:100%;object-fit:cover}
+.cam-ph{position:absolute;inset:0;display:grid;place-items:center;color:#aaa;font-size:14px}
+.resultado{text-align:center;display:flex;flex-direction:column;justify-content:center;min-height:260px}
+.resultado.ok{background:var(--verdeb);border-color:#a7e0bd}
+.resultado.warn{background:var(--amarillob);border-color:#f0d58c}
+.resultado.error{background:var(--rojob);border-color:#f3b4b4}
+.resultado .icono{font-size:46px;line-height:1}
+.resultado h3{font-size:20px;margin:8px 0}
+/* modal */
+#modal{position:fixed;inset:0;background:rgba(15,42,74,.55);display:none;align-items:center;justify-content:center;padding:16px;z-index:50}
+#modal.open{display:flex}
+#modal .caja{background:#fff;border-radius:14px;padding:20px;width:100%;max-width:440px;max-height:92vh;overflow-y:auto}
+.acciones{display:flex;gap:8px;justify-content:flex-end;margin-top:14px}
+.check{display:flex;gap:8px;align-items:center;font-weight:400;font-size:14px}
+.check input{width:auto}
+.comprobante{text-align:center}
+.cmp-head{display:flex;align-items:center;gap:10px;justify-content:center;margin-bottom:10px;text-align:left}
+.cmp-head .logo{background:var(--azul);color:#fff}
+.cmp-head small{display:block;color:var(--gris)}
+.qr svg{width:210px;height:210px}
+.qr-fallback{padding:30px;border:2px dashed var(--borde);border-radius:10px;font-family:monospace}
+.codigo{font-family:monospace;font-size:20px;font-weight:700;letter-spacing:1px;color:var(--azul)}
+.comprobante .kv{text-align:left}
+/* toast */
+#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1f2937;color:#fff;padding:11px 18px;border-radius:10px;font-size:14px;opacity:0;transition:.25s;pointer-events:none;z-index:60;max-width:90vw}
+#toast.show{opacity:1}
+#toast.error{background:var(--rojo)}
+@media print{body>*:not(#modal){display:none!important}#modal{position:static;background:none;display:block}#modal .caja{max-width:none;box-shadow:none}.no-print{display:none!important}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="modal"><div class="caja" id="modalCaja"></div></div>
+<div id="toast"></div>
+<script>
+/* ===================== Utilidades ===================== */
+const KEY = 'almudena_prototipo_v1';
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const z = n => String(n).padStart(2, '0');
+const ymd = d => d.getFullYear() + '-' + z(d.getMonth() + 1) + '-' + z(d.getDate());
+const hoy = () => ymd(new Date());
+const addDays = (s, n) => { const d = new Date(s + 'T12:00'); d.setDate(d.getDate() + n); return ymd(d); };
+const fmtF = s => { const [y, m, d] = s.split('-'); return d + '/' + m + '/' + y; };
+const cap1 = s => s.charAt(0).toUpperCase() + s.slice(1);
+const fmtFL = s => cap1(new Date(s + 'T12:00').toLocaleDateString('es-AR', {weekday:'long', day:'numeric', month:'long'}));
+const fmtDT = t => new Date(t).toLocaleString('es-AR', {dateStyle:'short', timeStyle:'short'});
+const fmtH = t => new Date(t).toLocaleTimeString('es-AR', {hour:'2-digit', minute:'2-digit'});
+const pesos = n => '$ ' + Number(n).toLocaleString('es-AR');
+const norm = s => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+const horas = (a, b) => { const r = []; for (let h = a; h < b; h++) r.push(z(h) + ':00'); return r; };
+
+/* ===================== Datos de ejemplo ===================== */
+const INFO = {
+  horarios: 'Martes a domingo de 9 a 22 h. Los lunes el complejo permanece cerrado por mantenimiento. Atención administrativa: martes a viernes de 9 a 13 h.',
+  ubicacion: 'Complejo Policial Almudena, Salta Capital. (Cargar aquí la dirección exacta y el enlace a Google Maps.)',
+  requisitos: ['Ser socio activo o integrante del grupo familiar habilitado.', 'Presentar el código QR de la reserva o la credencial de socio junto con el DNI.', 'Los invitados deben ingresar acompañados por el socio titular.', 'Para la pileta: revisación médica vigente.'],
+  reglamento: ['Respetar el horario reservado; la tolerancia es de 15 minutos.', 'Cancelar con al menos 24 h de anticipación para liberar el turno.', 'No se permite el ingreso de mascotas.', 'El socio titular es responsable por daños en las instalaciones.', 'Prohibido el consumo de bebidas alcohólicas en canchas y pileta.']
+};
+
+function seed() {
+  const inst = [
+    {id:'q1', tipo:'Quincho', nombre:'Quincho 1', cap:'Hasta 30 personas', turnos:['Mediodía 11–16 h','Noche 20–01 h'], cupo:1, tarifa:18000, activo:true},
+    {id:'q2', tipo:'Quincho', nombre:'Quincho 2', cap:'Hasta 30 personas', turnos:['Mediodía 11–16 h','Noche 20–01 h'], cupo:1, tarifa:18000, activo:true},
+    {id:'q3', tipo:'Quincho', nombre:'Quincho grande', cap:'Hasta 60 personas', turnos:['Mediodía 11–16 h','Noche 20–01 h'], cupo:1, tarifa:30000, activo:true},
+    {id:'f1', tipo:'Cancha', nombre:'Fútbol 5 – Cancha 1', cap:'10 jugadores', turnos:horas(9,22), cupo:1, tarifa:12000, activo:true},
+    {id:'f2', tipo:'Cancha', nombre:'Fútbol 5 – Cancha 2', cap:'10 jugadores', turnos:horas(9,22), cupo:1, tarifa:12000, activo:true},
+    {id:'pd', tipo:'Cancha', nombre:'Pádel', cap:'4 jugadores', turnos:horas(9,22), cupo:1, tarifa:8000, activo:true},
+    {id:'vo', tipo:'Cancha', nombre:'Vóley', cap:'12 jugadores', turnos:horas(9,22), cupo:1, tarifa:5000, activo:true},
+    {id:'pi', tipo:'Pileta', nombre:'Pileta (temporada)', cap:'40 grupos familiares por turno', turnos:['Mañana 10–14 h','Tarde 14–20 h'], cupo:40, tarifa:3000, activo:true}
+  ];
+  const padron = [
+    {nro:'1001', dni:'30111222', nombre:'Juan Pérez'},
+    {nro:'1002', dni:'28999111', nombre:'Ana Gómez'},
+    {nro:'1003', dni:'33444555', nombre:'Carlos Ruiz'},
+    {nro:'1004', dni:'35666777', nombre:'Laura Díaz'}
+  ];
+  const socios = [
+    {nro:'1001', dni:'30111222', nombre:'Juan Pérez', email:'juan.perez@ejemplo.com', pass:'1234', alta:Date.now(),
+      grupo:[{nombre:'María López', parentesco:'Cónyuge', dni:'31222333', estado:'habilitado'}, {nombre:'Tomás Pérez', parentesco:'Hijo', dni:'50111222', estado:'habilitado'}]},
+    {nro:'1002', dni:'28999111', nombre:'Ana Gómez', email:'ana.gomez@ejemplo.com', pass:'1234', alta:Date.now(), grupo:[]}
+  ];
+  const reservas = [];
+  const t0 = hoy();
+  let n = 0;
+  for (let i = -75; i <= 12; i++) {
+    const f = addDays(t0, i);
+    inst.forEach((it, ii) => {
+      it.turnos.forEach((tu, ti) => {
+        let cant = 0;
+        if (it.cupo > 1) cant = (Math.abs(i * 7 + ti * 5) % 9) + 3;
+        else cant = (Math.abs(i * 31 + ii * 17 + ti * 13) % 10) < (i < 0 ? 5 : 3) ? 1 : 0;
+        for (let k = 0; k < cant; k++) {
+          n++;
+          const pasado = i < 0 || (i === 0 && inicioTurno(tu) <= new Date().getHours());
+          const cancel = pasado && n % 11 === 0;
+          reservas.push({id:'r' + n, codigo:'ALM-D' + z(Math.floor(n / 100) % 100) + '-' + String(n).padStart(4, '0'), socio:String(1100 + (n * 37) % 800),
+            instId:it.id, fecha:f, turno:tu, estado: cancel ? 'cancelada' : (pasado ? 'utilizada' : 'confirmada'),
+            creada:new Date(addDays(f, -3) + 'T10:00').getTime(), ingreso: pasado && !cancel ? new Date(f + 'T' + z(inicioTurno(tu)) + ':05').getTime() : null});
+        }
+      });
+    });
+  }
+  const now = Date.now();
+  const noticias = [
+    {id:'n1', tipo:'Comunicado', titulo:'Nuevo sistema de reservas online', texto:'Desde ahora los socios pueden reservar quinchos, canchas y la pileta desde el celular o la computadora, sin necesidad de llamar.', fecha:now - 86400000 * 2},
+    {id:'n2', tipo:'Mantenimiento', titulo:'Pádel: mantenimiento de la superficie', texto:'La cancha de pádel permanecerá cerrada el próximo lunes por recambio de césped sintético.', fecha:now - 86400000},
+    {id:'n3', tipo:'Evento', titulo:'Torneo interno de fútbol 5', texto:'Inscripciones abiertas hasta fin de mes en la administración del complejo. Categorías libre y +40.', fecha:now - 86400000 * 3},
+    {id:'n4', tipo:'Clima', titulo:'Alerta por tormentas', texto:'Ante alertas meteorológicas se podrán suspender las actividades al aire libre. Las reservas afectadas se reprograman sin costo.', fecha:now - 3600000 * 5},
+    {id:'n5', tipo:'Promoción', titulo:'Pileta: abono de temporada', texto:'Los grupos familiares que abonen la temporada completa antes del 15 de diciembre tienen un 15 % de descuento.', fecha:now - 86400000 * 4}
+  ];
+  const s = {inst, padron, socios, reservas, noticias, auditoria:[], staff:[{user:'admin', pass:'admin', rol:'admin', nombre:'Administración'}, {user:'porteria', pass:'1234', rol:'porteria', nombre:'Personal de portería'}]};
+  // reserva del socio demo
+  const f3 = addDays(t0, 3);
+  s.reservas = s.reservas.filter(r => !(r.instId === 'q2' && r.fecha === f3 && r.turno === 'Noche 20–01 h'));
+  s.reservas.push({id:'r-demo', codigo:'ALM-7KQ4-X9TP', socio:'1001', instId:'q2', fecha:f3, turno:'Noche 20–01 h', estado:'confirmada', creada:now - 86400000, ingreso:null});
+  s.auditoria.push({t:now, usuario:'sistema', accion:'Base de datos de ejemplo inicializada'});
+  return s;
+}
+function inicioTurno(t) { const m = t.match(/(\d{1,2})/); return m ? +m[1] : 0; }
+
+/* ===================== Estado ===================== */
+let S;
+function load() { try { const raw = localStorage.getItem(KEY); if (raw) { S = JSON.parse(raw); return; } } catch (e) {} S = seed(); save(); }
+function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
+let ses = null;
+let ui = {acceso:'login', view:'', inst:'q1', mes:hoy().slice(0, 7), dia:null, chat:[], validacion:null, f:null, msg:null, q:''};
+
+const getInst = id => S.inst.find(i => i.id === id) || {nombre:'?', tipo:'?', turnos:[], cupo:1};
+const instNombre = id => getInst(id).nombre;
+const socioActual = () => S.socios.find(s => s.nro === ses.nro);
+const nombreSocio = nro => (S.socios.find(s => s.nro === nro) || S.padron.find(s => s.nro === nro) || {nombre:'Socio ' + nro}).nombre;
+const usuarioLog = () => ses ? (ses.rol === 'socio' ? 'Socio ' + ses.nro : ses.user) : 'anónimo';
+function log(accion) { S.auditoria.push({t:Date.now(), usuario:usuarioLog(), accion}); save(); }
+const ocup = (instId, fecha, turno, exceptoId) => S.reservas.filter(r => r.instId === instId && r.fecha === fecha && r.turno === turno && r.estado !== 'cancelada' && r.id !== exceptoId).length;
+function turnoPasado(f, t) { const h = hoy(); if (f < h) return true; if (f > h) return false; return inicioTurno(t) <= new Date().getHours(); }
+function estadoDia(inst, f) {
+  if (f < hoy()) return 'pasado';
+  if (f > addDays(hoy(), 30)) return 'fuera';
+  if (!inst.activo) return 'cerrado';
+  const libres = inst.turnos.filter(t => !turnoPasado(f, t) && ocup(inst.id, f, t) < inst.cupo).length;
+  if (!libres) return 'lleno';
+  return libres < inst.turnos.length ? 'parcial' : 'libre';
+}
+function genCodigo() {
+  const A = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let c;
+  do {
+    const v = new Uint32Array(8); crypto.getRandomValues(v);
+    const p = Array.from(v, x => A[x % A.length]).join('');
+    c = 'ALM-' + p.slice(0, 4) + '-' + p.slice(4);
+  } while (S.reservas.some(r => r.codigo === c));
+  return c;
+}
+function crearReserva(nro, instId, fecha, turno, porAdmin) {
+  const inst = getInst(instId);
+  if (!S.socios.some(s => s.nro === nro) && !S.padron.some(s => s.nro === nro)) return {error:'El número de socio no existe en el padrón.'};
+  if (!inst.activo) return {error:'La instalación está suspendida por mantenimiento.'};
+  if (turnoPasado(fecha, turno)) return {error:'No se puede reservar una fecha u horario pasado.'};
+  if (!porAdmin && fecha > addDays(hoy(), 30)) return {error:'Se puede reservar con hasta 30 días de anticipación.'};
+  if (ocup(instId, fecha, turno) >= inst.cupo) return {error:'Ese horario acaba de ser ocupado. Elegí otro.'};
+  const dup = S.reservas.find(r => r.socio === nro && r.fecha === fecha && r.estado === 'confirmada' && getInst(r.instId).tipo === inst.tipo);
+  if (dup) return {error:`Ya existe una reserva de ${inst.tipo.toLowerCase()} para ese día (${instNombre(dup.instId)}, ${dup.turno}). Se permite una por tipo y por día.`};
+  const r = {id:'r' + Date.now().toString(36), codigo:genCodigo(), socio:nro, instId, fecha, turno, estado:'confirmada', creada:Date.now(), ingreso:null};
+  S.reservas.push(r);
+  log(`${porAdmin ? 'Alta manual de' : 'Nueva'} reserva ${r.codigo}: ${inst.nombre}, ${fmtF(fecha)} ${turno} (socio ${nro})`);
+  return {r};
+}
+
+/* ===================== UI helpers ===================== */
+function toast(msg, tipo) { const t = $('#toast'); t.textContent = msg; t.className = 'show ' + (tipo || ''); clearTimeout(t._h); t._h = setTimeout(() => t.className = '', 3200); }
+function showModal(html) { $('#modalCaja').innerHTML = html; $('#modal').classList.add('open'); pintarQR(); }
+function closeModal() { $('#modal').classList.remove('open'); }
+function qrSvg(text) {
+  try { if (typeof qrcode === 'function') { const q = qrcode(0, 'M'); q.addData(text); q.make(); return q.createSvgTag({cellSize:6, margin:2, scalable:true}); } } catch (e) {}
+  return '<div class="qr-fallback">QR: ' + esc(text) + '<br><small>(sin conexión: no se pudo dibujar el QR)</small></div>';
+}
+function pintarQR() { document.querySelectorAll('[data-qr]').forEach(el => { if (!el.innerHTML) el.innerHTML = qrSvg(el.dataset.qr); }); }
+const badgeEstado = e => ({confirmada:'<span class="badge b-verde">Confirmada</span>', utilizada:'<span class="badge b-azul">Utilizada</span>', cancelada:'<span class="badge b-rojo">Cancelada</span>'}[e] || e);
+const TIPOS_NOT = ['Comunicado','Novedad','Evento','Promoción','Mantenimiento','Clima','Reglamento','Documentación'];
+const badgeNot = t => `<span class="badge ${['Mantenimiento','Clima'].includes(t) ? 'b-amarillo' : ['Evento','Promoción'].includes(t) ? 'b-verde' : 'b-azul'}">${esc(t)}</span>`;
+function bars(data) {
+  const max = Math.max(1, ...data.map(d => d[1]));
+  return data.map(([l, v]) => `<div class="barra"><span>${esc(l)}</span><div class="bg"><div class="fg" style="width:${v / max * 100}%"></div></div><b>${v}</b></div>`).join('');
+}
+
+/* ===================== Acceso ===================== */
+function vistaAcceso() {
+  const m = ui.msg ? `<div class="${ui.msg.tipo}">${esc(ui.msg.txt)}</div>` : '';
+  let body = '';
+  if (ui.acceso === 'login') body = `
+    <h3>Ingresar</h3>
+    <form data-form="login">
+      <label>N° de socio, DNI o usuario</label><input name="u" required autocomplete="username">
+      <label>Contraseña</label><input name="p" type="password" required autocomplete="current-password">
+      <button class="btn full" style="margin-top:14px">Ingresar</button>
+    </form>${m}
+    <div class="links"><a data-act="acceso" data-v="registro">Registrarme</a><a data-act="acceso" data-v="recuperar">Olvidé mi contraseña</a></div>
+    <div class="demo"><b>Cuentas de demostración</b> (prototipo):
+      <div class="chips"><button class="chip" data-act="demo" data-u="1001" data-p="1234">Socio 1001</button><button class="chip" data-act="demo" data-u="porteria" data-p="1234">Portería</button><button class="chip" data-act="demo" data-u="admin" data-p="admin">Administrador</button></div>
+    </div>`;
+  if (ui.acceso === 'registro') body = `
+    <h3>Formulario de registro</h3>
+    <p class="muted small">El sistema valida automáticamente que el número de socio y el DNI coincidan con el padrón. Para probar usá socio 1003 y DNI 33444555.</p>
+    <form data-form="registro">
+      <label>N° de socio</label><input name="nro" required inputmode="numeric">
+      <label>DNI del titular</label><input name="dni" required inputmode="numeric">
+      <label>Correo electrónico</label><input name="email" type="email" required>
+      <label>Teléfono (WhatsApp)</label><input name="tel" inputmode="tel">
+      <label>Contraseña (mínimo 6 caracteres)</label><input name="p" type="password" required minlength="6">
+      <label>Repetir contraseña</label><input name="p2" type="password" required>
+      <button class="btn full" style="margin-top:14px">Crear cuenta</button>
+    </form>${m}
+    <div class="links"><a data-act="acceso" data-v="login">← Volver al ingreso</a></div>`;
+  if (ui.acceso === 'recuperar') body = `
+    <h3>Recuperar contraseña</h3>
+    <p class="muted small">Te enviamos un enlace de un solo uso, válido por 30 minutos, al correo registrado.</p>
+    <form data-form="recuperar">
+      <label>N° de socio</label><input name="nro" required>
+      <label>Correo electrónico registrado</label><input name="email" type="email" required>
+      <button class="btn full" style="margin-top:14px">Enviar enlace</button>
+    </form>${m}
+    <div class="links"><a data-act="acceso" data-v="login">← Volver al ingreso</a></div>`;
+  return `<div class="acceso"><div class="box">
+    <div class="marca"><div class="logo">CPA</div><div><b>Complejo Policial Almudena</b><small style="color:var(--gris)">Sistema de Gestión Integral <span class="badge-proto">PROTOTIPO</span></small></div></div>
+    ${body}
+    <p class="small muted" style="text-align:center;margin-top:16px"><a data-act="reset" style="cursor:pointer;text-decoration:underline">Reiniciar datos de demostración</a></p>
+  </div></div>`;
+}
+
+/* ===================== Vistas ===================== */
+const NAV = {
+  socio:[['inicio','Inicio'],['reservar','Reservar'],['mis','Mis reservas'],['familia','Grupo familiar'],['asistente','Asistente']],
+  porteria:[['validar','Validar QR'],['ingresos','Ingresos de hoy']],
+  admin:[['panel','Panel'],['reservas','Reservas'],['nueva','Nueva reserva'],['instalaciones','Instalaciones'],['comunicados','Comunicados'],['socios','Socios'],['auditoria','Auditoría']]
+};
+
+function listaNoticias(admin) {
+  const ns = S.noticias.slice().sort((a, b) => b.fecha - a.fecha);
+  if (!ns.length) return '<p class="muted">No hay publicaciones.</p>';
+  return ns.map(n => `<div class="card noticia ${esc(n.tipo)}">
+    <div style="display:flex;justify-content:space-between;gap:8px;align-items:center">${badgeNot(n.tipo)}<span class="small muted">${fmtDT(n.fecha)}</span></div>
+    <h3 style="margin:8px 0 0">${esc(n.titulo)}</h3><p>${esc(n.texto)}</p>
+    ${admin ? `<div style="margin-top:10px"><button class="btn-sm rojo" data-act="delnot" data-id="${n.id}">Eliminar</button></div>` : ''}</div>`).join('');
+}
+
+const V = {
+  inicio() {
+    const s = socioActual();
+    const prox = S.reservas.filter(r => r.socio === s.nro && r.estado === 'confirmada' && r.fecha >= hoy()).sort((a, b) => a.fecha.localeCompare(b.fecha))[0];
+    return `<h2>Hola, ${esc(s.nombre.split(' ')[0])}</h2>
+    <div class="grid2">
+      <div class="card">${prox ? `<h3>Tu próxima reserva</h3><p><b>${esc(instNombre(prox.instId))}</b><br>${fmtFL(prox.fecha)} · ${esc(prox.turno)}</p><button class="btn" data-act="verqr" data-id="${prox.id}">Ver comprobante QR</button>`
+        : `<h3>No tenés reservas próximas</h3><p class="muted">Reservá un quincho, una cancha o la pileta en pocos pasos.</p><button class="btn" data-act="nav" data-v="reservar">Reservar ahora</button>`}</div>
+      <div class="card"><h3>¿Tenés una consulta?</h3><p class="muted">El asistente virtual responde sobre horarios, tarifas, reglamento y disponibilidad, y te guía para reservar.</p><button class="btn ghost" data-act="nav" data-v="asistente">Abrir asistente</button></div>
+    </div>
+    <h3 class="sec">Comunicados y novedades</h3>${listaNoticias(false)}`;
+  },
+
+  reservar() {
+    const inst = getInst(ui.inst);
+    const tipos = ['Quincho', 'Cancha', 'Pileta'];
+    const chips = tipos.map(t => `<div class="grupo-tit">${t === 'Quincho' ? 'Quinchos' : t === 'Cancha' ? 'Canchas' : 'Pileta'}</div><div class="chips">${S.inst.filter(i => i.tipo === t).map(i => `<button class="chip ${i.id === ui.inst ? 'on' : ''}" data-act="inst" data-id="${i.id}">${esc(i.nombre)}</button>`).join('')}</div>`).join('');
+    let det = '<div class="card muted">3. Seleccioná un día del calendario para ver los horarios disponibles.</div>';
+    if (ui.dia) {
+      const ts = inst.turnos.map(t => {
+        const lib = inst.cupo - ocup(inst.id, ui.dia, t), pas = turnoPasado(ui.dia, t), ok = lib > 0 && !pas && inst.activo;
+        return `<button class="turno ${ok ? '' : 'no'}" ${ok ? `data-act="turno" data-t="${esc(t)}"` : 'disabled'}><b>${esc(t)}</b><span>${pas ? 'Horario pasado' : !inst.activo ? 'Suspendido' : ok ? (inst.cupo > 1 ? lib + ' lugares libres' : 'Disponible') : 'Ocupado'}</span></button>`;
+      }).join('');
+      det = `<div class="card"><label style="margin-top:0">3. Elegí el horario</label><h3>${fmtFL(ui.dia)}</h3><div class="turnos">${ts}</div></div>`;
+    }
+    return `<h2>Reservar</h2>
+    <div class="card"><label style="margin-top:0">1. Elegí la instalación</label>${chips}
+      <div class="instinfo"><b>${esc(inst.nombre)}</b> · ${esc(inst.cap)} · Tarifa: <b>${pesos(inst.tarifa)}</b> ${!inst.activo ? '<span class="badge b-rojo">Suspendida por mantenimiento</span>' : ''}</div></div>
+    <div class="grid2"><div class="card"><label style="margin-top:0">2. Elegí la fecha</label>${calendario(inst)}
+      <div class="leyenda"><span><i style="background:var(--verdeb);border:1px solid #a7e0bd"></i>Libre</span><span><i style="background:var(--amarillob);border:1px solid #f0d58c"></i>Pocos turnos</span><span><i style="background:var(--rojob);border:1px solid #f3b4b4"></i>Completo</span><span><i style="background:#f3f4f6"></i>No disponible</span></div>
+      <p class="small muted">La disponibilidad se actualiza en tiempo real.</p></div>${det}</div>`;
+  },
+
+  mis() {
+    const s = socioActual();
+    const rs = S.reservas.filter(r => r.socio === s.nro);
+    const prox = rs.filter(r => r.estado === 'confirmada' && r.fecha >= hoy()).sort((a, b) => a.fecha.localeCompare(b.fecha));
+    const hist = rs.filter(r => !prox.includes(r)).sort((a, b) => b.fecha.localeCompare(a.fecha));
+    const item = r => `<div class="item"><div><b>${esc(instNombre(r.instId))}</b> ${badgeEstado(r.estado)}<br><span class="small muted">${fmtF(r.fecha)} · ${esc(r.turno)} · ${r.codigo}${r.ingreso ? ' · Ingreso ' + fmtDT(r.ingreso) : ''}</span></div>
+      <div class="acc">${r.estado !== 'cancelada' ? `<button class="btn-sm" data-act="verqr" data-id="${r.id}">Ver QR</button>` : ''}${r.estado === 'confirmada' && r.fecha >= hoy() ? `<button class="btn-sm rojo" data-act="cancelar" data-id="${r.id}">Cancelar</button>` : ''}</div></div>`;
+    return `<h2>Mis reservas</h2>
+      <div class="card"><h3>Próximas</h3>${prox.length ? prox.map(item).join('') : '<p class="muted">No tenés reservas próximas.</p>'}</div>
+      <div class="card"><h3>Historial</h3>${hist.length ? hist.map(item).join('') : '<p class="muted">Todavía no hay historial.</p>'}</div>`;
+  },
+
+  familia() {
+    const s = socioActual();
+    return `<h2>Grupo familiar</h2>
+    <div class="card"><h3>Titular</h3><div class="item"><div><b>${esc(s.nombre)}</b><br><span class="small muted">Socio N° ${s.nro} · DNI ${esc(s.dni)}</span></div><span class="badge b-verde">Habilitado</span></div></div>
+    <div class="card"><h3>Integrantes</h3>${s.grupo.length ? s.grupo.map(g => `<div class="item"><div><b>${esc(g.nombre)}</b><br><span class="small muted">${esc(g.parentesco)} · DNI ${esc(g.dni)}</span></div>${g.estado === 'habilitado' ? '<span class="badge b-verde">Habilitado</span>' : '<span class="badge b-amarillo">Pendiente de aprobación</span>'}</div>`).join('') : '<p class="muted">No hay integrantes cargados.</p>'}</div>
+    <div class="card"><h3>Solicitar alta de un familiar</h3><p class="small muted">La administración verifica la documentación antes de habilitarlo.</p>
+      <form data-form="familiar"><div class="grid2"><div><label>Nombre y apellido</label><input name="nombre" required></div><div><label>DNI</label><input name="dni" required inputmode="numeric"></div></div>
+      <label>Parentesco</label><select name="parentesco"><option>Cónyuge</option><option>Hijo/a</option><option>Padre/Madre</option><option>Otro</option></select>
+      <button class="btn" style="margin-top:12px">Enviar solicitud</button></form></div>`;
+  },
+
+  asistente() {
+    if (!ui.chat.length) ui.chat.push({de:'bot', html:'¡Hola! Soy el asistente virtual del Complejo Policial Almudena. Puedo responderte sobre <b>horarios, tarifas, reglamento, disponibilidad, actividades, eventos, requisitos de ingreso y ubicación</b>, y guiarte para hacer una reserva. ¿En qué te ayudo?'});
+    const sugs = ['¿Qué hay libre mañana?', '¿Cuánto cuesta un quincho?', '¿Cómo reservo?', 'Horarios', 'Requisitos para ingresar', 'Reglamento', 'Próximos eventos', '¿Dónde queda?'];
+    return `<h2>Asistente virtual</h2>
+    <div class="card chat"><div class="msgs" id="msgs">${ui.chat.map(m => `<div class="msg ${m.de}">${m.html}</div>`).join('')}</div>
+      <div class="sugs">${sugs.map(x => `<button class="chip" data-act="preg" data-q="${esc(x)}">${esc(x)}</button>`).join('')}</div>
+      <form data-form="chat" class="chatform"><input name="q" id="chatq" placeholder="Escribí tu consulta…" autocomplete="off"><button class="btn">Enviar</button></form></div>
+    <p class="small muted">Prototipo: responde con reglas y con los datos cargados en el sistema (tarifas, disponibilidad y comunicados reales del sistema). En la versión final se conecta a un modelo de inteligencia artificial.</p>`;
+  },
+
+  validar() {
+    const v = ui.validacion;
+    const ico = {ok:'✅', warn:'⚠️', error:'⛔'};
+    return `<h2>Validar ingreso</h2>
+    <div class="grid2"><div class="card"><h3>Escanear código QR</h3>
+      <div class="cam"><video id="video" playsinline muted></video><div class="cam-ph" id="camph">Cámara apagada</div></div>
+      <button class="btn full" type="button" data-act="camara">Activar cámara</button>
+      <form data-form="codigo" class="row"><input name="c" placeholder="O ingresá el código: ALM-XXXX-XXXX" autocomplete="off"><button class="btn ghost">Validar</button></form>
+      <p class="small muted">Para probar: en “Ingresos de hoy” podés simular el escaneo de una reserva.</p></div>
+    <div class="card resultado ${v ? v.tipo : ''}">${v ? `<div class="icono">${ico[v.tipo]}</div><h3>${esc(v.titulo)}</h3><p>${v.html}</p><p class="small muted">${fmtDT(v.t)}</p>` : '<p class="muted">El resultado de la validación aparece acá.</p>'}</div></div>`;
+  },
+
+  ingresos() {
+    const h = hoy();
+    const rs = S.reservas.filter(r => r.fecha === h && r.estado !== 'cancelada').sort((a, b) => inicioTurno(a.turno) - inicioTurno(b.turno));
+    const dentro = rs.filter(r => r.estado === 'utilizada'), esperan = rs.filter(r => r.estado === 'confirmada');
+    return `<h2>Ingresos de hoy</h2>
+    <div class="kpis"><div class="kpi"><b>${rs.length}</b><span>Reservas del día</span></div><div class="kpi"><b>${dentro.length}</b><span>Ingresos registrados</span></div><div class="kpi"><b>${esperan.length}</b><span>Pendientes de ingreso</span></div><div class="kpi"><b>${fmtH(Date.now())}</b><span>Hora actual</span></div></div>
+    <div class="card"><h3>Pendientes de ingreso</h3>${esperan.length ? esperan.map(r => `<div class="item"><div><b>${esc(instNombre(r.instId))}</b> · ${esc(r.turno)}<br><span class="small muted">${esc(nombreSocio(r.socio))} (socio ${r.socio}) · ${r.codigo}</span></div><button class="btn-sm" data-act="simular" data-c="${r.codigo}">Simular escaneo</button></div>`).join('') : '<p class="muted">No hay ingresos pendientes.</p>'}</div>
+    <div class="card"><h3>Ingresos registrados</h3>${dentro.length ? dentro.map(r => `<div class="item"><div><b>${esc(instNombre(r.instId))}</b> · ${esc(r.turno)}<br><span class="small muted">${esc(nombreSocio(r.socio))} · ${r.codigo}</span></div><span class="badge b-azul">Ingresó ${r.ingreso ? fmtH(r.ingreso) : ''}</span></div>`).join('') : '<p class="muted">Todavía no se registraron ingresos.</p>'}</div>`;
+  },
+
+  panel() {
+    const h = hoy(), mes = h.slice(0, 7), anio = h.slice(0, 4);
+    const val = S.reservas.filter(r => r.estado !== 'cancelada');
+    const activas = S.reservas.filter(r => r.estado === 'confirmada' && r.fecha >= h).length;
+    const delMes = val.filter(r => r.fecha.startsWith(mes)).length;
+    const ingHoy = S.reservas.filter(r => r.ingreso && ymd(new Date(r.ingreso)) === h).length;
+    let tot = 0, oc = 0;
+    for (let i = 0; i < 7; i++) { const f = addDays(h, i); S.inst.filter(x => x.cupo === 1).forEach(x => x.turnos.forEach(t => { tot++; if (ocup(x.id, f, t)) oc++; })); }
+    const porInst = S.inst.map(i => [i.nombre, val.filter(r => r.instId === i.id && r.fecha.startsWith(mes)).length]);
+    const meses = []; const d = new Date(); d.setDate(1);
+    for (let i = 5; i >= 0; i--) { const x = new Date(d.getFullYear(), d.getMonth() - i, 1); const k = x.getFullYear() + '-' + z(x.getMonth() + 1); meses.push([x.toLocaleDateString('es-AR', {month:'short', year:'2-digit'}), val.filter(r => r.fecha.startsWith(k)).length]); }
+    const cancel = S.reservas.filter(r => r.estado === 'cancelada' && r.fecha.startsWith(mes)).length;
+    return `<h2>Panel administrativo</h2>
+    <div class="kpis"><div class="kpi"><b>${S.socios.length}</b><span>Socios con cuenta (de 7.335)</span></div><div class="kpi"><b>${activas}</b><span>Reservas activas</span></div><div class="kpi"><b>${delMes}</b><span>Reservas este mes</span></div><div class="kpi"><b>${ingHoy}</b><span>Ingresos hoy</span></div></div>
+    <div class="grid2"><div class="card"><h3>Uso por instalación (mes actual)</h3>${bars(porInst)}</div>
+      <div class="card"><h3>Reservas por mes</h3>${bars(meses)}<p class="small muted">Ocupación de quinchos y canchas en los próximos 7 días: <b>${Math.round(oc / tot * 100)} %</b> · Cancelaciones del mes: <b>${cancel}</b></p></div></div>
+    <div class="card" style="margin-top:14px"><h3>Reportes</h3><p class="small muted">Exportación en CSV (se abre con Excel).</p>
+      <div class="chips"><button class="btn" data-act="rep" data-p="${mes}">Reporte mensual (${mes})</button><button class="btn ghost" data-act="rep" data-p="${anio}">Reporte anual (${anio})</button></div></div>`;
+  },
+
+  reservas() {
+    const h = hoy();
+    if (!ui.f) ui.f = {desde:addDays(h, -7), hasta:addDays(h, 30), inst:'', estado:'', q:''};
+    const f = ui.f;
+    const rs = filtrarReservas();
+    return `<h2>Administración de reservas</h2>
+    <div class="card"><form data-form="filtro" class="filtros">
+      <div><label>Desde</label><input type="date" name="desde" value="${f.desde}"></div>
+      <div><label>Hasta</label><input type="date" name="hasta" value="${f.hasta}"></div>
+      <div><label>Instalación</label><select name="inst"><option value="">Todas</option>${S.inst.map(i => `<option value="${i.id}" ${f.inst === i.id ? 'selected' : ''}>${esc(i.nombre)}</option>`).join('')}</select></div>
+      <div><label>Estado</label><select name="estado"><option value="">Todos</option>${['confirmada','utilizada','cancelada'].map(e => `<option ${f.estado === e ? 'selected' : ''}>${e}</option>`).join('')}</select></div>
+      <div><label>Socio / código</label><input name="q" value="${esc(f.q)}" placeholder="N°, nombre o código"></div>
+      <div><button class="btn">Filtrar</button></div></form></div>
+    <div class="card"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><h3 style="margin:0">${rs.length} reservas</h3><button class="btn-sm" data-act="exportar">Exportar CSV</button></div>
+    <div class="scroll"><table class="tabla"><thead><tr><th>Código</th><th>Socio</th><th>Instalación</th><th>Fecha</th><th>Turno</th><th>Estado</th><th></th></tr></thead><tbody>
+    ${rs.slice(0, 200).map(r => `<tr><td style="font-family:monospace">${r.codigo}</td><td>${r.socio}<br><span class="small muted">${esc(nombreSocio(r.socio))}</span></td><td>${esc(instNombre(r.instId))}</td><td>${fmtF(r.fecha)}</td><td>${esc(r.turno)}</td><td>${badgeEstado(r.estado)}</td>
+      <td style="white-space:nowrap">${r.estado === 'confirmada' ? `<button class="btn-sm" data-act="modificar" data-id="${r.id}">Modificar</button> <button class="btn-sm rojo" data-act="cancelar" data-id="${r.id}">Cancelar</button>` : ''}</td></tr>`).join('')}
+    </tbody></table></div>${rs.length > 200 ? '<p class="small muted">Se muestran las primeras 200. Usá los filtros o exportá para ver todas.</p>' : ''}</div>`;
+  },
+
+  nueva() {
+    const i0 = S.inst[0];
+    return `<h2>Nueva reserva (alta manual)</h2>
+    <div class="card" style="max-width:520px"><p class="small muted">Para socios que reservan por teléfono o en forma presencial. Se aplican las mismas validaciones que en la web.</p>
+    <form data-form="nueva">
+      <label>N° de socio</label><input name="nro" required inputmode="numeric">
+      <label>Instalación</label><select name="inst" id="n_inst">${S.inst.map(i => `<option value="${i.id}">${esc(i.nombre)}</option>`).join('')}</select>
+      <label>Fecha</label><input type="date" name="fecha" required min="${hoy()}" value="${hoy()}">
+      <label>Turno</label><select name="turno" id="n_turno">${i0.turnos.map(t => `<option>${esc(t)}</option>`).join('')}</select>
+      <button class="btn" style="margin-top:14px">Registrar reserva</button></form></div>`;
+  },
+
+  instalaciones() {
+    return `<h2>Instalaciones y disponibilidad</h2>
+    <div class="card scroll"><table class="tabla"><thead><tr><th>Instalación</th><th>Tipo</th><th>Turnos</th><th>Tarifa</th><th>Estado</th></tr></thead><tbody>
+    ${S.inst.map(i => `<tr><td><b>${esc(i.nombre)}</b><br><span class="small muted">${esc(i.cap)}</span></td><td>${i.tipo}</td><td>${i.turnos.length}${i.cupo > 1 ? ` (cupo ${i.cupo})` : ''}</td>
+      <td><input type="number" style="width:120px" data-tarifa="${i.id}" value="${i.tarifa}" min="0" step="500"></td>
+      <td>${i.activo ? '<span class="badge b-verde">Habilitada</span>' : '<span class="badge b-rojo">Mantenimiento</span>'}<br><button class="btn-sm" style="margin-top:6px" data-act="toggleinst" data-id="${i.id}">${i.activo ? 'Suspender' : 'Habilitar'}</button></td></tr>`).join('')}
+    </tbody></table><p class="small muted">Al suspender una instalación se bloquean automáticamente las nuevas reservas y podés publicar el aviso en Comunicados.</p></div>`;
+  },
+
+  comunicados() {
+    return `<h2>Comunicación institucional</h2>
+    <div class="card"><h3>Nueva publicación</h3><form data-form="noticia">
+      <div class="grid2"><div><label>Tipo</label><select name="tipo">${TIPOS_NOT.map(t => `<option>${t}</option>`).join('')}</select></div><div><label>Título</label><input name="titulo" required maxlength="120"></div></div>
+      <label>Texto</label><textarea name="texto" required></textarea>
+      <button class="btn" style="margin-top:12px">Publicar</button></form></div>
+    <h3 class="sec">Publicadas</h3>${listaNoticias(true)}`;
+  },
+
+  socios() {
+    const pend = [];
+    S.socios.forEach(s => s.grupo.forEach((g, gi) => { if (g.estado === 'pendiente') pend.push({s, g, gi}); }));
+    const q = norm(ui.q || '');
+    const lista = S.socios.filter(s => !q || norm(s.nombre + ' ' + s.nro + ' ' + s.dni).includes(q));
+    const sinCuenta = S.padron.filter(p => !S.socios.some(s => s.nro === p.nro)).length;
+    return `<h2>Socios y grupos familiares</h2>
+    <div class="card"><h3>Solicitudes pendientes (${pend.length})</h3>${pend.length ? pend.map(p => `<div class="item"><div><b>${esc(p.g.nombre)}</b> · ${esc(p.g.parentesco)} · DNI ${esc(p.g.dni)}<br><span class="small muted">Titular: ${esc(p.s.nombre)} (socio ${p.s.nro})</span></div><div class="acc"><button class="btn-sm" data-act="aprobar" data-n="${p.s.nro}" data-i="${p.gi}">Aprobar</button><button class="btn-sm rojo" data-act="rechazar" data-n="${p.s.nro}" data-i="${p.gi}">Rechazar</button></div></div>`).join('') : '<p class="muted">No hay solicitudes pendientes.</p>'}</div>
+    <div class="card"><div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;align-items:center"><h3 style="margin:0">Socios con cuenta (${S.socios.length})</h3><span class="small muted">En padrón sin cuenta: ${sinCuenta}</span></div>
+    <form data-form="buscarsocio" class="row"><input name="q" value="${esc(ui.q || '')}" placeholder="Buscar por nombre, N° o DNI"><button class="btn ghost">Buscar</button></form>
+    <div class="scroll"><table class="tabla" style="margin-top:10px"><thead><tr><th>N°</th><th>Nombre</th><th>DNI</th><th>Correo</th><th>Grupo</th><th>Reservas</th></tr></thead><tbody>
+    ${lista.map(s => `<tr><td>${s.nro}</td><td>${esc(s.nombre)}</td><td>${esc(s.dni)}</td><td>${esc(s.email)}</td><td>${s.grupo.filter(g => g.estado === 'habilitado').length} habilitados</td><td>${S.reservas.filter(r => r.socio === s.nro).length}</td></tr>`).join('')}
+    </tbody></table></div></div>`;
+  },
+
+  auditoria() {
+    const a = S.auditoria.slice().reverse().slice(0, 300);
+    return `<h2>Registro de auditoría</h2><div class="card scroll"><p class="small muted">Cada operación queda registrada con fecha, hora y usuario.</p>
+    <table class="tabla"><thead><tr><th>Fecha y hora</th><th>Usuario</th><th>Operación</th></tr></thead><tbody>
+    ${a.map(x => `<tr><td style="white-space:nowrap">${fmtDT(x.t)}</td><td>${esc(x.usuario)}</td><td>${esc(x.accion)}</td></tr>`).join('')}</tbody></table></div>`;
+  }
+};
+
+function calendario(inst) {
+  const [y, m] = ui.mes.split('-').map(Number);
+  const first = new Date(y, m - 1, 1), start = (first.getDay() + 6) % 7, dias = new Date(y, m, 0).getDate();
+  let h = `<div class="cal-head"><button type="button" data-act="mes" data-d="-1" ${ui.mes <= hoy().slice(0, 7) ? 'disabled' : ''}>‹</button><b>${cap1(first.toLocaleDateString('es-AR', {month:'long', year:'numeric'}))}</b><button type="button" data-act="mes" data-d="1">›</button></div><div class="cal">`;
+  h += ['L','M','M','J','V','S','D'].map(x => `<div class="dow">${x}</div>`).join('');
+  for (let i = 0; i < start; i++) h += '<div></div>';
+  for (let d = 1; d <= dias; d++) {
+    const f = y + '-' + z(m) + '-' + z(d), e = estadoDia(inst, f), off = ['pasado','fuera','cerrado'].includes(e);
+    h += `<button type="button" class="dia ${off ? '' : e} ${ui.dia === f ? 'sel' : ''}" data-act="dia" data-f="${f}" ${off ? 'disabled' : ''}>${d}</button>`;
+  }
+  return h + '</div>';
+}
+
+function filtrarReservas() {
+  const f = ui.f, q = norm(f.q || '');
+  return S.reservas.filter(r => (!f.desde || r.fecha >= f.desde) && (!f.hasta || r.fecha <= f.hasta) && (!f.inst || r.instId === f.inst) && (!f.estado || r.estado === f.estado)
+    && (!q || norm(r.socio + ' ' + r.codigo + ' ' + nombreSocio(r.socio)).includes(q))).sort((a, b) => a.fecha.localeCompare(b.fecha) || inicioTurno(a.turno) - inicioTurno(b.turno));
+}
+
+function exportCSV(rows, nombre) {
+  const head = ['Código','N° socio','Nombre','Instalación','Tipo','Fecha','Turno','Estado','Creada','Ingreso'];
+  const lines = [head, ...rows.map(r => [r.codigo, r.socio, nombreSocio(r.socio), instNombre(r.instId), getInst(r.instId).tipo, fmtF(r.fecha), r.turno, r.estado, fmtDT(r.creada), r.ingreso ? fmtDT(r.ingreso) : ''])]
+    .map(l => l.map(v => '"' + String(v).replace(/"/g, '""') + '"').join(';')).join('\r\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob(['﻿' + lines], {type:'text/csv;charset=utf-8'}));
+  a.download = nombre; document.body.appendChild(a); a.click(); a.remove();
+  log('Exportó ' + nombre + ' (' + rows.length + ' registros)');
+  toast('Archivo exportado: ' + nombre);
+}
+
+/* ===================== Render ===================== */
+function render() {
+  detenerCamara();
+  const app = $('#app');
+  if (!ses) { app.innerHTML = vistaAcceso(); return; }
+  const nom = ses.rol === 'socio' ? socioActual().nombre + ' · Socio ' + ses.nro : S.staff.find(s => s.user === ses.user).nombre;
+  app.innerHTML = `<header class="top"><div class="marca"><div class="logo">CPA</div><div><b>Complejo Policial Almudena</b> <span class="badge-proto">PROTOTIPO</span><small>Sistema de Gestión Integral</small></div></div>
+    <div class="who"><span>${esc(nom)}</span><button class="btn-sm ghost" data-act="salir">Salir</button></div></header>
+    <nav class="tabs">${NAV[ses.rol].map(([k, l]) => `<button class="tab ${ui.view === k ? 'on' : ''}" data-act="nav" data-v="${k}">${l}</button>`).join('')}</nav>
+    <main>${V[ui.view]()}</main>`;
+  pintarQR();
+  const m = $('#msgs'); if (m) m.scrollTop = m.scrollHeight;
+}
+
+/* ===================== Asistente (reglas) ===================== */
+function responder(qRaw) {
+  const q = norm(qRaw);
+  const has = re => re.test(q);
+  const lista = arr => '<ul>' + arr.map(x => '<li>' + esc(x) + '</li>').join('') + '</ul>';
+  if (has(/^(hola|buen(os|as)|que tal)/)) return '¡Hola! Contame qué necesitás: reservar, consultar tarifas, horarios o disponibilidad.';
+  if (has(/cancel/)) return 'Para cancelar: entrá a <b>Mis reservas</b> y tocá “Cancelar” en la reserva. Te pedimos hacerlo con al menos 24 h de anticipación para liberar el turno.<br><button class="btn" data-act="nav" data-v="mis">Ir a Mis reservas</button>';
+  if (has(/libre|disponib|hay lugar|hay turno|ocupad/)) {
+    const dias = has(/manana/) ? [addDays(hoy(), 1)] : has(/hoy/) ? [hoy()] : [hoy(), addDays(hoy(), 1)];
+    let h = '';
+    dias.forEach(f => {
+      h += `<b>${fmtFL(f)}</b><ul>`;
+      S.inst.forEach(i => {
+        if (!i.activo) { h += `<li>${esc(i.nombre)}: suspendida</li>`; return; }
+        const lib = i.turnos.filter(t => !turnoPasado(f, t) && ocup(i.id, f, t) < i.cupo);
+        h += `<li>${esc(i.nombre)}: ${lib.length ? (i.tipo === 'Cancha' ? lib.length + ' horarios libres' : lib.map(esc).join(', ')) : 'completo'}</li>`;
+      });
+      h += '</ul>';
+    });
+    return h + '<button class="btn" data-act="nav" data-v="reservar">Reservar</button>';
+  }
+  if (has(/reserv|como (hago|alquilo)|quiero (un|una|el|la)|alquil|turno/)) return 'Reservar es muy simple:<ol><li>Entrá a <b>Reservar</b>.</li><li>Elegí la instalación (quincho, cancha o pileta).</li><li>Elegí el día en el calendario: verde es libre, amarillo quedan pocos turnos, rojo completo.</li><li>Tocá el horario disponible, aceptá el reglamento y confirmá.</li><li>Recibís al instante tu <b>comprobante con código QR</b>, que mostrás en la entrada.</li></ol>Se permite una reserva por tipo de instalación y por día, con hasta 30 días de anticipación.<br><button class="btn" data-act="nav" data-v="reservar">Empezar a reservar</button>';
+  if (has(/tarifa|precio|cuesta|costo|valor|sale|pagar/)) return 'Tarifas vigentes:' + lista(S.inst.map(i => `${i.nombre}: ${pesos(i.tarifa)}${i.tipo === 'Cancha' ? ' por hora' : i.tipo === 'Pileta' ? ' por grupo y turno' : ' por turno'}`)) + 'Por ahora se abonan en la administración del complejo.';
+  if (has(/horario|hora|abre|abren|cierra|atencion/)) return esc(INFO.horarios);
+  if (has(/reglamento|norma|regla|permit|mascota|perro|alcohol|prohib/)) return 'Puntos principales del reglamento:' + lista(INFO.reglamento) + 'El reglamento completo está publicado en Comunicados.';
+  if (has(/requisito|ingres|entrar|invitad|credencial|document|revisacion/)) return 'Requisitos para ingresar:' + lista(INFO.requisitos);
+  if (has(/donde|ubicacion|direccion|llegar|queda|mapa/)) return esc(INFO.ubicacion);
+  if (has(/evento|torneo|fiesta|campeonato/)) { const ev = S.noticias.filter(n => n.tipo === 'Evento'); return ev.length ? 'Próximos eventos:' + lista(ev.map(e => e.titulo + ': ' + e.texto)) : 'Por el momento no hay eventos publicados.'; }
+  if (has(/actividad|deporte|futbol|padel|voley|pileta|natacion|quincho/)) return 'En el complejo podés usar:' + lista(S.inst.map(i => `${i.nombre} (${i.cap})${i.activo ? '' : ' – suspendida temporalmente'}`)) + '¿Querés que te diga qué hay libre hoy o mañana?';
+  if (has(/noticia|novedad|comunicado|aviso|clima|lluvia|tormenta|mantenimiento/)) { const ns = S.noticias.slice().sort((a, b) => b.fecha - a.fecha).slice(0, 3); return 'Últimas publicaciones:' + lista(ns.map(n => `[${n.tipo}] ${n.titulo}`)) + '<button class="btn" data-act="nav" data-v="inicio">Ver todas</button>'; }
+  if (has(/familia|grupo|hijo|esposa|conyuge/)) return 'Podés ver y solicitar altas de tu grupo familiar en <b>Grupo familiar</b>. La administración aprueba cada integrante antes de habilitarlo.<br><button class="btn" data-act="nav" data-v="familia">Ir a Grupo familiar</button>';
+  if (has(/contrasen|clave|password/)) return 'Si olvidaste tu contraseña, en la pantalla de ingreso tocá “Olvidé mi contraseña” y te llega un enlace de un solo uso a tu correo registrado.';
+  if (has(/gracias/)) return '¡De nada! Si necesitás algo más, acá estoy.';
+  return 'No estoy seguro de haber entendido. Puedo ayudarte con: horarios, tarifas, reglamento, disponibilidad, actividades, eventos, requisitos de ingreso, ubicación, noticias y cómo reservar.';
+}
+function preguntar(q) {
+  if (!q.trim()) return;
+  ui.chat.push({de:'yo', html:esc(q)});
+  ui.chat.push({de:'bot', html:responder(q)});
+  render();
+  const i = $('#chatq'); if (i) i.focus();
+}
+
+/* ===================== Portería ===================== */
+let stream = null, scanTimer = null;
+async function iniciarCamara() {
+  if (!('BarcodeDetector' in window)) { toast('Este navegador no lee QR con la cámara. Usá Chrome en Android o ingresá el código.', 'error'); return; }
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}});
+    const v = $('#video'); v.srcObject = stream; await v.play(); $('#camph').style.display = 'none';
+    const det = new BarcodeDetector({formats:['qr_code']});
+    scanTimer = setInterval(async () => { try { const c = await det.detect(v); if (c.length) validar(c[0].rawValue); } catch (e) {} }, 400);
+  } catch (e) { toast('No se pudo acceder a la cámara.', 'error'); }
+}
+function detenerCamara() { clearInterval(scanTimer); scanTimer = null; if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; } }
+function validar(codigo) {
+  const c = String(codigo).trim().toUpperCase();
+  const r = S.reservas.find(x => x.codigo === c);
+  let v;
+  if (!r) { v = {tipo:'error', titulo:'QR inválido', html:`El código <b>${esc(c)}</b> no existe en el sistema. Posible comprobante falso o adulterado.`}; log('Intento de validación con código inexistente: ' + c); }
+  else {
+    const det = `<b>${esc(nombreSocio(r.socio))}</b> (socio ${r.socio})<br>${esc(instNombre(r.instId))} · ${fmtF(r.fecha)} · ${esc(r.turno)}`;
+    if (r.estado === 'cancelada') { v = {tipo:'error', titulo:'Reserva cancelada', html:det + '<br>Esta reserva fue cancelada y no habilita el ingreso.'}; log('Validación rechazada (cancelada): ' + c); }
+    else if (r.estado === 'utilizada') { v = {tipo:'warn', titulo:'QR ya utilizado', html:det + `<br>Ya se registró el ingreso ${r.ingreso ? 'el ' + fmtDT(r.ingreso) : ''}. El QR es válido una sola vez.`}; log('Validación rechazada (QR reutilizado): ' + c); }
+    else if (r.fecha !== hoy()) { v = {tipo:'warn', titulo:'Fecha incorrecta', html:det + `<br>La reserva es para el <b>${fmtF(r.fecha)}</b>, no para hoy.`}; log('Validación rechazada (otra fecha): ' + c); }
+    else {
+      r.estado = 'utilizada'; r.ingreso = Date.now();
+      const s = S.socios.find(x => x.nro === r.socio);
+      const fam = s && s.grupo.filter(g => g.estado === 'habilitado').length ? '<br><span class="small">Grupo familiar habilitado: ' + s.grupo.filter(g => g.estado === 'habilitado').map(g => esc(g.nombre)).join(', ') + '</span>' : '';
+      v = {tipo:'ok', titulo:'Ingreso autorizado', html:det + fam};
+      log('Ingreso registrado: ' + c);
+    }
+  }
+  v.t = Date.now(); ui.validacion = v; save();
+  if (ui.view !== 'validar') ui.view = 'validar';
+  render();
+}
+
+/* ===================== Eventos ===================== */
+function entrar(u, p) {
+  u = u.trim();
+  const st = S.staff.find(s => s.user === u && s.pass === p);
+  if (st) { ses = {rol:st.rol, user:st.user}; ui.view = st.rol === 'admin' ? 'panel' : 'validar'; log('Inicio de sesión'); render(); return; }
+  const so = S.socios.find(s => (s.nro === u || s.dni === u) && s.pass === p);
+  if (so) { ses = {rol:'socio', nro:so.nro}; ui.view = 'inicio'; ui.chat = []; log('Inicio de sesión'); render(); return; }
+  S.auditoria.push({t:Date.now(), usuario:u || 'anónimo', accion:'Intento de ingreso fallido'}); save();
+  ui.msg = {tipo:'err', txt:'Usuario o contraseña incorrectos.'}; render();
+}
+
+const ACT = {
+  nav: b => { ui.view = b.dataset.v; closeModal(); render(); window.scrollTo(0, 0); },
+  acceso: b => { ui.acceso = b.dataset.v; ui.msg = null; render(); },
+  demo: b => entrar(b.dataset.u, b.dataset.p),
+  reset: () => { if (confirm('¿Reiniciar todos los datos de demostración?')) { S = seed(); save(); ui.msg = {tipo:'ok', txt:'Datos reiniciados.'}; render(); } },
+  salir: () => { log('Cierre de sesión'); ses = null; ui = {acceso:'login', view:'', inst:'q1', mes:hoy().slice(0, 7), dia:null, chat:[], validacion:null, f:null, msg:null, q:''}; render(); },
+  inst: b => { ui.inst = b.dataset.id; ui.dia = null; render(); },
+  mes: b => { const [y, m] = ui.mes.split('-').map(Number); const d = new Date(y, m - 1 + Number(b.dataset.d), 1); ui.mes = d.getFullYear() + '-' + z(d.getMonth() + 1); render(); },
+  dia: b => { ui.dia = b.dataset.f; render(); },
+  turno: b => {
+    const inst = getInst(ui.inst), t = b.dataset.t;
+    showModal(`<h3>Confirmar reserva</h3><table class="kv"><tr><td>Instalación</td><td><b>${esc(inst.nombre)}</b></td></tr><tr><td>Fecha</td><td>${fmtFL(ui.dia)}</td></tr><tr><td>Horario</td><td>${esc(t)}</td></tr><tr><td>Capacidad</td><td>${esc(inst.cap)}</td></tr><tr><td>Tarifa</td><td>${pesos(inst.tarifa)} <span class="small muted">(se abona en el complejo)</span></td></tr></table>
+      <label class="check"><input type="checkbox" id="acepto"> Leí y acepto el reglamento del complejo</label>
+      <div class="acciones"><button class="btn ghost" data-act="cerrar">Volver</button><button class="btn" data-act="confirmar" data-t="${esc(t)}">Confirmar reserva</button></div>`);
+  },
+  confirmar: b => {
+    if (!$('#acepto').checked) { toast('Tenés que aceptar el reglamento.', 'error'); return; }
+    const res = crearReserva(ses.nro, ui.inst, ui.dia, b.dataset.t, false);
+    if (res.error) { closeModal(); toast(res.error, 'error'); render(); return; }
+    render(); comprobante(res.r); toast('¡Reserva confirmada!');
+  },
+  verqr: b => comprobante(S.reservas.find(r => r.id === b.dataset.id)),
+  cerrar: () => closeModal(),
+  imprimir: () => window.print(),
+  cancelar: b => {
+    const r = S.reservas.find(x => x.id === b.dataset.id);
+    if (!confirm(`¿Cancelar la reserva de ${instNombre(r.instId)} del ${fmtF(r.fecha)} (${r.turno})?`)) return;
+    r.estado = 'cancelada'; log(`Canceló la reserva ${r.codigo}`); toast('Reserva cancelada. El turno quedó libre.'); render();
+  },
+  preg: b => preguntar(b.dataset.q),
+  camara: () => iniciarCamara(),
+  simular: b => validar(b.dataset.c),
+  rep: b => { const p = b.dataset.p; exportCSV(S.reservas.filter(r => r.fecha.startsWith(p)).sort((a, c) => a.fecha.localeCompare(c.fecha)), `reporte_reservas_${p}.csv`); },
+  exportar: () => exportCSV(filtrarReservas(), `reservas_${ui.f.desde}_a_${ui.f.hasta}.csv`),
+  modificar: b => {
+    const r = S.reservas.find(x => x.id === b.dataset.id), inst = getInst(r.instId);
+    showModal(`<h3>Modificar reserva</h3><p class="small muted">${r.codigo} · ${esc(nombreSocio(r.socio))} · ${esc(inst.nombre)}</p>
+      <form data-form="modificar" data-id="${r.id}"><label>Nueva fecha</label><input type="date" name="fecha" value="${r.fecha}" min="${hoy()}" required>
+      <label>Nuevo turno</label><select name="turno">${inst.turnos.map(t => `<option ${t === r.turno ? 'selected' : ''}>${esc(t)}</option>`).join('')}</select>
+      <div class="acciones"><button type="button" class="btn ghost" data-act="cerrar">Volver</button><button class="btn">Guardar cambios</button></div></form>`);
+  },
+  toggleinst: b => { const i = getInst(b.dataset.id); i.activo = !i.activo; log(`${i.activo ? 'Habilitó' : 'Suspendió por mantenimiento'} ${i.nombre}`); toast(i.nombre + (i.activo ? ' habilitada' : ' suspendida')); render(); },
+  delnot: b => { const n = S.noticias.find(x => x.id === b.dataset.id); if (!confirm('¿Eliminar “' + n.titulo + '”?')) return; S.noticias = S.noticias.filter(x => x !== n); log('Eliminó la publicación: ' + n.titulo); render(); },
+  aprobar: b => { const s = S.socios.find(x => x.nro === b.dataset.n), g = s.grupo[+b.dataset.i]; g.estado = 'habilitado'; log(`Aprobó familiar ${g.nombre} del socio ${s.nro}`); toast('Familiar habilitado'); render(); },
+  rechazar: b => { const s = S.socios.find(x => x.nro === b.dataset.n), g = s.grupo[+b.dataset.i]; s.grupo.splice(+b.dataset.i, 1); log(`Rechazó familiar ${g.nombre} del socio ${s.nro}`); toast('Solicitud rechazada'); render(); }
+};
+
+function comprobante(r) {
+  showModal(`<div class="comprobante"><div class="cmp-head"><div class="logo">CPA</div><div><b>Complejo Policial Almudena</b><small>Comprobante digital de reserva</small></div></div>
+    <div class="qr" data-qr="${r.codigo}"></div><div class="codigo">${r.codigo}</div>
+    <table class="kv"><tr><td>Socio</td><td>${esc(nombreSocio(r.socio))} (N° ${r.socio})</td></tr><tr><td>Instalación</td><td>${esc(instNombre(r.instId))}</td></tr><tr><td>Fecha</td><td>${fmtFL(r.fecha)}</td></tr><tr><td>Horario</td><td>${esc(r.turno)}</td></tr><tr><td>Estado</td><td>${badgeEstado(r.estado)}</td></tr><tr><td>Emitido</td><td>${fmtDT(r.creada)}</td></tr>${r.ingreso ? `<tr><td>Ingreso</td><td>${fmtDT(r.ingreso)}</td></tr>` : ''}</table>
+    <p class="small muted">Presentá este QR en el ingreso. Es único e intransferible y solo es válido una vez.</p></div>
+    <div class="acciones no-print"><button class="btn ghost" data-act="cerrar">Cerrar</button><button class="btn" data-act="imprimir">Descargar / imprimir</button></div>`);
+}
+
+const FORM = {
+  login: fd => entrar(fd.get('u'), fd.get('p')),
+  registro: fd => {
+    const nro = fd.get('nro').trim(), dni = fd.get('dni').trim(), p = fd.get('p');
+    const pad = S.padron.find(x => x.nro === nro);
+    let err = null;
+    if (!pad) err = 'El número de socio no figura en el padrón de socios activos.';
+    else if (pad.dni !== dni) err = 'El DNI no coincide con el titular de ese número de socio.';
+    else if (S.socios.some(s => s.nro === nro)) err = 'Ese socio ya tiene una cuenta. Usá “Olvidé mi contraseña”.';
+    else if (p.length < 6) err = 'La contraseña debe tener al menos 6 caracteres.';
+    else if (p !== fd.get('p2')) err = 'Las contraseñas no coinciden.';
+    if (err) { ui.msg = {tipo:'err', txt:err}; render(); return; }
+    S.socios.push({nro, dni, nombre:pad.nombre, email:fd.get('email').trim(), tel:fd.get('tel').trim(), pass:p, alta:Date.now(), grupo:[]});
+    S.auditoria.push({t:Date.now(), usuario:'Socio ' + nro, accion:'Registro de cuenta nueva (validado contra padrón)'}); save();
+    ui.acceso = 'login'; ui.msg = {tipo:'ok', txt:`Cuenta creada para ${pad.nombre}. Ya podés ingresar con tu N° de socio.`}; render();
+  },
+  recuperar: fd => {
+    const s = S.socios.find(x => x.nro === fd.get('nro').trim() && x.email.toLowerCase() === fd.get('email').trim().toLowerCase());
+    if (s) S.auditoria.push({t:Date.now(), usuario:'Socio ' + s.nro, accion:'Solicitud de recuperación de contraseña'}), save();
+    ui.msg = {tipo:'ok', txt:'Si los datos son correctos, vas a recibir un enlace de recuperación en tu correo en los próximos minutos. (Simulado en el prototipo.)'}; render();
+  },
+  familiar: fd => { const s = socioActual(); s.grupo.push({nombre:fd.get('nombre').trim(), dni:fd.get('dni').trim(), parentesco:fd.get('parentesco'), estado:'pendiente'}); log('Solicitó alta de familiar: ' + fd.get('nombre').trim()); toast('Solicitud enviada a la administración'); render(); },
+  chat: fd => preguntar(fd.get('q')),
+  codigo: fd => { if (fd.get('c').trim()) validar(fd.get('c')); },
+  filtro: fd => { ui.f = {desde:fd.get('desde'), hasta:fd.get('hasta'), inst:fd.get('inst'), estado:fd.get('estado'), q:fd.get('q')}; render(); },
+  nueva: (fd, f) => { const res = crearReserva(fd.get('nro').trim(), fd.get('inst'), fd.get('fecha'), fd.get('turno'), true); if (res.error) { toast(res.error, 'error'); return; } f.reset(); comprobante(res.r); toast('Reserva registrada'); },
+  modificar: (fd, f) => {
+    const r = S.reservas.find(x => x.id === f.dataset.id), inst = getInst(r.instId), fe = fd.get('fecha'), t = fd.get('turno');
+    if (turnoPasado(fe, t)) { toast('No se puede mover a una fecha u horario pasado.', 'error'); return; }
+    if (ocup(r.instId, fe, t, r.id) >= inst.cupo) { toast('Ese horario está ocupado.', 'error'); return; }
+    log(`Modificó la reserva ${r.codigo}: ${fmtF(r.fecha)} ${r.turno} → ${fmtF(fe)} ${t}`);
+    r.fecha = fe; r.turno = t; save(); closeModal(); toast('Reserva modificada'); render();
+  },
+  noticia: fd => { S.noticias.push({id:'n' + Date.now(), tipo:fd.get('tipo'), titulo:fd.get('titulo').trim(), texto:fd.get('texto').trim(), fecha:Date.now()}); log('Publicó: ' + fd.get('titulo').trim()); toast('Publicado'); render(); },
+  buscarsocio: fd => { ui.q = fd.get('q'); render(); }
+};
+
+document.addEventListener('click', e => {
+  if (e.target.id === 'modal') { closeModal(); return; }
+  const b = e.target.closest('[data-act]'); if (!b || b.disabled) return;
+  e.preventDefault();
+  ACT[b.dataset.act] && ACT[b.dataset.act](b, e);
+});
+document.addEventListener('submit', e => { const f = e.target.closest('form[data-form]'); if (!f) return; e.preventDefault(); FORM[f.dataset.form](new FormData(f), f); });
+document.addEventListener('change', e => {
+  if (e.target.id === 'n_inst') { $('#n_turno').innerHTML = getInst(e.target.value).turnos.map(t => `<option>${esc(t)}</option>`).join(''); }
+  if (e.target.dataset.tarifa) { const i = getInst(e.target.dataset.tarifa); const v = Math.max(0, Number(e.target.value) || 0); log(`Cambió la tarifa de ${i.nombre}: ${pesos(i.tarifa)} → ${pesos(v)}`); i.tarifa = v; toast('Tarifa actualizada'); }
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+load();
+render();
+</script>
+</body>
+</html>
