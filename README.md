@@ -16,15 +16,23 @@ Abrir `index.html` en Chrome (PC o celular). En la pantalla de ingreso hay acces
 
 Para probar el registro: socio `1003`, DNI `33444555`.
 
+## Panel del socio (diseño intuitivo)
+
+- **Inicio con accesos grandes**: Reservar, Mis reservas, Mi credencial, Preguntar, Información y Mi familia, más la próxima reserva con botón “Mostrar QR” y avisos de clima o mantenimiento destacados.
+- **Reserva paso a paso** con barra de progreso: ¿Qué? → ¿Cuál? → ¿Qué día? (tira de 14 días con colores y calendario completo opcional) → ¿Horario? → Confirmar.
+- **Barra de navegación inferior** en el celular y botón flotante del asistente.
+- **Mi cuenta**: datos de contacto, cambio de contraseña, credencial digital con QR y grupo familiar.
+- **Información**: horarios, tarifas, ubicación, requisitos, reglamento descargable, preguntas frecuentes y documentación.
+
 ## Funcionalidades (según la nota)
 
-1. **Gestión de usuarios** — login, recuperación de contraseña, registro validado contra padrón (N° de socio + DNI), grupo familiar con aprobación administrativa.
+1. **Gestión de usuarios** — login, recuperación de contraseña, registro validado contra padrón (N° de socio + DNI), grupo familiar con aprobación administrativa, administración de perfiles (suspender/habilitar cuentas, restablecer contraseñas, usuarios del personal por nivel).
 2. **Reservas** — quinchos, canchas y pileta; calendario interactivo con disponibilidad en tiempo real; bloqueo de horarios ocupados; confirmación inmediata; una reserva por tipo y por día.
 3. **Comprobantes digitales** — QR único e irrepetible, validación por cámara o código en portería, registro de fecha y hora de ingreso, rechazo de QR falsos, cancelados, reutilizados o de otra fecha.
 4. **Panel administrativo** — alta, modificación y cancelación; filtros; estadísticas; reportes mensuales/anuales y exportación CSV.
 5. **Asistente virtual** — responde horarios, tarifas, reglamento, disponibilidad, actividades, eventos, requisitos, ubicación y guía la reserva (por reglas en el prototipo; IA en la versión final).
 6. **Comunicación institucional** — comunicados, novedades, eventos, promociones, mantenimiento, clima, reglamento y documentación.
-7. **Seguridad** — permisos por rol y registro de auditoría de todas las operaciones.
+7. **Seguridad** — permisos por nivel (socio, portería, administrador), bloqueo tras 5 intentos fallidos, cierre de sesión por inactividad, consentimiento de datos personales (Ley 25.326), DNI enmascarado, copias de seguridad automáticas diarias (descarga y restauración) y registro de auditoría.
 8. **Diseño responsivo** — PC, celular y tablet.
 
 ## Próximos pasos para la versión productiva

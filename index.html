@@ -146,13 +146,95 @@ main{max-width:1100px;margin:0 auto;padding:18px 14px 60px}
 .cmp-head .logo{background:var(--azul);color:#fff}
 .cmp-head small{display:block;color:var(--gris)}
 .qr svg{width:210px;height:210px}
-.qr-fallback{padding:30px;border:2px dashed var(--borde);border-radius:10px;font-family:monospace}
+.qr-fallback{padding:30px;border:2px dashed var(--borde);border-radius:10px;font-family:monospace;color:#1f2937;font-size:13px}
+@media(max-width:760px){body.con-bottom #toast{bottom:90px}}
 .codigo{font-family:monospace;font-size:20px;font-weight:700;letter-spacing:1px;color:var(--azul)}
 .comprobante .kv{text-align:left}
 /* toast */
 #toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1f2937;color:#fff;padding:11px 18px;border-radius:10px;font-size:14px;opacity:0;transition:.25s;pointer-events:none;z-index:60;max-width:90vw}
 #toast.show{opacity:1}
 #toast.error{background:var(--rojo)}
+/* ====== Panel del socio (intuitivo) ====== */
+.hola{font-size:24px;margin:4px 0 2px;color:var(--azul)}
+.sub{color:var(--gris);margin:0 0 14px}
+.alerta{display:flex;gap:10px;align-items:flex-start;background:var(--amarillob);border:1px solid #f0d58c;border-radius:12px;padding:12px 14px;margin-bottom:12px;font-size:14px}
+.alerta b{display:block}
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:14px 0}
+@media(max-width:760px){.tiles{grid-template-columns:1fr 1fr}}
+.tile{background:#fff;border:1px solid var(--borde);border-radius:16px;padding:16px 14px;text-align:left;display:flex;flex-direction:column;gap:4px;min-height:116px;transition:.15s}
+.tile:hover{border-color:var(--azul2);box-shadow:0 4px 14px rgba(29,79,134,.12)}
+.tile .ic{font-size:30px;line-height:1.2}
+.tile b{font-size:16px;color:var(--azul)}
+.tile span.d{font-size:13px;color:var(--gris)}
+.tile.prim{background:var(--azul2);border-color:var(--azul2)}
+.tile.prim b,.tile.prim span.d{color:#fff}
+.prox{background:linear-gradient(135deg,var(--azul),var(--azul2));color:#fff;border-radius:16px;padding:18px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.prox small{opacity:.85;display:block}
+.prox b{font-size:18px;display:block;margin:2px 0}
+.prox .btn{background:#fff;color:var(--azul)}
+.stepper{display:flex;gap:4px;margin:4px 0 18px}
+.stepper div{flex:1;text-align:center;font-size:11px;color:var(--gris)}
+.stepper div i{display:block;height:5px;border-radius:9px;background:#dfe4ea;margin-bottom:5px}
+.stepper div.on{color:var(--azul2);font-weight:700}
+.stepper div.on i{background:var(--azul2)}
+.wtit{font-size:21px;color:var(--azul);margin:0 0 4px}
+.back{background:none;border:0;color:var(--azul2);font-weight:600;padding:6px 0;margin-bottom:4px}
+.opciones{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:10px}
+@media(max-width:760px){.opciones{grid-template-columns:1fr}}
+.opcion{background:#fff;border:2px solid var(--borde);border-radius:16px;padding:16px;text-align:left;display:flex;gap:14px;align-items:center}
+.opcion:hover{border-color:var(--azul2)}
+.opcion .ic{font-size:38px;flex:none}
+.opcion b{display:block;font-size:17px;color:var(--azul)}
+.opcion .d{font-size:13px;color:var(--gris);display:block}
+.opcion .p{font-size:13px;font-weight:700;color:var(--verde);display:block;margin-top:3px}
+.opcion:disabled{opacity:.55;cursor:default}
+.dias{display:flex;gap:8px;overflow-x:auto;padding:4px 2px 10px;margin-top:10px}
+.dchip{flex:none;width:76px;border:2px solid var(--borde);background:#fff;border-radius:14px;padding:10px 4px;text-align:center}
+.dchip small{display:block;font-size:12px;color:var(--gris)}
+.dchip b{display:block;font-size:22px;color:var(--azul)}
+.dchip em{display:block;font-style:normal;font-size:11px;font-weight:700;margin-top:2px}
+.dchip.libre em{color:var(--verde)}.dchip.parcial em{color:var(--amarillo)}.dchip.lleno em,.dchip.cerrado em{color:var(--rojo)}
+.dchip:disabled{background:#f5f6f8;cursor:default;opacity:.75}
+.dchip.sel{border-color:var(--azul2);background:var(--celeste)}
+.horarios{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-top:12px}
+.hbtn{border:2px solid #a7e0bd;background:var(--verdeb);border-radius:14px;padding:14px;text-align:left}
+.hbtn b{display:block;font-size:17px}.hbtn span{font-size:12px;color:var(--verde);font-weight:600}
+.hbtn:disabled{background:#f3f4f6;border-color:var(--borde);cursor:default;opacity:.7}
+.hbtn:disabled span{color:var(--gris)}
+.resumen{background:var(--celeste);border-radius:14px;padding:6px 16px;margin-top:10px}
+.btn.grande{padding:15px;font-size:17px;border-radius:12px;width:100%}
+.link{background:none;border:0;color:var(--azul2);text-decoration:underline;padding:0;font:inherit;font-weight:600}
+.seg{display:flex;background:#e9edf2;border-radius:10px;padding:4px;margin-bottom:14px}
+.seg button{flex:1;border:0;background:none;padding:9px;border-radius:8px;font-weight:600;color:var(--gris)}
+.seg button.on{background:#fff;color:var(--azul2);box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.rcard{background:#fff;border:1px solid var(--borde);border-radius:14px;padding:14px;margin-bottom:10px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.rcard .ic{font-size:30px}
+.rcard .info{flex:1;min-width:170px}
+.rcard .acc{display:flex;gap:8px;width:100%}
+.rcard .acc .btn{flex:1;padding:10px}
+.vacio{text-align:center;padding:30px 10px}
+.vacio .ic{font-size:44px}
+.tab .tic{font-size:20px;line-height:1.2}
+@media(min-width:761px){.tab .tic{display:none}}
+@media(max-width:760px){
+ .tabs.socio{position:fixed;bottom:0;top:auto;left:0;right:0;justify-content:space-around;border-top:1px solid var(--borde);border-bottom:0;padding:0 0 env(safe-area-inset-bottom);box-shadow:0 -2px 10px rgba(0,0,0,.06);z-index:15}
+ .tabs.socio .tab{display:flex;flex-direction:column;align-items:center;font-size:11px;padding:7px 2px 9px;border-bottom:0;border-top:3px solid transparent;flex:1}
+ .tabs.socio .tab.on{border-top-color:var(--azul2)}
+ body.con-bottom main{padding-bottom:96px}
+ .tabs:not(.socio) .tic{display:none}
+}
+.fab{position:fixed;right:18px;bottom:22px;width:58px;height:58px;border-radius:50%;background:var(--azul2);color:#fff;border:0;font-size:26px;box-shadow:0 6px 18px rgba(0,0,0,.25);z-index:20}
+@media(max-width:760px){.fab{bottom:86px}}
+details.acc{background:#fff;border:1px solid var(--borde);border-radius:12px;margin-bottom:10px}
+details.acc summary{padding:15px 16px;font-weight:700;color:var(--azul);cursor:pointer;list-style:none;display:flex;justify-content:space-between;gap:10px}
+details.acc summary::-webkit-details-marker{display:none}
+details.acc summary::after{content:'+';color:var(--gris);font-size:20px;line-height:1}
+details.acc[open] summary::after{content:'−'}
+details.acc .cont{padding:0 16px 14px;font-size:14px;line-height:1.5}
+.credencial{max-width:360px;margin:0 auto;background:linear-gradient(135deg,var(--azul),var(--azul2));color:#fff;border-radius:18px;padding:20px;text-align:center}
+.credencial .qrbox{background:#fff;border-radius:12px;padding:8px;display:inline-block;margin:12px 0}
+.credencial .qr svg{width:180px;height:180px;display:block}
+.avatar{width:54px;height:54px;border-radius:50%;background:var(--azul);color:#fff;display:grid;place-items:center;font-weight:800;font-size:18px;flex:none}
 @media print{body>*:not(#modal){display:none!important}#modal{position:static;background:none;display:block}#modal .caja{max-width:none;box-shadow:none}.no-print{display:none!important}}
 </style>
 </head>
@@ -162,7 +244,7 @@ main{max-width:1100px;margin:0 auto;padding:18px 14px 60px}
 <div id="toast"></div>
 <script>
 /* ===================== Utilidades ===================== */
-const KEY = 'almudena_prototipo_v1';
+const KEY = 'almudena_prototipo_v2';
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const z = n => String(n).padStart(2, '0');
@@ -185,6 +267,19 @@ const INFO = {
   requisitos: ['Ser socio activo o integrante del grupo familiar habilitado.', 'Presentar el código QR de la reserva o la credencial de socio junto con el DNI.', 'Los invitados deben ingresar acompañados por el socio titular.', 'Para la pileta: revisación médica vigente.'],
   reglamento: ['Respetar el horario reservado; la tolerancia es de 15 minutos.', 'Cancelar con al menos 24 h de anticipación para liberar el turno.', 'No se permite el ingreso de mascotas.', 'El socio titular es responsable por daños en las instalaciones.', 'Prohibido el consumo de bebidas alcohólicas en canchas y pileta.']
 };
+
+const FAQ = [
+  ['¿Con cuánta anticipación puedo reservar?', 'Hasta 30 días antes. Los turnos se liberan automáticamente cuando alguien cancela.'],
+  ['¿Cuántas reservas puedo tener?', 'Una por tipo de instalación (quincho, cancha o pileta) por día.'],
+  ['¿Cómo cancelo una reserva?', 'En “Mis reservas”, tocá “Cancelar”. Te pedimos hacerlo con 24 h de anticipación.'],
+  ['¿Qué pasa si llueve?', 'Si hay alerta meteorológica se publica un aviso y las reservas al aire libre se reprograman sin costo.'],
+  ['¿Pueden ir mis familiares?', 'Sí, los integrantes del grupo familiar habilitado. Podés solicitar altas desde “Mi familia”.'],
+  ['¿Dónde y cómo pago?', 'Por ahora en la administración del complejo. Más adelante se podrá pagar online.'],
+  ['¿Qué presento en la entrada?', 'El código QR de tu reserva (desde el celular o impreso) y tu DNI.']
+];
+const ICON = {q1:'🍖', q2:'🍖', q3:'🍖', f1:'⚽', f2:'⚽', pd:'🎾', vo:'🏐', pi:'🏊'};
+const unidad = i => i.tipo === 'Cancha' ? 'por hora' : i.tipo === 'Pileta' ? 'por grupo y turno' : 'por turno';
+const maskDni = d => String(d).length > 4 ? String(d).slice(0, 2) + '.***.' + String(d).slice(-3) : '***';
 
 function seed() {
   const inst = [
@@ -235,6 +330,8 @@ function seed() {
     {id:'n2', tipo:'Mantenimiento', titulo:'Pádel: mantenimiento de la superficie', texto:'La cancha de pádel permanecerá cerrada el próximo lunes por recambio de césped sintético.', fecha:now - 86400000},
     {id:'n3', tipo:'Evento', titulo:'Torneo interno de fútbol 5', texto:'Inscripciones abiertas hasta fin de mes en la administración del complejo. Categorías libre y +40.', fecha:now - 86400000 * 3},
     {id:'n4', tipo:'Clima', titulo:'Alerta por tormentas', texto:'Ante alertas meteorológicas se podrán suspender las actividades al aire libre. Las reservas afectadas se reprograman sin costo.', fecha:now - 3600000 * 5},
+    {id:'n6', tipo:'Reglamento', titulo:'Reglamento interno del complejo', texto:'Rige para todos los socios, familiares e invitados. Podés descargarlo desde Información → Reglamento del complejo.', fecha:now - 86400000 * 10},
+    {id:'n7', tipo:'Documentación', titulo:'Formulario de alta de grupo familiar', texto:'Para habilitar a un familiar se debe presentar copia del DNI y la documentación que acredite el parentesco en la administración.', fecha:now - 86400000 * 12},
     {id:'n5', tipo:'Promoción', titulo:'Pileta: abono de temporada', texto:'Los grupos familiares que abonen la temporada completa antes del 15 de diciembre tienen un 15 % de descuento.', fecha:now - 86400000 * 4}
   ];
   const s = {inst, padron, socios, reservas, noticias, auditoria:[], staff:[{user:'admin', pass:'admin', rol:'admin', nombre:'Administración'}, {user:'porteria', pass:'1234', rol:'porteria', nombre:'Personal de portería'}]};
@@ -252,7 +349,8 @@ let S;
 function load() { try { const raw = localStorage.getItem(KEY); if (raw) { S = JSON.parse(raw); return; } } catch (e) {} S = seed(); save(); }
 function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
 let ses = null;
-let ui = {acceso:'login', view:'', inst:'q1', mes:hoy().slice(0, 7), dia:null, chat:[], validacion:null, f:null, msg:null, q:''};
+const uiInicial = () => ({acceso:'login', view:'', mes:hoy().slice(0, 7), wiz:{paso:1}, verCal:false, mtab:'prox', ntipo:'', chat:[], validacion:null, f:null, msg:null, q:''});
+let ui = uiInicial();
 
 const getInst = id => S.inst.find(i => i.id === id) || {nombre:'?', tipo:'?', turnos:[], cupo:1};
 const instNombre = id => getInst(id).nombre;
@@ -337,6 +435,7 @@ function vistaAcceso() {
       <label>Teléfono (WhatsApp)</label><input name="tel" inputmode="tel">
       <label>Contraseña (mínimo 6 caracteres)</label><input name="p" type="password" required minlength="6">
       <label>Repetir contraseña</label><input name="p2" type="password" required>
+      <label class="check" style="margin-top:12px"><input type="checkbox" name="consent" value="1"> <span>Acepto que mis datos se usen solo para la gestión del complejo, conforme a la Ley 25.326 de Protección de Datos Personales.</span></label>
       <button class="btn full" style="margin-top:14px">Crear cuenta</button>
     </form>${m}
     <div class="links"><a data-act="acceso" data-v="login">← Volver al ingreso</a></div>`;
@@ -358,13 +457,15 @@ function vistaAcceso() {
 
 /* ===================== Vistas ===================== */
 const NAV = {
-  socio:[['inicio','Inicio'],['reservar','Reservar'],['mis','Mis reservas'],['familia','Grupo familiar'],['asistente','Asistente']],
+  socio:[['inicio','Inicio','🏠'],['reservar','Reservar','📅'],['mis','Mis reservas','🎟️'],['asistente','Asistente','💬'],['perfil','Mi cuenta','👤']],
   porteria:[['validar','Validar QR'],['ingresos','Ingresos de hoy']],
-  admin:[['panel','Panel'],['reservas','Reservas'],['nueva','Nueva reserva'],['instalaciones','Instalaciones'],['comunicados','Comunicados'],['socios','Socios'],['auditoria','Auditoría']]
+  admin:[['panel','Panel'],['reservas','Reservas'],['nueva','Nueva reserva'],['instalaciones','Instalaciones'],['comunicados','Comunicados'],['socios','Socios'],['seguridad','Seguridad'],['auditoria','Auditoría']]
 };
 
-function listaNoticias(admin) {
-  const ns = S.noticias.slice().sort((a, b) => b.fecha - a.fecha);
+function listaNoticias(admin, limite, tipo) {
+  let ns = S.noticias.slice().sort((a, b) => b.fecha - a.fecha);
+  if (tipo) ns = ns.filter(n => n.tipo === tipo);
+  if (limite) ns = ns.slice(0, limite);
   if (!ns.length) return '<p class="muted">No hay publicaciones.</p>';
   return ns.map(n => `<div class="card noticia ${esc(n.tipo)}">
     <div style="display:flex;justify-content:space-between;gap:8px;align-items:center">${badgeNot(n.tipo)}<span class="small muted">${fmtDT(n.fecha)}</span></div>
@@ -375,53 +476,123 @@ function listaNoticias(admin) {
 const V = {
   inicio() {
     const s = socioActual();
-    const prox = S.reservas.filter(r => r.socio === s.nro && r.estado === 'confirmada' && r.fecha >= hoy()).sort((a, b) => a.fecha.localeCompare(b.fecha))[0];
-    return `<h2>Hola, ${esc(s.nombre.split(' ')[0])}</h2>
-    <div class="grid2">
-      <div class="card">${prox ? `<h3>Tu próxima reserva</h3><p><b>${esc(instNombre(prox.instId))}</b><br>${fmtFL(prox.fecha)} · ${esc(prox.turno)}</p><button class="btn" data-act="verqr" data-id="${prox.id}">Ver comprobante QR</button>`
-        : `<h3>No tenés reservas próximas</h3><p class="muted">Reservá un quincho, una cancha o la pileta en pocos pasos.</p><button class="btn" data-act="nav" data-v="reservar">Reservar ahora</button>`}</div>
-      <div class="card"><h3>¿Tenés una consulta?</h3><p class="muted">El asistente virtual responde sobre horarios, tarifas, reglamento y disponibilidad, y te guía para reservar.</p><button class="btn ghost" data-act="nav" data-v="asistente">Abrir asistente</button></div>
-    </div>
-    <h3 class="sec">Comunicados y novedades</h3>${listaNoticias(false)}`;
+    const alertas = S.noticias.filter(n => ['Clima', 'Mantenimiento'].includes(n.tipo) && Date.now() - n.fecha < 3 * 86400000);
+    const prox = S.reservas.filter(r => r.socio === s.nro && r.estado === 'confirmada' && r.fecha >= hoy()).sort((a, b) => a.fecha.localeCompare(b.fecha) || inicioTurno(a.turno) - inicioTurno(b.turno))[0];
+    const hr = new Date().getHours(), saludo = hr < 12 ? 'Buen día' : hr < 20 ? 'Buenas tardes' : 'Buenas noches';
+    const tiles = [['nuevares', '📅', 'Reservar', 'Quinchos, canchas y pileta', 'prim'], ['mis', '🎟️', 'Mis reservas', 'Ver mi QR o cancelar'], ['credencial', '🪪', 'Mi credencial', 'Credencial digital de socio'],
+      ['asistente', '💬', 'Preguntar', 'Asistente virtual las 24 h'], ['info', 'ℹ️', 'Información', 'Horarios, tarifas, reglamento'], ['familia', '👨‍👩‍👧', 'Mi familia', 'Grupo familiar habilitado']];
+    return `${alertas.map(a => `<div class="alerta"><span style="font-size:22px">${a.tipo === 'Clima' ? '⛈️' : '🛠️'}</span><div><b>${esc(a.titulo)}</b>${esc(a.texto)}</div></div>`).join('')}
+    <h2 class="hola">${saludo}, ${esc(s.nombre.split(' ')[0])} 👋</h2><p class="sub">¿Qué querés hacer hoy?</p>
+    ${prox ? `<div class="prox"><div><small>Tu próxima reserva</small><b>${ICON[prox.instId] || ''} ${esc(instNombre(prox.instId))}</b>${fmtFL(prox.fecha)} · ${esc(prox.turno)}</div><button class="btn" data-act="verqr" data-id="${prox.id}">Mostrar QR</button></div>` : ''}
+    <div class="tiles">${tiles.map(([v, ic, t, d, c]) => `<button class="tile ${c || ''}" ${v === 'nuevares' ? 'data-act="nuevares"' : `data-act="nav" data-v="${v}"`}><span class="ic">${ic}</span><b>${t}</b><span class="d">${d}</span></button>`).join('')}</div>
+    <div style="display:flex;justify-content:space-between;align-items:center"><h3 class="sec">Novedades</h3><button class="link" data-act="nav" data-v="novedades">Ver todas</button></div>${listaNoticias(false, 3)}`;
+  },
+
+  novedades() {
+    const tipos = ['', ...TIPOS_NOT.filter(t => S.noticias.some(n => n.tipo === t))];
+    return `<button class="back" data-act="nav" data-v="inicio">← Inicio</button><h2>Comunicados y novedades</h2>
+    <div class="chips" style="margin-bottom:14px">${tipos.map(t => `<button class="chip ${ui.ntipo === t ? 'on' : ''}" data-act="ntipo" data-t="${t}">${t || 'Todas'}</button>`).join('')}</div>${listaNoticias(false, 0, ui.ntipo)}`;
   },
 
   reservar() {
-    const inst = getInst(ui.inst);
-    const tipos = ['Quincho', 'Cancha', 'Pileta'];
-    const chips = tipos.map(t => `<div class="grupo-tit">${t === 'Quincho' ? 'Quinchos' : t === 'Cancha' ? 'Canchas' : 'Pileta'}</div><div class="chips">${S.inst.filter(i => i.tipo === t).map(i => `<button class="chip ${i.id === ui.inst ? 'on' : ''}" data-act="inst" data-id="${i.id}">${esc(i.nombre)}</button>`).join('')}</div>`).join('');
-    let det = '<div class="card muted">3. Seleccioná un día del calendario para ver los horarios disponibles.</div>';
-    if (ui.dia) {
-      const ts = inst.turnos.map(t => {
-        const lib = inst.cupo - ocup(inst.id, ui.dia, t), pas = turnoPasado(ui.dia, t), ok = lib > 0 && !pas && inst.activo;
-        return `<button class="turno ${ok ? '' : 'no'}" ${ok ? `data-act="turno" data-t="${esc(t)}"` : 'disabled'}><b>${esc(t)}</b><span>${pas ? 'Horario pasado' : !inst.activo ? 'Suspendido' : ok ? (inst.cupo > 1 ? lib + ' lugares libres' : 'Disponible') : 'Ocupado'}</span></button>`;
-      }).join('');
-      det = `<div class="card"><label style="margin-top:0">3. Elegí el horario</label><h3>${fmtFL(ui.dia)}</h3><div class="turnos">${ts}</div></div>`;
+    const w = ui.wiz;
+    const pasos = ['Qué', 'Cuál', 'Día', 'Horario', 'Confirmar'];
+    const st = `<div class="stepper">${pasos.map((p, i) => `<div class="${i < w.paso ? 'on' : ''}"><i></i>${p}</div>`).join('')}</div>`;
+    const back = w.paso > 1 ? '<button class="back" data-act="wback">← Volver</button>' : '';
+    let c = '';
+    if (w.paso === 1) {
+      const T = [['Quincho', '🍖', 'Quinchos', 'Para asados y reuniones'], ['Cancha', '⚽', 'Canchas', 'Fútbol 5, pádel y vóley, por hora'], ['Pileta', '🏊', 'Pileta', 'Turno mañana o tarde, en temporada']];
+      c = `<h2 class="wtit">¿Qué querés reservar?</h2><p class="sub">Tocá una opción para empezar.</p><div class="opciones">${T.map(([t, ic, n, d]) => {
+        const is = S.inst.filter(i => i.tipo === t), act = is.some(i => i.activo), min = Math.min(...is.map(i => i.tarifa));
+        return `<button class="opcion" data-act="wtipo" data-t="${t}" ${act ? '' : 'disabled'}><span class="ic">${ic}</span><span><b>${n}</b><span class="d">${d}</span><span class="p">${act ? 'Desde ' + pesos(min) : 'Suspendido por mantenimiento'}</span></span></button>`;
+      }).join('')}</div>`;
     }
-    return `<h2>Reservar</h2>
-    <div class="card"><label style="margin-top:0">1. Elegí la instalación</label>${chips}
-      <div class="instinfo"><b>${esc(inst.nombre)}</b> · ${esc(inst.cap)} · Tarifa: <b>${pesos(inst.tarifa)}</b> ${!inst.activo ? '<span class="badge b-rojo">Suspendida por mantenimiento</span>' : ''}</div></div>
-    <div class="grid2"><div class="card"><label style="margin-top:0">2. Elegí la fecha</label>${calendario(inst)}
-      <div class="leyenda"><span><i style="background:var(--verdeb);border:1px solid #a7e0bd"></i>Libre</span><span><i style="background:var(--amarillob);border:1px solid #f0d58c"></i>Pocos turnos</span><span><i style="background:var(--rojob);border:1px solid #f3b4b4"></i>Completo</span><span><i style="background:#f3f4f6"></i>No disponible</span></div>
-      <p class="small muted">La disponibilidad se actualiza en tiempo real.</p></div>${det}</div>`;
+    if (w.paso === 2) {
+      const is = S.inst.filter(i => i.tipo === w.tipo);
+      c = `<h2 class="wtit">¿Cuál ${w.tipo === 'Quincho' ? 'quincho' : 'cancha'} preferís?</h2><p class="sub">Elegí el lugar.</p><div class="opciones">${is.map(i => `<button class="opcion" data-act="winst" data-id="${i.id}" ${i.activo ? '' : 'disabled'}><span class="ic">${ICON[i.id]}</span><span><b>${esc(i.nombre)}</b><span class="d">${esc(i.cap)}</span><span class="p">${i.activo ? pesos(i.tarifa) + ' ' + unidad(i) : 'En mantenimiento'}</span></span></button>`).join('')}</div>`;
+    }
+    if (w.paso === 3) {
+      const inst = getInst(w.inst);
+      let dias = '';
+      for (let k = 0; k < 14; k++) {
+        const f = addDays(hoy(), k), e = estadoDia(inst, f), d = new Date(f + 'T12:00'), off = e === 'lleno' || e === 'cerrado';
+        dias += `<button class="dchip ${e} ${w.dia === f ? 'sel' : ''}" data-act="wdia" data-f="${f}" ${off ? 'disabled' : ''}><small>${k === 0 ? 'Hoy' : k === 1 ? 'Mañana' : cap1(d.toLocaleDateString('es-AR', {weekday:'short'}).replace('.', ''))}</small><b>${d.getDate()}</b><em>${{libre:'Libre', parcial:'Pocos', lleno:'Completo', cerrado:'Cerrado'}[e] || ''}</em></button>`;
+      }
+      c = `<h2 class="wtit">¿Qué día?</h2><p class="sub">${ICON[inst.id]} ${esc(inst.nombre)} · deslizá para ver más días.</p><div class="dias">${dias}</div>
+      <button class="link" data-act="wcal">${ui.verCal ? 'Ocultar calendario' : '📅 Ver calendario completo (hasta 30 días)'}</button>
+      ${ui.verCal ? `<div class="card" style="margin-top:12px;max-width:440px">${calendario(inst)}<div class="leyenda"><span><i style="background:var(--verdeb);border:1px solid #a7e0bd"></i>Libre</span><span><i style="background:var(--amarillob);border:1px solid #f0d58c"></i>Pocos turnos</span><span><i style="background:var(--rojob);border:1px solid #f3b4b4"></i>Completo</span></div></div>` : ''}`;
+    }
+    if (w.paso === 4) {
+      const inst = getInst(w.inst);
+      const hs = inst.turnos.map(t => {
+        const lib = inst.cupo - ocup(inst.id, w.dia, t), pas = turnoPasado(w.dia, t), ok = lib > 0 && !pas && inst.activo;
+        return `<button class="hbtn" ${ok ? `data-act="wturno" data-t="${esc(t)}"` : 'disabled'}><b>${esc(t)}</b><span>${pas ? 'Ya pasó' : ok ? (inst.cupo > 1 ? lib + ' lugares libres' : 'Disponible') : 'Ocupado'}</span></button>`;
+      }).join('');
+      c = `<h2 class="wtit">¿En qué horario?</h2><p class="sub">${ICON[inst.id]} ${esc(inst.nombre)} · ${fmtFL(w.dia)}</p><div class="horarios">${hs}</div>`;
+    }
+    if (w.paso === 5) {
+      const inst = getInst(w.inst);
+      c = `<h2 class="wtit">Revisá y confirmá</h2><p class="sub">Si está todo bien, tocá “Confirmar reserva”.</p>
+      <div class="resumen"><table class="kv"><tr><td>Lugar</td><td><b>${ICON[inst.id]} ${esc(inst.nombre)}</b></td></tr><tr><td>Día</td><td>${fmtFL(w.dia)}</td></tr><tr><td>Horario</td><td>${esc(w.turno)}</td></tr><tr><td>Capacidad</td><td>${esc(inst.cap)}</td></tr><tr><td>Costo</td><td>${pesos(inst.tarifa)} <span class="small muted">(se abona en el complejo)</span></td></tr></table></div>
+      <label class="check" style="margin:16px 0"><input type="checkbox" id="acepto"> <span>Acepto el <button type="button" class="link" data-act="verreg">reglamento del complejo</button></span></label>
+      <button class="btn grande" data-act="confirmar">✔ Confirmar reserva</button><p class="small muted" style="text-align:center">Vas a recibir tu comprobante con código QR al instante.</p>`;
+    }
+    return `<div style="max-width:780px;margin:0 auto">${back}${st}${c}</div>`;
   },
 
   mis() {
     const s = socioActual();
     const rs = S.reservas.filter(r => r.socio === s.nro);
-    const prox = rs.filter(r => r.estado === 'confirmada' && r.fecha >= hoy()).sort((a, b) => a.fecha.localeCompare(b.fecha));
+    const prox = rs.filter(r => r.estado === 'confirmada' && r.fecha >= hoy()).sort((a, b) => a.fecha.localeCompare(b.fecha) || inicioTurno(a.turno) - inicioTurno(b.turno));
     const hist = rs.filter(r => !prox.includes(r)).sort((a, b) => b.fecha.localeCompare(a.fecha));
-    const item = r => `<div class="item"><div><b>${esc(instNombre(r.instId))}</b> ${badgeEstado(r.estado)}<br><span class="small muted">${fmtF(r.fecha)} · ${esc(r.turno)} · ${r.codigo}${r.ingreso ? ' · Ingreso ' + fmtDT(r.ingreso) : ''}</span></div>
-      <div class="acc">${r.estado !== 'cancelada' ? `<button class="btn-sm" data-act="verqr" data-id="${r.id}">Ver QR</button>` : ''}${r.estado === 'confirmada' && r.fecha >= hoy() ? `<button class="btn-sm rojo" data-act="cancelar" data-id="${r.id}">Cancelar</button>` : ''}</div></div>`;
+    const lista = ui.mtab === 'hist' ? hist : prox;
+    const card = r => `<div class="rcard"><span class="ic">${ICON[r.instId] || '📍'}</span><div class="info"><b>${esc(instNombre(r.instId))}</b> ${badgeEstado(r.estado)}<br><span class="small muted">${fmtFL(r.fecha)} · ${esc(r.turno)}${r.ingreso ? '<br>Ingresó ' + fmtDT(r.ingreso) : ''}</span></div>
+      ${r.estado === 'confirmada' && r.fecha >= hoy() ? `<div class="acc"><button class="btn" data-act="verqr" data-id="${r.id}">Mostrar QR</button><button class="btn ghost" data-act="cancelar" data-id="${r.id}">Cancelar</button></div>` : r.estado !== 'cancelada' ? `<button class="btn-sm" data-act="verqr" data-id="${r.id}">Ver comprobante</button>` : ''}</div>`;
     return `<h2>Mis reservas</h2>
-      <div class="card"><h3>Próximas</h3>${prox.length ? prox.map(item).join('') : '<p class="muted">No tenés reservas próximas.</p>'}</div>
-      <div class="card"><h3>Historial</h3>${hist.length ? hist.map(item).join('') : '<p class="muted">Todavía no hay historial.</p>'}</div>`;
+    <div class="seg"><button class="${ui.mtab !== 'hist' ? 'on' : ''}" data-act="mtab" data-t="prox">Próximas (${prox.length})</button><button class="${ui.mtab === 'hist' ? 'on' : ''}" data-act="mtab" data-t="hist">Historial (${hist.length})</button></div>
+    ${lista.length ? lista.map(card).join('') : `<div class="card vacio"><div class="ic">${ui.mtab === 'hist' ? '🗂️' : '📅'}</div><p>${ui.mtab === 'hist' ? 'Todavía no tenés historial.' : 'No tenés reservas próximas.'}</p>${ui.mtab === 'hist' ? '' : '<button class="btn" data-act="nuevares">Hacer una reserva</button>'}</div>`}`;
+  },
+
+  perfil() {
+    const s = socioActual();
+    const ini = s.nombre.split(' ').map(x => x[0]).slice(0, 2).join('');
+    return `<h2>Mi cuenta</h2>
+    <div class="card" style="display:flex;gap:14px;align-items:center"><div class="avatar">${esc(ini)}</div><div><b style="font-size:17px">${esc(s.nombre)}</b><br><span class="muted small">Socio N° ${s.nro} · DNI ${maskDni(s.dni)}</span></div></div>
+    <div class="tiles"><button class="tile" data-act="nav" data-v="credencial"><span class="ic">🪪</span><b>Mi credencial</b><span class="d">Mostrala en la entrada</span></button><button class="tile" data-act="nav" data-v="familia"><span class="ic">👨‍👩‍👧</span><b>Mi familia</b><span class="d">${s.grupo.filter(g => g.estado === 'habilitado').length} habilitados</span></button><button class="tile" data-act="nav" data-v="info"><span class="ic">ℹ️</span><b>Información</b><span class="d">Reglamento y más</span></button></div>
+    <div class="card"><h3>Mis datos de contacto</h3><form data-form="datos"><label>Correo electrónico</label><input name="email" type="email" required value="${esc(s.email)}"><label>Teléfono (WhatsApp)</label><input name="tel" inputmode="tel" value="${esc(s.tel || '')}"><button class="btn" style="margin-top:12px">Guardar cambios</button></form></div>
+    <div class="card"><h3>Cambiar contraseña</h3><form data-form="pass"><label>Contraseña actual</label><input name="a" type="password" required autocomplete="current-password"><label>Nueva contraseña (mínimo 6 caracteres)</label><input name="n" type="password" required minlength="6" autocomplete="new-password"><label>Repetir nueva contraseña</label><input name="n2" type="password" required autocomplete="new-password"><button class="btn" style="margin-top:12px">Cambiar contraseña</button></form></div>
+    <button class="btn ghost full" data-act="salir">Cerrar sesión</button>`;
+  },
+
+  credencial() {
+    const s = socioActual(), fam = s.grupo.filter(g => g.estado === 'habilitado');
+    return `<button class="back" data-act="nav" data-v="perfil">← Mi cuenta</button><h2>Mi credencial digital</h2>
+    <div class="credencial"><div class="cmp-head" style="justify-content:center;margin:0"><div class="logo">CPA</div><div style="text-align:left"><b>Complejo Policial Almudena</b><small style="color:#cfe0f5">Credencial de socio</small></div></div>
+      <div class="qrbox"><div class="qr" data-qr="CPA-SOCIO-${s.nro}"></div></div><b style="font-size:20px;display:block">${esc(s.nombre)}</b><div>Socio N° ${s.nro}</div>
+      <div class="small" style="opacity:.85;margin-top:8px">${fam.length ? 'Grupo familiar: ' + fam.map(g => esc(g.nombre)).join(', ') : 'Sin grupo familiar cargado'}</div></div>
+    <p class="muted small" style="text-align:center;margin-top:12px">Mostrala en la portería junto con tu DNI. Para usar una instalación reservada, mostrá el QR de la reserva.</p>`;
+  },
+
+  info() {
+    const acc = (t, html, open) => `<details class="acc" ${open ? 'open' : ''}><summary>${t}</summary><div class="cont">${html}</div></details>`;
+    const ul = a => '<ul>' + a.map(x => '<li>' + esc(x) + '</li>').join('') + '</ul>';
+    const docs = S.noticias.filter(n => ['Reglamento', 'Documentación'].includes(n.tipo));
+    return `<h2>Información del complejo</h2><p class="sub">Tocá cada tema para ver el detalle.</p>
+    ${acc('🕘 Horarios de atención', esc(INFO.horarios), true)}
+    ${acc('💲 Tarifas', ul(S.inst.map(i => `${i.nombre}: ${pesos(i.tarifa)} ${unidad(i)}${i.activo ? '' : ' (suspendida)'}`)))}
+    ${acc('📍 Ubicación', esc(INFO.ubicacion))}
+    ${acc('✅ Requisitos para ingresar', ul(INFO.requisitos))}
+    ${acc('📘 Reglamento del complejo', ul(INFO.reglamento) + '<button class="btn-sm" data-act="descreg">Descargar reglamento</button>')}
+    ${acc('❓ Preguntas frecuentes', FAQ.map(([q, a]) => `<p><b>${esc(q)}</b><br>${esc(a)}</p>`).join(''))}
+    ${acc('📄 Documentación institucional', docs.length ? docs.map(d => `<p><b>${esc(d.titulo)}</b><br>${esc(d.texto)}</p>`).join('') : '<p class="muted">No hay documentos publicados.</p>')}
+    <div class="card" style="text-align:center;margin-top:14px"><p style="margin-top:0">¿No encontrás lo que buscás?</p><button class="btn" data-act="nav" data-v="asistente">💬 Preguntale al asistente</button></div>`;
   },
 
   familia() {
     const s = socioActual();
-    return `<h2>Grupo familiar</h2>
-    <div class="card"><h3>Titular</h3><div class="item"><div><b>${esc(s.nombre)}</b><br><span class="small muted">Socio N° ${s.nro} · DNI ${esc(s.dni)}</span></div><span class="badge b-verde">Habilitado</span></div></div>
-    <div class="card"><h3>Integrantes</h3>${s.grupo.length ? s.grupo.map(g => `<div class="item"><div><b>${esc(g.nombre)}</b><br><span class="small muted">${esc(g.parentesco)} · DNI ${esc(g.dni)}</span></div>${g.estado === 'habilitado' ? '<span class="badge b-verde">Habilitado</span>' : '<span class="badge b-amarillo">Pendiente de aprobación</span>'}</div>`).join('') : '<p class="muted">No hay integrantes cargados.</p>'}</div>
+    return `<button class="back" data-act="nav" data-v="perfil">← Mi cuenta</button><h2>Mi grupo familiar</h2>
+    <div class="card"><h3>Titular</h3><div class="item"><div><b>${esc(s.nombre)}</b><br><span class="small muted">Socio N° ${s.nro} · DNI ${maskDni(s.dni)}</span></div><span class="badge b-verde">Habilitado</span></div></div>
+    <div class="card"><h3>Integrantes</h3>${s.grupo.length ? s.grupo.map(g => `<div class="item"><div><b>${esc(g.nombre)}</b><br><span class="small muted">${esc(g.parentesco)} · DNI ${maskDni(g.dni)}</span></div>${g.estado === 'habilitado' ? '<span class="badge b-verde">Habilitado</span>' : '<span class="badge b-amarillo">Pendiente de aprobación</span>'}</div>`).join('') : '<p class="muted">No hay integrantes cargados.</p>'}</div>
     <div class="card"><h3>Solicitar alta de un familiar</h3><p class="small muted">La administración verifica la documentación antes de habilitarlo.</p>
       <form data-form="familiar"><div class="grid2"><div><label>Nombre y apellido</label><input name="nombre" required></div><div><label>DNI</label><input name="dni" required inputmode="numeric"></div></div>
       <label>Parentesco</label><select name="parentesco"><option>Cónyuge</option><option>Hijo/a</option><option>Padre/Madre</option><option>Otro</option></select>
@@ -536,13 +707,32 @@ const V = {
     const q = norm(ui.q || '');
     const lista = S.socios.filter(s => !q || norm(s.nombre + ' ' + s.nro + ' ' + s.dni).includes(q));
     const sinCuenta = S.padron.filter(p => !S.socios.some(s => s.nro === p.nro)).length;
-    return `<h2>Socios y grupos familiares</h2>
-    <div class="card"><h3>Solicitudes pendientes (${pend.length})</h3>${pend.length ? pend.map(p => `<div class="item"><div><b>${esc(p.g.nombre)}</b> · ${esc(p.g.parentesco)} · DNI ${esc(p.g.dni)}<br><span class="small muted">Titular: ${esc(p.s.nombre)} (socio ${p.s.nro})</span></div><div class="acc"><button class="btn-sm" data-act="aprobar" data-n="${p.s.nro}" data-i="${p.gi}">Aprobar</button><button class="btn-sm rojo" data-act="rechazar" data-n="${p.s.nro}" data-i="${p.gi}">Rechazar</button></div></div>`).join('') : '<p class="muted">No hay solicitudes pendientes.</p>'}</div>
+    return `<h2>Socios y perfiles de usuario</h2>
+    <div class="card"><h3>Solicitudes de grupo familiar (${pend.length})</h3>${pend.length ? pend.map(p => `<div class="item"><div><b>${esc(p.g.nombre)}</b> · ${esc(p.g.parentesco)} · DNI ${esc(p.g.dni)}<br><span class="small muted">Titular: ${esc(p.s.nombre)} (socio ${p.s.nro})</span></div><div class="acc"><button class="btn-sm" data-act="aprobar" data-n="${p.s.nro}" data-i="${p.gi}">Aprobar</button><button class="btn-sm rojo" data-act="rechazar" data-n="${p.s.nro}" data-i="${p.gi}">Rechazar</button></div></div>`).join('') : '<p class="muted">No hay solicitudes pendientes.</p>'}</div>
     <div class="card"><div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;align-items:center"><h3 style="margin:0">Socios con cuenta (${S.socios.length})</h3><span class="small muted">En padrón sin cuenta: ${sinCuenta}</span></div>
     <form data-form="buscarsocio" class="row"><input name="q" value="${esc(ui.q || '')}" placeholder="Buscar por nombre, N° o DNI"><button class="btn ghost">Buscar</button></form>
-    <div class="scroll"><table class="tabla" style="margin-top:10px"><thead><tr><th>N°</th><th>Nombre</th><th>DNI</th><th>Correo</th><th>Grupo</th><th>Reservas</th></tr></thead><tbody>
-    ${lista.map(s => `<tr><td>${s.nro}</td><td>${esc(s.nombre)}</td><td>${esc(s.dni)}</td><td>${esc(s.email)}</td><td>${s.grupo.filter(g => g.estado === 'habilitado').length} habilitados</td><td>${S.reservas.filter(r => r.socio === s.nro).length}</td></tr>`).join('')}
+    <div class="scroll"><table class="tabla" style="margin-top:10px"><thead><tr><th>N°</th><th>Nombre</th><th>DNI</th><th>Contacto</th><th>Grupo</th><th>Estado</th><th></th></tr></thead><tbody>
+    ${lista.map(s => `<tr><td>${s.nro}</td><td>${esc(s.nombre)}</td><td>${esc(s.dni)}</td><td>${esc(s.email)}<br><span class="small muted">${esc(s.tel || '')}</span></td><td>${s.grupo.filter(g => g.estado === 'habilitado').length}</td><td>${s.activo === false ? '<span class="badge b-rojo">Suspendida</span>' : '<span class="badge b-verde">Activa</span>'}</td>
+      <td style="white-space:nowrap"><button class="btn-sm" data-act="togglesocio" data-n="${s.nro}">${s.activo === false ? 'Habilitar' : 'Suspender'}</button> <button class="btn-sm" data-act="resetpass" data-n="${s.nro}">Restablecer clave</button></td></tr>`).join('')}
     </tbody></table></div></div>`;
+  },
+
+  seguridad() {
+    let bks = []; try { bks = JSON.parse(localStorage.getItem(KEY + '_bk') || '[]'); } catch (e) {}
+    const fallos = S.auditoria.filter(a => /fallido|Bloqueo|inexistente|inactividad/.test(a.accion)).slice(-10).reverse();
+    return `<h2>Seguridad y copias de seguridad</h2>
+    <div class="grid2"><div class="card"><h3>Copias de seguridad automáticas</h3><p class="small muted">El sistema genera una copia diaria automática y guarda las últimas 3.</p>
+      ${bks.length ? bks.slice().reverse().map((b, i) => `<div class="item"><div><b>${fmtDT(b.t)}</b><br><span class="small muted">${Math.round(b.data.length / 1024)} KB</span></div><button class="btn-sm" data-act="restbk" data-i="${bks.length - 1 - i}">Restaurar</button></div>`).join('') : '<p class="muted">Sin copias todavía.</p>'}
+      <div class="chips" style="margin-top:12px"><button class="btn" data-act="backup">Crear copia ahora</button><button class="btn ghost" data-act="descbk">Descargar copia (.json)</button></div>
+      <label>Restaurar desde un archivo</label><input type="file" id="restfile" accept=".json,application/json"></div>
+    <div class="card"><h3>Medidas activas</h3><ul class="small" style="padding-left:18px;line-height:1.6">
+      <li>Permisos por nivel de usuario: socio, portería y administrador.</li><li>Bloqueo de 5 minutos tras 5 intentos de ingreso fallidos.</li><li>Cierre automático de sesión tras 15 minutos de inactividad.</li><li>Registro de auditoría de todas las operaciones.</li><li>Consentimiento de protección de datos personales (Ley 25.326) al registrarse.</li><li>DNI enmascarado en las vistas del socio.</li><li>En producción: HTTPS obligatorio y contraseñas cifradas en el servidor.</li></ul>
+      <h3 style="margin-top:14px">Eventos de seguridad recientes</h3>${fallos.length ? fallos.map(a => `<div class="small" style="padding:4px 0;border-bottom:1px solid var(--borde)">${fmtDT(a.t)} · ${esc(a.usuario)} · ${esc(a.accion)}</div>`).join('') : '<p class="muted small">Sin eventos.</p>'}</div></div>
+    <div class="card" style="margin-top:14px"><h3>Usuarios del personal</h3>
+      <div class="scroll"><table class="tabla"><thead><tr><th>Usuario</th><th>Nombre</th><th>Nivel</th><th>Estado</th><th></th></tr></thead><tbody>
+      ${S.staff.map(u => `<tr><td>${esc(u.user)}</td><td>${esc(u.nombre)}</td><td>${u.rol === 'admin' ? 'Administrador' : 'Portería'}</td><td>${u.activo === false ? '<span class="badge b-rojo">Suspendido</span>' : '<span class="badge b-verde">Activo</span>'}</td><td>${u.user === ses.user ? '<span class="small muted">(vos)</span>' : `<button class="btn-sm" data-act="togglestaff" data-u="${esc(u.user)}">${u.activo === false ? 'Habilitar' : 'Suspender'}</button>`}</td></tr>`).join('')}
+      </tbody></table></div>
+      <form data-form="staff" class="filtros" style="margin-top:12px;grid-template-columns:repeat(4,1fr) auto"><div><label>Usuario</label><input name="user" required></div><div><label>Nombre</label><input name="nombre" required></div><div><label>Nivel</label><select name="rol"><option value="porteria">Portería</option><option value="admin">Administrador</option></select></div><div><label>Contraseña</label><input name="pass" type="password" required minlength="6"></div><div><button class="btn">Agregar</button></div></form></div>`;
   },
 
   auditoria() {
@@ -561,7 +751,7 @@ function calendario(inst) {
   for (let i = 0; i < start; i++) h += '<div></div>';
   for (let d = 1; d <= dias; d++) {
     const f = y + '-' + z(m) + '-' + z(d), e = estadoDia(inst, f), off = ['pasado','fuera','cerrado'].includes(e);
-    h += `<button type="button" class="dia ${off ? '' : e} ${ui.dia === f ? 'sel' : ''}" data-act="dia" data-f="${f}" ${off ? 'disabled' : ''}>${d}</button>`;
+    h += `<button type="button" class="dia ${off ? '' : e} ${ui.wiz.dia === f ? 'sel' : ''}" data-act="dia" data-f="${f}" ${off ? 'disabled' : ''}>${d}</button>`;
   }
   return h + '</div>';
 }
@@ -587,12 +777,14 @@ function exportCSV(rows, nombre) {
 function render() {
   detenerCamara();
   const app = $('#app');
+  document.body.classList.toggle('con-bottom', !!ses && ses.rol === 'socio');
   if (!ses) { app.innerHTML = vistaAcceso(); return; }
+  const navAct = {familia:'perfil', credencial:'perfil', info:'inicio', novedades:'inicio'}[ui.view] || ui.view;
   const nom = ses.rol === 'socio' ? socioActual().nombre + ' · Socio ' + ses.nro : S.staff.find(s => s.user === ses.user).nombre;
   app.innerHTML = `<header class="top"><div class="marca"><div class="logo">CPA</div><div><b>Complejo Policial Almudena</b> <span class="badge-proto">PROTOTIPO</span><small>Sistema de Gestión Integral</small></div></div>
     <div class="who"><span>${esc(nom)}</span><button class="btn-sm ghost" data-act="salir">Salir</button></div></header>
-    <nav class="tabs">${NAV[ses.rol].map(([k, l]) => `<button class="tab ${ui.view === k ? 'on' : ''}" data-act="nav" data-v="${k}">${l}</button>`).join('')}</nav>
-    <main>${V[ui.view]()}</main>`;
+    <nav class="tabs ${ses.rol === 'socio' ? 'socio' : ''}">${NAV[ses.rol].map(([k, l, ic]) => `<button class="tab ${navAct === k ? 'on' : ''}" data-act="nav" data-v="${k}"><span class="tic">${ic || ''}</span>${l}</button>`).join('')}</nav>
+    <main>${V[ui.view]()}</main>${ses.rol === 'socio' && ui.view !== 'asistente' ? '<button class="fab" data-act="nav" data-v="asistente" title="Asistente virtual" aria-label="Asistente virtual">💬</button>' : ''}`;
   pintarQR();
   const m = $('#msgs'); if (m) m.scrollTop = m.scrollHeight;
 }
@@ -616,17 +808,19 @@ function responder(qRaw) {
       });
       h += '</ul>';
     });
-    return h + '<button class="btn" data-act="nav" data-v="reservar">Reservar</button>';
+    return h + '<button class="btn" data-act="nuevares">Reservar</button>';
   }
-  if (has(/reserv|como (hago|alquilo)|quiero (un|una|el|la)|alquil|turno/)) return 'Reservar es muy simple:<ol><li>Entrá a <b>Reservar</b>.</li><li>Elegí la instalación (quincho, cancha o pileta).</li><li>Elegí el día en el calendario: verde es libre, amarillo quedan pocos turnos, rojo completo.</li><li>Tocá el horario disponible, aceptá el reglamento y confirmá.</li><li>Recibís al instante tu <b>comprobante con código QR</b>, que mostrás en la entrada.</li></ol>Se permite una reserva por tipo de instalación y por día, con hasta 30 días de anticipación.<br><button class="btn" data-act="nav" data-v="reservar">Empezar a reservar</button>';
+  if (has(/reserv|como (hago|alquilo)|quiero (un|una|el|la)|alquil|turno/)) return 'Reservar es muy simple:<ol><li>Entrá a <b>Reservar</b>.</li><li>Elegí la instalación (quincho, cancha o pileta).</li><li>Elegí el día en el calendario: verde es libre, amarillo quedan pocos turnos, rojo completo.</li><li>Tocá el horario disponible, aceptá el reglamento y confirmá.</li><li>Recibís al instante tu <b>comprobante con código QR</b>, que mostrás en la entrada.</li></ol>Se permite una reserva por tipo de instalación y por día, con hasta 30 días de anticipación.<br><button class="btn" data-act="nuevares">Empezar a reservar</button>';
   if (has(/tarifa|precio|cuesta|costo|valor|sale|pagar/)) return 'Tarifas vigentes:' + lista(S.inst.map(i => `${i.nombre}: ${pesos(i.tarifa)}${i.tipo === 'Cancha' ? ' por hora' : i.tipo === 'Pileta' ? ' por grupo y turno' : ' por turno'}`)) + 'Por ahora se abonan en la administración del complejo.';
   if (has(/horario|hora|abre|abren|cierra|atencion/)) return esc(INFO.horarios);
   if (has(/reglamento|norma|regla|permit|mascota|perro|alcohol|prohib/)) return 'Puntos principales del reglamento:' + lista(INFO.reglamento) + 'El reglamento completo está publicado en Comunicados.';
-  if (has(/requisito|ingres|entrar|invitad|credencial|document|revisacion/)) return 'Requisitos para ingresar:' + lista(INFO.requisitos);
+  if (has(/credencial|carnet/)) return 'Tu credencial digital está en <b>Mi cuenta → Mi credencial</b>. Mostrala en la portería junto con tu DNI.<br><button class="btn" data-act="nav" data-v="credencial">Ver mi credencial</button>';
+  if (has(/pregunta|frecuente|faq|dudas/)) return 'Preguntas frecuentes:' + FAQ.map(([p, r]) => `<p style="margin:6px 0"><b>${esc(p)}</b><br>${esc(r)}</p>`).join('');
+  if (has(/requisito|ingres|entrar|invitad|document|revisacion/)) return 'Requisitos para ingresar:' + lista(INFO.requisitos);
   if (has(/donde|ubicacion|direccion|llegar|queda|mapa/)) return esc(INFO.ubicacion);
   if (has(/evento|torneo|fiesta|campeonato/)) { const ev = S.noticias.filter(n => n.tipo === 'Evento'); return ev.length ? 'Próximos eventos:' + lista(ev.map(e => e.titulo + ': ' + e.texto)) : 'Por el momento no hay eventos publicados.'; }
   if (has(/actividad|deporte|futbol|padel|voley|pileta|natacion|quincho/)) return 'En el complejo podés usar:' + lista(S.inst.map(i => `${i.nombre} (${i.cap})${i.activo ? '' : ' – suspendida temporalmente'}`)) + '¿Querés que te diga qué hay libre hoy o mañana?';
-  if (has(/noticia|novedad|comunicado|aviso|clima|lluvia|tormenta|mantenimiento/)) { const ns = S.noticias.slice().sort((a, b) => b.fecha - a.fecha).slice(0, 3); return 'Últimas publicaciones:' + lista(ns.map(n => `[${n.tipo}] ${n.titulo}`)) + '<button class="btn" data-act="nav" data-v="inicio">Ver todas</button>'; }
+  if (has(/noticia|novedad|comunicado|aviso|clima|lluvia|tormenta|mantenimiento/)) { const ns = S.noticias.slice().sort((a, b) => b.fecha - a.fecha).slice(0, 3); return 'Últimas publicaciones:' + lista(ns.map(n => `[${n.tipo}] ${n.titulo}`)) + '<button class="btn" data-act="nav" data-v="novedades">Ver todas</button>'; }
   if (has(/familia|grupo|hijo|esposa|conyuge/)) return 'Podés ver y solicitar altas de tu grupo familiar en <b>Grupo familiar</b>. La administración aprueba cada integrante antes de habilitarlo.<br><button class="btn" data-act="nav" data-v="familia">Ir a Grupo familiar</button>';
   if (has(/contrasen|clave|password/)) return 'Si olvidaste tu contraseña, en la pantalla de ingreso tocá “Olvidé mi contraseña” y te llega un enlace de un solo uso a tu correo registrado.';
   if (has(/gracias/)) return '¡De nada! Si necesitás algo más, acá estoy.';
@@ -656,7 +850,18 @@ function validar(codigo) {
   const c = String(codigo).trim().toUpperCase();
   const r = S.reservas.find(x => x.codigo === c);
   let v;
-  if (!r) { v = {tipo:'error', titulo:'QR inválido', html:`El código <b>${esc(c)}</b> no existe en el sistema. Posible comprobante falso o adulterado.`}; log('Intento de validación con código inexistente: ' + c); }
+  if (c.startsWith('CPA-SOCIO-')) {
+    const s = S.socios.find(x => x.nro === c.slice(10));
+    if (!s) { v = {tipo:'error', titulo:'Credencial inválida', html:'El número de socio no existe.'}; log('Credencial inválida: ' + c); }
+    else if (s.activo === false) { v = {tipo:'error', titulo:'Cuenta suspendida', html:`<b>${esc(s.nombre)}</b> (socio ${s.nro})<br>La cuenta del socio está suspendida.`}; log('Credencial de cuenta suspendida: ' + c); }
+    else {
+      const rh = S.reservas.filter(x => x.socio === s.nro && x.fecha === hoy() && x.estado === 'confirmada');
+      const fam = s.grupo.filter(g => g.estado === 'habilitado');
+      v = {tipo:'ok', titulo:'Socio verificado', html:`<b>${esc(s.nombre)}</b> (socio ${s.nro})<br>Grupo familiar: ${fam.length ? fam.map(g => esc(g.nombre)).join(', ') : 'ninguno'}<br>${rh.length ? 'Reservas de hoy: ' + rh.map(x => esc(instNombre(x.instId) + ' ' + x.turno)).join(', ') + '<br><span class="small">Para habilitar la instalación escaneá el QR de la reserva.</span>' : 'Sin reservas para hoy.'}`};
+      log('Credencial de socio verificada: ' + c);
+    }
+  }
+  else if (!r) { v = {tipo:'error', titulo:'QR inválido', html:`El código <b>${esc(c)}</b> no existe en el sistema. Posible comprobante falso o adulterado.`}; log('Intento de validación con código inexistente: ' + c); }
   else {
     const det = `<b>${esc(nombreSocio(r.socio))}</b> (socio ${r.socio})<br>${esc(instNombre(r.instId))} · ${fmtF(r.fecha)} · ${esc(r.turno)}`;
     if (r.estado === 'cancelada') { v = {tipo:'error', titulo:'Reserva cancelada', html:det + '<br>Esta reserva fue cancelada y no habilita el ingreso.'}; log('Validación rechazada (cancelada): ' + c); }
@@ -678,12 +883,22 @@ function validar(codigo) {
 /* ===================== Eventos ===================== */
 function entrar(u, p) {
   u = u.trim();
+  S.bloqueos = S.bloqueos || {};
+  const bq = S.bloqueos[u];
+  if (bq && bq.hasta > Date.now()) { ui.msg = {tipo:'err', txt:`Demasiados intentos fallidos. Probá de nuevo en ${Math.ceil((bq.hasta - Date.now()) / 60000)} min.`}; render(); return; }
   const st = S.staff.find(s => s.user === u && s.pass === p);
+  const so = !st && S.socios.find(s => (s.nro === u || s.dni === u) && s.pass === p);
+  if ((st && st.activo === false) || (so && so.activo === false)) { ui.msg = {tipo:'err', txt:'La cuenta está suspendida. Comunicate con la administración del complejo.'}; render(); return; }
+  if (st || so) delete S.bloqueos[u];
+  ultimaAct = Date.now();
   if (st) { ses = {rol:st.rol, user:st.user}; ui.view = st.rol === 'admin' ? 'panel' : 'validar'; log('Inicio de sesión'); render(); return; }
-  const so = S.socios.find(s => (s.nro === u || s.dni === u) && s.pass === p);
-  if (so) { ses = {rol:'socio', nro:so.nro}; ui.view = 'inicio'; ui.chat = []; log('Inicio de sesión'); render(); return; }
-  S.auditoria.push({t:Date.now(), usuario:u || 'anónimo', accion:'Intento de ingreso fallido'}); save();
-  ui.msg = {tipo:'err', txt:'Usuario o contraseña incorrectos.'}; render();
+  if (so) { ses = {rol:'socio', nro:so.nro}; ui = uiInicial(); ui.view = 'inicio'; log('Inicio de sesión'); render(); return; }
+  const b = S.bloqueos[u] = S.bloqueos[u] || {n:0, hasta:0};
+  b.n++;
+  S.auditoria.push({t:Date.now(), usuario:u || 'anónimo', accion:'Intento de ingreso fallido'});
+  if (b.n >= 5) { b.hasta = Date.now() + 5 * 60000; b.n = 0; S.auditoria.push({t:Date.now(), usuario:u || 'anónimo', accion:'Bloqueo temporal por 5 intentos fallidos'}); ui.msg = {tipo:'err', txt:'Demasiados intentos fallidos. El acceso quedó bloqueado por 5 minutos.'}; }
+  else ui.msg = {tipo:'err', txt:`Usuario o contraseña incorrectos. Te quedan ${5 - b.n} intentos.`};
+  save(); render();
 }
 
 const ACT = {
@@ -691,21 +906,25 @@ const ACT = {
   acceso: b => { ui.acceso = b.dataset.v; ui.msg = null; render(); },
   demo: b => entrar(b.dataset.u, b.dataset.p),
   reset: () => { if (confirm('¿Reiniciar todos los datos de demostración?')) { S = seed(); save(); ui.msg = {tipo:'ok', txt:'Datos reiniciados.'}; render(); } },
-  salir: () => { log('Cierre de sesión'); ses = null; ui = {acceso:'login', view:'', inst:'q1', mes:hoy().slice(0, 7), dia:null, chat:[], validacion:null, f:null, msg:null, q:''}; render(); },
-  inst: b => { ui.inst = b.dataset.id; ui.dia = null; render(); },
+  salir: () => { log('Cierre de sesión'); ses = null; ui = uiInicial(); closeModal(); render(); },
+  nuevares: () => { ui.wiz = {paso:1}; ui.verCal = false; ui.view = 'reservar'; render(); window.scrollTo(0, 0); },
+  wtipo: b => { const is = S.inst.filter(i => i.tipo === b.dataset.t && i.activo); ui.wiz.tipo = b.dataset.t; if (is.length === 1 && S.inst.filter(i => i.tipo === b.dataset.t).length === 1) { ui.wiz.inst = is[0].id; ui.wiz.paso = 3; } else ui.wiz.paso = 2; ui.verCal = false; render(); window.scrollTo(0, 0); },
+  winst: b => { ui.wiz.inst = b.dataset.id; ui.wiz.paso = 3; ui.verCal = false; render(); window.scrollTo(0, 0); },
+  wdia: b => { ui.wiz.dia = b.dataset.f; ui.wiz.paso = 4; render(); window.scrollTo(0, 0); },
+  dia: b => { ui.wiz.dia = b.dataset.f; ui.wiz.paso = 4; render(); window.scrollTo(0, 0); },
+  wturno: b => { ui.wiz.turno = b.dataset.t; ui.wiz.paso = 5; render(); window.scrollTo(0, 0); },
+  wback: () => { const w = ui.wiz; w.paso = (w.paso === 3 && S.inst.filter(i => i.tipo === w.tipo).length === 1) ? 1 : w.paso - 1; render(); },
+  wcal: () => { ui.verCal = !ui.verCal; if (ui.verCal) ui.mes = (ui.wiz.dia || hoy()).slice(0, 7); render(); },
   mes: b => { const [y, m] = ui.mes.split('-').map(Number); const d = new Date(y, m - 1 + Number(b.dataset.d), 1); ui.mes = d.getFullYear() + '-' + z(d.getMonth() + 1); render(); },
-  dia: b => { ui.dia = b.dataset.f; render(); },
-  turno: b => {
-    const inst = getInst(ui.inst), t = b.dataset.t;
-    showModal(`<h3>Confirmar reserva</h3><table class="kv"><tr><td>Instalación</td><td><b>${esc(inst.nombre)}</b></td></tr><tr><td>Fecha</td><td>${fmtFL(ui.dia)}</td></tr><tr><td>Horario</td><td>${esc(t)}</td></tr><tr><td>Capacidad</td><td>${esc(inst.cap)}</td></tr><tr><td>Tarifa</td><td>${pesos(inst.tarifa)} <span class="small muted">(se abona en el complejo)</span></td></tr></table>
-      <label class="check"><input type="checkbox" id="acepto"> Leí y acepto el reglamento del complejo</label>
-      <div class="acciones"><button class="btn ghost" data-act="cerrar">Volver</button><button class="btn" data-act="confirmar" data-t="${esc(t)}">Confirmar reserva</button></div>`);
-  },
-  confirmar: b => {
-    if (!$('#acepto').checked) { toast('Tenés que aceptar el reglamento.', 'error'); return; }
-    const res = crearReserva(ses.nro, ui.inst, ui.dia, b.dataset.t, false);
-    if (res.error) { closeModal(); toast(res.error, 'error'); render(); return; }
-    render(); comprobante(res.r); toast('¡Reserva confirmada!');
+  mtab: b => { ui.mtab = b.dataset.t; render(); },
+  ntipo: b => { ui.ntipo = b.dataset.t; render(); },
+  verreg: () => showModal(`<h3>Reglamento del complejo</h3><ul style="padding-left:18px;line-height:1.6">${INFO.reglamento.map(x => '<li>' + esc(x) + '</li>').join('')}</ul><div class="acciones"><button class="btn" data-act="cerrar">Entendido</button></div>`),
+  descreg: () => descargar('Reglamento del Complejo Policial Almudena\n\n' + INFO.reglamento.map((x, i) => (i + 1) + '. ' + x).join('\n'), 'reglamento_complejo_almudena.txt', 'text/plain'),
+  confirmar: () => {
+    if (!$('#acepto').checked) { toast('Marcá la casilla para aceptar el reglamento.', 'error'); return; }
+    const w = ui.wiz, res = crearReserva(ses.nro, w.inst, w.dia, w.turno, false);
+    if (res.error) { toast(res.error, 'error'); w.paso = 4; render(); return; }
+    ui.wiz = {paso:1}; ui.view = 'mis'; ui.mtab = 'prox'; render(); comprobante(res.r, true);
   },
   verqr: b => comprobante(S.reservas.find(r => r.id === b.dataset.id)),
   cerrar: () => closeModal(),
@@ -730,11 +949,17 @@ const ACT = {
   toggleinst: b => { const i = getInst(b.dataset.id); i.activo = !i.activo; log(`${i.activo ? 'Habilitó' : 'Suspendió por mantenimiento'} ${i.nombre}`); toast(i.nombre + (i.activo ? ' habilitada' : ' suspendida')); render(); },
   delnot: b => { const n = S.noticias.find(x => x.id === b.dataset.id); if (!confirm('¿Eliminar “' + n.titulo + '”?')) return; S.noticias = S.noticias.filter(x => x !== n); log('Eliminó la publicación: ' + n.titulo); render(); },
   aprobar: b => { const s = S.socios.find(x => x.nro === b.dataset.n), g = s.grupo[+b.dataset.i]; g.estado = 'habilitado'; log(`Aprobó familiar ${g.nombre} del socio ${s.nro}`); toast('Familiar habilitado'); render(); },
+  togglesocio: b => { const s = S.socios.find(x => x.nro === b.dataset.n); s.activo = s.activo === false; log(`${s.activo ? 'Habilitó' : 'Suspendió'} la cuenta del socio ${s.nro}`); toast('Cuenta ' + (s.activo ? 'habilitada' : 'suspendida')); render(); },
+  resetpass: b => { const s = S.socios.find(x => x.nro === b.dataset.n); const v = new Uint32Array(1); crypto.getRandomValues(v); s.pass = String(100000 + v[0] % 900000); log(`Restableció la contraseña del socio ${s.nro}`); showModal(`<h3>Contraseña restablecida</h3><p>Contraseña temporal para <b>${esc(s.nombre)}</b> (socio ${s.nro}):</p><p class="codigo">${s.pass}</p><p class="small muted">Entregala al socio y pedile que la cambie desde “Mi cuenta”. En producción se envía por correo.</p><div class="acciones"><button class="btn" data-act="cerrar">Listo</button></div>`); },
+  togglestaff: b => { const u = S.staff.find(x => x.user === b.dataset.u); u.activo = u.activo === false; log(`${u.activo ? 'Habilitó' : 'Suspendió'} al usuario ${u.user}`); render(); },
+  backup: () => { if (autoBackup(true)) { log('Copia de seguridad manual'); toast('Copia de seguridad creada'); } else toast('No hay espacio para la copia. Descargala como archivo.', 'error'); render(); },
+  descbk: () => { descargar(JSON.stringify(S), `copia_almudena_${hoy()}.json`, 'application/json'); log('Descargó copia de seguridad'); },
+  restbk: b => { let bks = []; try { bks = JSON.parse(localStorage.getItem(KEY + '_bk') || '[]'); } catch (e) {} const bk = bks[+b.dataset.i]; if (!bk || !confirm('¿Restaurar la copia del ' + fmtDT(bk.t) + '? Se reemplazan los datos actuales.')) return; S = JSON.parse(bk.data); log('Restauró la copia del ' + fmtDT(bk.t)); toast('Copia restaurada'); render(); },
   rechazar: b => { const s = S.socios.find(x => x.nro === b.dataset.n), g = s.grupo[+b.dataset.i]; s.grupo.splice(+b.dataset.i, 1); log(`Rechazó familiar ${g.nombre} del socio ${s.nro}`); toast('Solicitud rechazada'); render(); }
 };
 
-function comprobante(r) {
-  showModal(`<div class="comprobante"><div class="cmp-head"><div class="logo">CPA</div><div><b>Complejo Policial Almudena</b><small>Comprobante digital de reserva</small></div></div>
+function comprobante(r, nueva) {
+  showModal(`${nueva ? '<div class="ok" style="text-align:center;margin:0 0 12px;font-weight:700">✅ ¡Listo! Tu reserva está confirmada</div>' : ''}<div class="comprobante"><div class="cmp-head"><div class="logo">CPA</div><div><b>Complejo Policial Almudena</b><small>Comprobante digital de reserva</small></div></div>
     <div class="qr" data-qr="${r.codigo}"></div><div class="codigo">${r.codigo}</div>
     <table class="kv"><tr><td>Socio</td><td>${esc(nombreSocio(r.socio))} (N° ${r.socio})</td></tr><tr><td>Instalación</td><td>${esc(instNombre(r.instId))}</td></tr><tr><td>Fecha</td><td>${fmtFL(r.fecha)}</td></tr><tr><td>Horario</td><td>${esc(r.turno)}</td></tr><tr><td>Estado</td><td>${badgeEstado(r.estado)}</td></tr><tr><td>Emitido</td><td>${fmtDT(r.creada)}</td></tr>${r.ingreso ? `<tr><td>Ingreso</td><td>${fmtDT(r.ingreso)}</td></tr>` : ''}</table>
     <p class="small muted">Presentá este QR en el ingreso. Es único e intransferible y solo es válido una vez.</p></div>
@@ -752,6 +977,7 @@ const FORM = {
     else if (S.socios.some(s => s.nro === nro)) err = 'Ese socio ya tiene una cuenta. Usá “Olvidé mi contraseña”.';
     else if (p.length < 6) err = 'La contraseña debe tener al menos 6 caracteres.';
     else if (p !== fd.get('p2')) err = 'Las contraseñas no coinciden.';
+    else if (!fd.get('consent')) err = 'Tenés que aceptar la política de protección de datos personales.';
     if (err) { ui.msg = {tipo:'err', txt:err}; render(); return; }
     S.socios.push({nro, dni, nombre:pad.nombre, email:fd.get('email').trim(), tel:fd.get('tel').trim(), pass:p, alta:Date.now(), grupo:[]});
     S.auditoria.push({t:Date.now(), usuario:'Socio ' + nro, accion:'Registro de cuenta nueva (validado contra padrón)'}); save();
@@ -764,6 +990,9 @@ const FORM = {
   },
   familiar: fd => { const s = socioActual(); s.grupo.push({nombre:fd.get('nombre').trim(), dni:fd.get('dni').trim(), parentesco:fd.get('parentesco'), estado:'pendiente'}); log('Solicitó alta de familiar: ' + fd.get('nombre').trim()); toast('Solicitud enviada a la administración'); render(); },
   chat: fd => preguntar(fd.get('q')),
+  datos: fd => { const s = socioActual(); s.email = fd.get('email').trim(); s.tel = fd.get('tel').trim(); log('Actualizó sus datos de contacto'); toast('Datos guardados'); render(); },
+  pass: (fd, f) => { const s = socioActual(); if (fd.get('a') !== s.pass) { toast('La contraseña actual no es correcta.', 'error'); return; } if (fd.get('n').length < 6) { toast('La nueva contraseña debe tener al menos 6 caracteres.', 'error'); return; } if (fd.get('n') !== fd.get('n2')) { toast('Las contraseñas nuevas no coinciden.', 'error'); return; } s.pass = fd.get('n'); log('Cambió su contraseña'); f.reset(); toast('Contraseña actualizada'); },
+  staff: fd => { const u = fd.get('user').trim(); if (S.staff.some(x => x.user === u) || S.socios.some(x => x.nro === u)) { toast('Ese usuario ya existe.', 'error'); return; } S.staff.push({user:u, nombre:fd.get('nombre').trim(), rol:fd.get('rol'), pass:fd.get('pass'), activo:true}); log(`Creó el usuario ${u} (${fd.get('rol')})`); toast('Usuario creado'); render(); },
   codigo: fd => { if (fd.get('c').trim()) validar(fd.get('c')); },
   filtro: fd => { ui.f = {desde:fd.get('desde'), hasta:fd.get('hasta'), inst:fd.get('inst'), estado:fd.get('estado'), q:fd.get('q')}; render(); },
   nueva: (fd, f) => { const res = crearReserva(fd.get('nro').trim(), fd.get('inst'), fd.get('fecha'), fd.get('turno'), true); if (res.error) { toast(res.error, 'error'); return; } f.reset(); comprobante(res.r); toast('Reserva registrada'); },
@@ -786,12 +1015,39 @@ document.addEventListener('click', e => {
 });
 document.addEventListener('submit', e => { const f = e.target.closest('form[data-form]'); if (!f) return; e.preventDefault(); FORM[f.dataset.form](new FormData(f), f); });
 document.addEventListener('change', e => {
+  if (e.target.id === 'restfile' && e.target.files[0]) {
+    const rd = new FileReader();
+    rd.onload = () => { try { const d = JSON.parse(rd.result); if (!d.reservas || !d.socios || !d.inst) throw 0; if (!confirm('¿Restaurar los datos desde el archivo? Se reemplazan los actuales.')) return; S = d; log('Restauró datos desde archivo'); toast('Datos restaurados'); render(); } catch (er) { toast('El archivo no es una copia válida del sistema.', 'error'); } };
+    rd.readAsText(e.target.files[0]);
+  }
   if (e.target.id === 'n_inst') { $('#n_turno').innerHTML = getInst(e.target.value).turnos.map(t => `<option>${esc(t)}</option>`).join(''); }
   if (e.target.dataset.tarifa) { const i = getInst(e.target.dataset.tarifa); const v = Math.max(0, Number(e.target.value) || 0); log(`Cambió la tarifa de ${i.nombre}: ${pesos(i.tarifa)} → ${pesos(v)}`); i.tarifa = v; toast('Tarifa actualizada'); }
 });
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 
+function descargar(txt, nombre, tipo) {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([txt], {type:tipo + ';charset=utf-8'}));
+  a.download = nombre; document.body.appendChild(a); a.click(); a.remove();
+}
+function autoBackup(forzar) {
+  try {
+    const bks = JSON.parse(localStorage.getItem(KEY + '_bk') || '[]');
+    if (!forzar && bks.length && Date.now() - bks[bks.length - 1].t < 86400000) return true;
+    bks.push({t:Date.now(), data:JSON.stringify(S)});
+    while (bks.length > 3) bks.shift();
+    localStorage.setItem(KEY + '_bk', JSON.stringify(bks));
+    return true;
+  } catch (e) { return false; }
+}
+let ultimaAct = Date.now();
+['click', 'keydown', 'touchstart'].forEach(ev => document.addEventListener(ev, () => { ultimaAct = Date.now(); }, {passive:true}));
+setInterval(() => {
+  if (ses && Date.now() - ultimaAct > 15 * 60000) { log('Sesión cerrada por inactividad'); ses = null; ui = uiInicial(); ui.msg = {tipo:'err', txt:'Tu sesión se cerró por inactividad. Ingresá de nuevo.'}; closeModal(); render(); }
+}, 30000);
+
 load();
+autoBackup(false);
 render();
 </script>
 </body>
