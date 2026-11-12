@@ -4,9 +4,25 @@ Prototipo del **Sistema Web Inteligente de Gestión Integral** solicitado por la
 
 > ⚠️ **Prototipo de demostración.** Los datos (socios, tarifas, horarios, reservas) son de ejemplo y se guardan solo en el navegador (`localStorage`). No usar con datos reales.
 
+## Dos sitios
+
+| Sitio | Archivo | Para quién |
+|---|---|---|
+| **Reservas para socios** | `index.html` | Sitio público + cuenta del socio: reservar, pagar e informar el pago, QR, credencial, asistente |
+| **Administración** | `admin.html` | Personal del complejo: pagos por confirmar, lugares disponibles, agenda, reservas, socios, comunicados, seguridad. También portería |
+
+Ambos comparten `styles.css` y `app.js`. En el prototipo los datos se guardan en el navegador, así que la administración ve lo que hacen los socios **solo si se usa el mismo navegador**. En la versión real ambos sitios se conectan a la misma base de datos en un servidor.
+
+## Pagos
+
+1. El socio reserva y la reserva queda con **💲 Pago pendiente**.
+2. Transfiere (alias/CBU de ejemplo) y desde *Mis reservas → Pagar* informa el pago con N° de operación y foto del comprobante → **🕓 Pago en revisión**.
+3. La administración, en *Pagos*, ve el comprobante y lo **confirma ✅** o **rechaza ⛔**. También puede registrar pagos en efectivo.
+4. Portería ve al escanear el QR si el pago está confirmado.
+
 ## Cómo probarlo
 
-Abrir `index.html` en Chrome (PC o celular). En la pantalla de ingreso hay accesos de demostración:
+Abrir `index.html` (socios) o `admin.html` (personal) en Chrome. Cada pantalla de ingreso tiene sus accesos de demostración:
 
 | Rol | Usuario | Contraseña |
 |---|---|---|
