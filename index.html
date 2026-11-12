@@ -299,6 +299,26 @@ details.acc .cont{padding:0 16px 14px;font-size:14px;line-height:1.5}
 .icg{font-size:40px;display:block;margin-bottom:6px}
 .s-foot{text-align:center;padding:28px;color:var(--gris);font-size:13px;border-top:1px solid var(--borde);margin-top:30px;background:#fff}
 @media(max-width:860px){.s-nav{display:none}.hero{grid-template-columns:1fr;padding:28px 18px;gap:24px}.hero h1{font-size:28px}.grid3{grid-template-columns:1fr}.s-sec{padding:18px}.s-head{padding:12px 16px}}
+/* ====== Administrador ====== */
+.sgrupo{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:#6b8a74;margin:14px 12px 4px}
+.sgrupo:first-child{margin-top:0}
+@media(min-width:900px){.tiles.cuatro{grid-template-columns:repeat(4,1fr)}}
+.agbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.agtit{margin-left:auto;font-size:16px;color:var(--azul)}
+.agfila{display:grid;grid-template-columns:200px 1fr;gap:14px;padding:12px 0;border-bottom:1px solid var(--borde);align-items:start}
+.agfila:last-child{border-bottom:0}
+.agnom{display:flex;gap:8px;align-items:flex-start}
+.agslots{display:flex;flex-wrap:wrap;gap:6px}
+.slot{border:1px solid var(--borde);border-radius:10px;padding:6px 9px;width:118px;text-align:left;font-size:12px;background:#fff}
+.slot b{display:block;font-size:13px}
+.slot span{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.slot.lib{background:var(--verdeb);border-color:#a7e0bd;color:var(--verde)}
+.slot.lib:hover{border-color:var(--verde);box-shadow:0 2px 8px rgba(46,139,79,.2)}
+.slot.ocu{background:#fff3d6;border-color:#f0d58c;color:#7a5a12}
+.slot.ocu.usada{background:var(--celeste);border-color:#b9dcc4;color:var(--azul)}
+.slot.pas{background:#f3f4f6;color:#9aa3ad}
+div.slot{cursor:default}
+@media(max-width:760px){.agfila{grid-template-columns:1fr}.slot{width:calc(50% - 3px)}.agtit{margin-left:0;width:100%}}
 @media print{body>*:not(#modal){display:none!important}#modal{position:static;background:none;display:block}#modal .caja{max-width:none;box-shadow:none}.no-print{display:none!important}}
 </style>
 </head>
@@ -419,7 +439,9 @@ let ui = uiInicial();
 const getInst = id => S.inst.find(i => i.id === id) || {nombre:'?', tipo:'?', turnos:[], cupo:1};
 const instNombre = id => getInst(id).nombre;
 const socioActual = () => S.socios.find(s => s.nro === ses.nro);
-const nombreSocio = nro => (S.socios.find(s => s.nro === nro) || S.padron.find(s => s.nro === nro) || {nombre:'Socio ' + nro}).nombre;
+const NOMS = ['Martín','Lucía','Diego','Carolina','Jorge','Valeria','Pablo','Romina','Sergio','Natalia','Gustavo','Florencia','Ricardo','Paola','Marcelo','Silvina','Fernando','Daniela','Héctor','Gabriela'];
+const APES = ['Gómez','Fernández','Rodríguez','López','Martínez','Guzmán','Cruz','Mamaní','Flores','Sosa','Romero','Vargas','Aguirre','Choque','Díaz','Ruiz','Ortiz','Tolaba','Quispe','Herrera'];
+const nombreSocio = nro => { const s = S.socios.find(x => x.nro === nro) || S.padron.find(x => x.nro === nro); if (s) return s.nombre; const n = parseInt(nro, 10) || 0; return NOMS[n % NOMS.length] + ' ' + APES[(n * 7 + 3) % APES.length]; };
 const usuarioLog = () => ses ? (ses.rol === 'socio' ? 'Socio ' + ses.nro : ses.user) : 'anónimo';
 function log(accion) { S.auditoria.push({t:Date.now(), usuario:usuarioLog(), accion}); save(); }
 const ocup = (instId, fecha, turno, exceptoId) => S.reservas.filter(r => r.instId === instId && r.fecha === fecha && r.turno === turno && r.estado !== 'cancelada' && r.id !== exceptoId).length;
@@ -555,11 +577,11 @@ function vistaAcceso() {
 }
 
 /* ===================== Vistas ===================== */
-const ICONOS = {inicio:'🏠', reservar:'📅', mis:'🎟️', asistente:'💬', perfil:'👤', validar:'📷', ingresos:'🚪', panel:'📊', reservas:'🗂️', nueva:'➕', instalaciones:'🏟️', comunicados:'📢', socios:'👥', seguridad:'🔒', auditoria:'📜'};
+const ICONOS = {agenda:'📆', inicio:'🏠', reservar:'📅', mis:'🎟️', asistente:'💬', perfil:'👤', validar:'📷', ingresos:'🚪', panel:'📊', reservas:'🗂️', nueva:'➕', instalaciones:'🏟️', comunicados:'📢', socios:'👥', seguridad:'🔒', auditoria:'📜'};
 const NAV = {
   socio:[['inicio','Inicio','🏠'],['reservar','Reservar','📅'],['mis','Mis reservas','🎟️'],['asistente','Asistente','💬'],['perfil','Mi cuenta','👤']],
   porteria:[['validar','Validar QR'],['ingresos','Ingresos de hoy']],
-  admin:[['panel','Panel'],['reservas','Reservas'],['nueva','Nueva reserva'],['instalaciones','Instalaciones'],['comunicados','Comunicados'],['socios','Socios'],['seguridad','Seguridad'],['auditoria','Auditoría']]
+  admin:[['_','Principal'],['panel','Inicio'],['agenda','Agenda'],['reservas','Reservas'],['nueva','Nueva reserva'],['_','Gestión'],['socios','Socios'],['instalaciones','Instalaciones'],['comunicados','Comunicados'],['_','Sistema'],['seguridad','Seguridad'],['auditoria','Auditoría']]
 };
 
 function listaNoticias(admin, limite, tipo) {
@@ -741,19 +763,54 @@ const V = {
     const val = S.reservas.filter(r => r.estado !== 'cancelada');
     const activas = S.reservas.filter(r => r.estado === 'confirmada' && r.fecha >= h).length;
     const delMes = val.filter(r => r.fecha.startsWith(mes)).length;
-    const ingHoy = S.reservas.filter(r => r.ingreso && ymd(new Date(r.ingreso)) === h).length;
+    const hoyR = S.reservas.filter(r => r.fecha === h && r.estado !== 'cancelada').sort((a, b) => inicioTurno(a.turno) - inicioTurno(b.turno));
+    const ingHoy = hoyR.filter(r => r.estado === 'utilizada').length, espHoy = hoyR.filter(r => r.estado === 'confirmada');
     let tot = 0, oc = 0;
     for (let i = 0; i < 7; i++) { const f = addDays(h, i); S.inst.filter(x => x.cupo === 1).forEach(x => x.turnos.forEach(t => { tot++; if (ocup(x.id, f, t)) oc++; })); }
     const porInst = S.inst.map(i => [i.nombre, val.filter(r => r.instId === i.id && r.fecha.startsWith(mes)).length]);
     const meses = []; const d = new Date(); d.setDate(1);
-    for (let i = 5; i >= 0; i--) { const x = new Date(d.getFullYear(), d.getMonth() - i, 1); const k = x.getFullYear() + '-' + z(x.getMonth() + 1); meses.push([x.toLocaleDateString('es-AR', {month:'short', year:'2-digit'}), val.filter(r => r.fecha.startsWith(k)).length]); }
+    for (let i = 5; i >= 0; i--) { const x = new Date(d.getFullYear(), d.getMonth() - i, 1); const k = x.getFullYear() + '-' + z(x.getMonth() + 1); meses.push([cap1(x.toLocaleDateString('es-AR', {month:'short', year:'2-digit'})), val.filter(r => r.fecha.startsWith(k)).length]); }
     const cancel = S.reservas.filter(r => r.estado === 'cancelada' && r.fecha.startsWith(mes)).length;
-    return `<h2>Panel administrativo</h2>
-    <div class="kpis"><div class="kpi"><b>${S.socios.length}</b><span>Socios con cuenta (de 7.335)</span></div><div class="kpi"><b>${activas}</b><span>Reservas activas</span></div><div class="kpi"><b>${delMes}</b><span>Reservas este mes</span></div><div class="kpi"><b>${ingHoy}</b><span>Ingresos hoy</span></div></div>
-    <div class="grid2"><div class="card"><h3>Uso por instalación (mes actual)</h3>${bars(porInst)}</div>
-      <div class="card"><h3>Reservas por mes</h3>${bars(meses)}<p class="small muted">Ocupación de quinchos y canchas en los próximos 7 días: <b>${Math.round(oc / tot * 100)} %</b> · Cancelaciones del mes: <b>${cancel}</b></p></div></div>
-    <div class="card" style="margin-top:14px"><h3>Reportes</h3><p class="small muted">Exportación en CSV (se abre con Excel).</p>
-      <div class="chips"><button class="btn" data-act="rep" data-p="${mes}">Reporte mensual (${mes})</button><button class="btn ghost" data-act="rep" data-p="${anio}">Reporte anual (${anio})</button></div></div>`;
+    const pendFam = S.socios.reduce((a, s) => a + s.grupo.filter(g => g.estado === 'pendiente').length, 0);
+    const susp = S.inst.filter(i => !i.activo);
+    const tareas = [];
+    if (pendFam) tareas.push(['👨‍👩‍👧', `${pendFam} solicitud${pendFam > 1 ? 'es' : ''} de grupo familiar para revisar`, 'socios', 'Revisar']);
+    if (susp.length) tareas.push(['🛠️', `${susp.length} instalación${susp.length > 1 ? 'es' : ''} en mantenimiento: ${susp.map(i => i.nombre).join(', ')}`, 'instalaciones', 'Ver']);
+    if (espHoy.length) tareas.push(['🚪', `${espHoy.length} reservas de hoy todavía no ingresaron`, 'agenda', 'Ver agenda']);
+    const hr = new Date().getHours(), saludo = hr < 12 ? 'Buen día' : hr < 20 ? 'Buenas tardes' : 'Buenas noches';
+    const acciones = [['agenda', '📆', 'Agenda del día', 'Ocupación de cada instalación'], ['nueva', '➕', 'Nueva reserva', 'Para socios que llaman o vienen'], ['comunicados', '📢', 'Publicar aviso', 'Comunicados y novedades'], ['reservas', '🔎', 'Buscar reserva', 'Por socio, código o fecha']];
+    return `<h2 class="hola">${saludo} 👋</h2><p class="sub">Resumen del complejo y accesos rápidos.</p>
+    <div class="tiles cuatro">${acciones.map(([v, ic, t, ds], i) => `<button class="tile ${i === 0 ? 'prim' : ''}" data-act="nav" data-v="${v}"><span class="ic">${ic}</span><b>${t}</b><span class="d">${ds}</span></button>`).join('')}</div>
+    <div class="kpis"><div class="kpi"><b>${hoyR.length}</b><span>Reservas de hoy</span></div><div class="kpi"><b>${ingHoy}</b><span>Ya ingresaron hoy</span></div><div class="kpi"><b>${activas}</b><span>Reservas activas</span></div><div class="kpi"><b>${Math.round(oc / tot * 100)} %</b><span>Ocupación próximos 7 días</span></div></div>
+    <div class="grid2"><div class="card"><h3>Tareas pendientes</h3>${tareas.length ? tareas.map(([ic, t, v, b]) => `<div class="item"><div style="display:flex;gap:10px;align-items:center"><span style="font-size:22px">${ic}</span><span>${esc(t)}</span></div><button class="btn-sm" data-act="nav" data-v="${v}">${b}</button></div>`).join('') : '<p class="muted">✅ No hay tareas pendientes.</p>'}</div>
+      <div class="card"><div style="display:flex;justify-content:space-between;align-items:center"><h3 style="margin:0">Próximos ingresos de hoy</h3><button class="link" data-act="nav" data-v="agenda">Agenda completa</button></div>
+      ${espHoy.length ? espHoy.slice(0, 6).map(r => `<div class="item"><div>${ICON[r.instId] || ''} <b>${esc(instNombre(r.instId))}</b> · ${esc(r.turno)}<br><span class="small muted">${esc(nombreSocio(r.socio))} (socio ${r.socio})</span></div><button class="btn-sm" data-act="agdet" data-id="${r.id}">Detalle</button></div>`).join('') : '<p class="muted">No quedan ingresos pendientes para hoy.</p>'}</div></div>
+    <div class="grid2" style="margin-top:14px"><div class="card"><h3>Uso por instalación (mes actual)</h3>${bars(porInst)}</div>
+      <div class="card"><h3>Reservas por mes</h3>${bars(meses)}<p class="small muted">Reservas este mes: <b>${delMes}</b> · Cancelaciones: <b>${cancel}</b> · Socios con cuenta: <b>${S.socios.length}</b> de 7.335</p></div></div>
+    <div class="card" style="margin-top:14px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap"><div><h3 style="margin:0">Reportes</h3><span class="small muted">Se descargan en CSV y se abren con Excel.</span></div>
+      <div class="chips"><button class="btn" data-act="rep" data-p="${mes}">⬇ Reporte mensual (${mes})</button><button class="btn ghost" data-act="rep" data-p="${anio}">⬇ Reporte anual (${anio})</button></div></div>`;
+  },
+
+  agenda() {
+    if (!ui.ag) ui.ag = hoy();
+    const f = ui.ag;
+    const filas = S.inst.map(i => {
+      const celdas = i.turnos.map(t => {
+        const pas = turnoPasado(f, t);
+        if (i.cupo > 1) { const o = ocup(i.id, f, t); return `<button class="slot ${pas || !i.activo ? 'pas' : o >= i.cupo ? 'ocu' : 'lib'}" data-act="agpileta" data-i="${i.id}" data-t="${esc(t)}"><b>${esc(t)}</b><span>${o} de ${i.cupo} grupos</span></button>`; }
+        const r = S.reservas.find(x => x.instId === i.id && x.fecha === f && x.turno === t && x.estado !== 'cancelada');
+        if (r) return `<button class="slot ocu ${r.estado === 'utilizada' ? 'usada' : ''}" data-act="agdet" data-id="${r.id}" title="${esc(nombreSocio(r.socio))}"><b>${esc(t)}</b><span>${r.estado === 'utilizada' ? '✓ ' : ''}${esc(nombreSocio(r.socio))}</span></button>`;
+        if (!i.activo) return `<div class="slot pas"><b>${esc(t)}</b><span>Suspendido</span></div>`;
+        if (pas) return `<div class="slot pas"><b>${esc(t)}</b><span>Libre (pasado)</span></div>`;
+        return `<button class="slot lib" data-act="agnueva" data-i="${i.id}" data-t="${esc(t)}"><b>${esc(t)}</b><span>+ Reservar</span></button>`;
+      }).join('');
+      const usados = i.turnos.filter(t => ocup(i.id, f, t) >= i.cupo).length;
+      return `<div class="agfila"><div class="agnom"><span style="font-size:22px">${ICON[i.id]}</span><div><b>${esc(i.nombre)}</b><br><span class="small muted">${i.activo ? `${usados} de ${i.turnos.length} ${i.cupo > 1 ? 'turnos completos' : 'ocupados'}` : '<span class="badge b-rojo">Mantenimiento</span>'}</span></div></div><div class="agslots">${celdas}</div></div>`;
+    }).join('');
+    return `<h2>Agenda del día</h2><p class="sub">Tocá un turno libre para reservarlo, o uno reservado para ver el detalle.</p>
+    <div class="card agbar"><button class="btn-sm" data-act="agdia" data-d="-1">‹ Día anterior</button><button class="btn-sm" data-act="aghoy">Hoy</button><button class="btn-sm" data-act="agdia" data-d="1">Día siguiente ›</button><input type="date" id="agfecha" value="${f}" style="width:auto"><b class="agtit">${fmtFL(f)}</b></div>
+    <div class="leyenda" style="margin:0 0 12px"><span><i style="background:var(--verdeb);border:1px solid #a7e0bd"></i>Libre</span><span><i style="background:#fff3d6;border:1px solid #f0d58c"></i>Reservado</span><span><i style="background:var(--celeste);border:1px solid #b9dcc4"></i>Ya ingresó</span><span><i style="background:#f3f4f6"></i>Pasado o suspendido</span></div>
+    <div class="card">${filas}</div>`;
   },
 
   reservas() {
@@ -761,7 +818,9 @@ const V = {
     if (!ui.f) ui.f = {desde:addDays(h, -7), hasta:addDays(h, 30), inst:'', estado:'', q:''};
     const f = ui.f;
     const rs = filtrarReservas();
-    return `<h2>Administración de reservas</h2>
+    const rap = [['hoy', 'Hoy'], ['semana', 'Próximos 7 días'], ['mes', 'Este mes'], ['futuras', 'Todas las próximas'], ['canceladas', 'Canceladas']];
+    return `<h2>Reservas</h2><p class="sub">Buscá por socio, código o fecha. Tocá “Detalle” para ver, modificar o cancelar.</p>
+    <div class="chips" style="margin-bottom:12px">${rap.map(([k, l]) => `<button class="chip ${ui.frap === k ? 'on' : ''}" data-act="frap" data-k="${k}">${l}</button>`).join('')}</div>
     <div class="card"><form data-form="filtro" class="filtros">
       <div><label>Desde</label><input type="date" name="desde" value="${f.desde}"></div>
       <div><label>Hasta</label><input type="date" name="hasta" value="${f.hasta}"></div>
@@ -772,20 +831,22 @@ const V = {
     <div class="card"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><h3 style="margin:0">${rs.length} reservas</h3><button class="btn-sm" data-act="exportar">Exportar CSV</button></div>
     <div class="scroll"><table class="tabla"><thead><tr><th>Código</th><th>Socio</th><th>Instalación</th><th>Fecha</th><th>Turno</th><th>Estado</th><th></th></tr></thead><tbody>
     ${rs.slice(0, 200).map(r => `<tr><td style="font-family:monospace">${r.codigo}</td><td>${r.socio}<br><span class="small muted">${esc(nombreSocio(r.socio))}</span></td><td>${esc(instNombre(r.instId))}</td><td>${fmtF(r.fecha)}</td><td>${esc(r.turno)}</td><td>${badgeEstado(r.estado)}</td>
-      <td style="white-space:nowrap">${r.estado === 'confirmada' ? `<button class="btn-sm" data-act="modificar" data-id="${r.id}">Modificar</button> <button class="btn-sm rojo" data-act="cancelar" data-id="${r.id}">Cancelar</button>` : ''}</td></tr>`).join('')}
+      <td style="white-space:nowrap"><button class="btn-sm" data-act="agdet" data-id="${r.id}">Detalle</button></td></tr>`).join('')}
     </tbody></table></div>${rs.length > 200 ? '<p class="small muted">Se muestran las primeras 200. Usá los filtros o exportá para ver todas.</p>' : ''}</div>`;
   },
 
   nueva() {
-    const i0 = S.inst[0];
-    return `<h2>Nueva reserva (alta manual)</h2>
-    <div class="card" style="max-width:520px"><p class="small muted">Para socios que reservan por teléfono o en forma presencial. Se aplican las mismas validaciones que en la web.</p>
-    <form data-form="nueva">
-      <label>N° de socio</label><input name="nro" required inputmode="numeric">
-      <label>Instalación</label><select name="inst" id="n_inst">${S.inst.map(i => `<option value="${i.id}">${esc(i.nombre)}</option>`).join('')}</select>
-      <label>Fecha</label><input type="date" name="fecha" required min="${hoy()}" value="${hoy()}">
-      <label>Turno</label><select name="turno" id="n_turno">${i0.turnos.map(t => `<option>${esc(t)}</option>`).join('')}</select>
-      <button class="btn" style="margin-top:14px">Registrar reserva</button></form></div>`;
+    const p = ui.pref || {}; ui.pref = null;
+    const inst = getInst(p.inst || S.inst[0].id), fecha = p.fecha || hoy();
+    return `<h2>Nueva reserva</h2><p class="sub">Para socios que reservan por teléfono o en persona. Se aplican las mismas reglas que en la web.</p>
+    <div class="grid2" style="align-items:start"><div class="card"><form data-form="nueva">
+      <label style="margin-top:0">1. N° de socio</label><input name="nro" id="n_nro" required inputmode="numeric" placeholder="Ej: 1001" autocomplete="off"><div id="n_socio" class="small muted" style="margin-top:6px">Escribí el número para buscar al socio.</div>
+      <label>2. Instalación</label><select name="inst" id="n_inst">${S.inst.map(i => `<option value="${i.id}" ${i.id === inst.id ? 'selected' : ''} ${i.activo ? '' : 'disabled'}>${ICON[i.id]} ${esc(i.nombre)}${i.activo ? '' : ' (mantenimiento)'}</option>`).join('')}</select>
+      <label>3. Fecha</label><input type="date" name="fecha" id="n_fecha" required min="${hoy()}" value="${fecha}">
+      <label>4. Turno</label><select name="turno" id="n_turno">${turnoOpts(inst, fecha, p.turno)}</select>
+      <button class="btn grande" style="margin-top:16px">✔ Registrar reserva</button></form></div>
+    <div class="card"><h3>Cómo funciona</h3><ul class="small" style="padding-left:18px;line-height:1.7"><li>Al escribir el número se muestra el nombre del socio y si su cuenta está activa.</li><li>Los turnos ocupados o pasados aparecen como “no disponible”.</li><li>Se permite una reserva por tipo de instalación y por día para cada socio.</li><li>Al registrar se genera el comprobante con QR para imprimir o enviar al socio.</li></ul>
+      <button class="btn ghost full" data-act="nav" data-v="agenda">📆 Ver la agenda del día</button></div></div>`;
   },
 
   instalaciones() {
@@ -861,6 +922,9 @@ function calendario(inst) {
   return h + '</div>';
 }
 
+function turnoOpts(inst, fecha, sel) {
+  return inst.turnos.map(t => { const no = !fecha || turnoPasado(fecha, t) || ocup(inst.id, fecha, t) >= inst.cupo; return `<option value="${esc(t)}" ${no ? 'disabled' : ''} ${t === sel ? 'selected' : ''}>${esc(t)}${no ? ' — no disponible' : inst.cupo > 1 ? ` — ${inst.cupo - ocup(inst.id, fecha, t)} lugares` : ' — libre'}</option>`; }).join('');
+}
 function filtrarReservas() {
   const f = ui.f, q = norm(f.q || '');
   return S.reservas.filter(r => (!f.desde || r.fecha >= f.desde) && (!f.hasta || r.fecha <= f.hasta) && (!f.inst || r.instId === f.inst) && (!f.estado || r.estado === f.estado)
@@ -890,11 +954,11 @@ function render() {
   const rolTxt = ses.rol === 'socio' ? 'Socio N° ' + ses.nro : ses.rol === 'admin' ? 'Administrador' : 'Portería';
   const ini = nomCorto.split(' ').map(x => x[0]).slice(0, 2).join('');
   const side = `<aside class="side"><div class="marca"><div class="logo">CPA</div><div><b>Complejo Policial Almudena</b><small>Sistema de Gestión <span class="badge-proto">PROTOTIPO</span></small></div></div>
-    <nav class="snav">${NAV[ses.rol].map(([k, l]) => `<button class="sitem ${navAct === k ? 'on' : ''}" data-act="nav" data-v="${k}"><span>${ICONOS[k] || '•'}</span>${l}</button>`).join('')}</nav>
+    <nav class="snav">${NAV[ses.rol].map(([k, l]) => k === '_' ? `<div class="sgrupo">${l}</div>` : `<button class="sitem ${navAct === k ? 'on' : ''}" data-act="nav" data-v="${k}"><span>${ICONOS[k] || '•'}</span>${l}</button>`).join('')}</nav>
     <div class="suser"><div class="avatar sm">${esc(ini)}</div><div><b>${esc(nomCorto)}</b><small>${rolTxt}</small></div></div><button class="btn ghost full" data-act="salir">Cerrar sesión</button></aside>`;
   app.innerHTML = `<div class="layout">${side}<div class="contenido"><header class="top"><div class="marca"><div class="logo">CPA</div><div><b>Complejo Policial Almudena</b> <span class="badge-proto">PROTOTIPO</span><small>Sistema de Gestión Integral</small></div></div>
     <div class="who"><span>${esc(nom)}</span><button class="btn-sm ghost" data-act="salir">Salir</button></div></header>
-    <nav class="tabs ${ses.rol === 'socio' ? 'socio' : ''}">${NAV[ses.rol].map(([k, l, ic]) => `<button class="tab ${navAct === k ? 'on' : ''}" data-act="nav" data-v="${k}"><span class="tic">${ICONOS[k] || ''}</span>${l}</button>`).join('')}</nav>
+    <nav class="tabs ${ses.rol === 'socio' ? 'socio' : ''}">${NAV[ses.rol].filter(n => n[0] !== '_').map(([k, l, ic]) => `<button class="tab ${navAct === k ? 'on' : ''}" data-act="nav" data-v="${k}"><span class="tic">${ICONOS[k] || ''}</span>${l}</button>`).join('')}</nav>
     <main><div class="ptitulo"><span>${new Date().toLocaleDateString('es-AR', {weekday:'long', day:'numeric', month:'long', year:'numeric'})}</span><span>${esc(rolTxt)}</span></div>${V[ui.view]()}</main></div></div>${ses.rol === 'socio' && ui.view !== 'asistente' ? '<button class="fab" data-act="nav" data-v="asistente" title="Asistente virtual" aria-label="Asistente virtual">💬</button>' : ''}`;
   pintarQR();
   const m = $('#msgs'); if (m) m.scrollTop = m.scrollHeight;
@@ -1029,6 +1093,31 @@ const ACT = {
   mes: b => { const [y, m] = ui.mes.split('-').map(Number); const d = new Date(y, m - 1 + Number(b.dataset.d), 1); ui.mes = d.getFullYear() + '-' + z(d.getMonth() + 1); render(); },
   mtab: b => { ui.mtab = b.dataset.t; render(); },
   ir: b => { const el = document.getElementById(b.dataset.id); if (el) el.scrollIntoView({behavior:'smooth', block:'start'}); },
+  agdia: b => { ui.ag = addDays(ui.ag || hoy(), Number(b.dataset.d)); render(); },
+  aghoy: () => { ui.ag = hoy(); render(); },
+  agnueva: b => { ui.pref = {inst:b.dataset.i, fecha:ui.ag || hoy(), turno:b.dataset.t}; closeModal(); ui.view = 'nueva'; render(); },
+  agdet: b => {
+    const r = S.reservas.find(x => x.id === b.dataset.id), s = S.socios.find(x => x.nro === r.socio);
+    showModal(`<h3>${ICON[r.instId] || ''} ${esc(instNombre(r.instId))}</h3><p class="small muted" style="margin-top:-6px">${fmtFL(r.fecha)} · ${esc(r.turno)}</p>
+      <table class="kv"><tr><td>Socio</td><td><b>${esc(nombreSocio(r.socio))}</b> (N° ${r.socio})</td></tr><tr><td>Contacto</td><td>${s ? esc(s.email) + (s.tel ? '<br>' + esc(s.tel) : '') : '<span class="muted">Sin cuenta web</span>'}</td></tr>
+      <tr><td>Estado</td><td>${badgeEstado(r.estado)}</td></tr><tr><td>Código</td><td style="font-family:monospace">${r.codigo}</td></tr><tr><td>Creada</td><td>${fmtDT(r.creada)}</td></tr>${r.ingreso ? `<tr><td>Ingreso</td><td>${fmtDT(r.ingreso)}</td></tr>` : ''}</table>
+      <div class="acciones" style="flex-wrap:wrap"><button class="btn ghost" data-act="cerrar">Cerrar</button>${r.estado !== 'cancelada' ? `<button class="btn ghost" data-act="verqr" data-id="${r.id}">Ver QR</button>` : ''}${r.estado === 'confirmada' ? `<button class="btn ghost" data-act="modificar" data-id="${r.id}">Modificar</button><button class="btn rojo" data-act="cancelar" data-id="${r.id}">Cancelar reserva</button>` : ''}</div>`);
+  },
+  agpileta: b => {
+    const i = getInst(b.dataset.i), t = b.dataset.t, f = ui.ag || hoy();
+    const rs = S.reservas.filter(r => r.instId === i.id && r.fecha === f && r.turno === t && r.estado !== 'cancelada');
+    const puede = i.activo && !turnoPasado(f, t) && rs.length < i.cupo;
+    showModal(`<h3>${ICON[i.id]} ${esc(i.nombre)} · ${esc(t)}</h3><p class="small muted" style="margin-top:-6px">${fmtFL(f)} · ${rs.length} de ${i.cupo} grupos</p>
+      <div style="max-height:300px;overflow-y:auto">${rs.length ? rs.map(r => `<div class="item"><div><b>${esc(nombreSocio(r.socio))}</b><br><span class="small muted">Socio ${r.socio} · ${r.codigo}</span></div>${badgeEstado(r.estado)}</div>`).join('') : '<p class="muted">Sin reservas en este turno.</p>'}</div>
+      <div class="acciones"><button class="btn ghost" data-act="cerrar">Cerrar</button>${puede ? `<button class="btn" data-act="agnueva" data-i="${i.id}" data-t="${esc(t)}">+ Agregar reserva</button>` : ''}</div>`);
+  },
+  frap: b => {
+    const k = b.dataset.k, h0 = hoy(); ui.frap = k;
+    const base = {inst:'', estado:'', q:''};
+    ui.f = k === 'hoy' ? {...base, desde:h0, hasta:h0} : k === 'semana' ? {...base, desde:h0, hasta:addDays(h0, 6)} : k === 'mes' ? {...base, desde:h0.slice(0, 8) + '01', hasta:h0.slice(0, 8) + '31'}
+      : k === 'futuras' ? {...base, desde:h0, hasta:addDays(h0, 365), estado:'confirmada'} : {...base, desde:addDays(h0, -90), hasta:addDays(h0, 365), estado:'cancelada'};
+    render();
+  },
   ntipo: b => { ui.ntipo = b.dataset.t; render(); },
   verreg: () => showModal(`<h3>Reglamento del complejo</h3><ul style="padding-left:18px;line-height:1.6">${INFO.reglamento.map(x => '<li>' + esc(x) + '</li>').join('')}</ul><div class="acciones"><button class="btn" data-act="cerrar">Entendido</button></div>`),
   descreg: () => descargar('Reglamento del Complejo Policial Almudena\n\n' + INFO.reglamento.map((x, i) => (i + 1) + '. ' + x).join('\n'), 'reglamento_complejo_almudena.txt', 'text/plain'),
@@ -1044,7 +1133,7 @@ const ACT = {
   cancelar: b => {
     const r = S.reservas.find(x => x.id === b.dataset.id);
     if (!confirm(`¿Cancelar la reserva de ${instNombre(r.instId)} del ${fmtF(r.fecha)} (${r.turno})?`)) return;
-    r.estado = 'cancelada'; log(`Canceló la reserva ${r.codigo}`); toast('Reserva cancelada. El turno quedó libre.'); render();
+    r.estado = 'cancelada'; log(`Canceló la reserva ${r.codigo}`); closeModal(); toast('Reserva cancelada. El turno quedó libre.'); render();
   },
   preg: b => preguntar(b.dataset.q),
   camara: () => iniciarCamara(),
@@ -1106,7 +1195,7 @@ const FORM = {
   pass: (fd, f) => { const s = socioActual(); if (fd.get('a') !== s.pass) { toast('La contraseña actual no es correcta.', 'error'); return; } if (fd.get('n').length < 6) { toast('La nueva contraseña debe tener al menos 6 caracteres.', 'error'); return; } if (fd.get('n') !== fd.get('n2')) { toast('Las contraseñas nuevas no coinciden.', 'error'); return; } s.pass = fd.get('n'); log('Cambió su contraseña'); f.reset(); toast('Contraseña actualizada'); },
   staff: fd => { const u = fd.get('user').trim(); if (S.staff.some(x => x.user === u) || S.socios.some(x => x.nro === u)) { toast('Ese usuario ya existe.', 'error'); return; } S.staff.push({user:u, nombre:fd.get('nombre').trim(), rol:fd.get('rol'), pass:fd.get('pass'), activo:true}); log(`Creó el usuario ${u} (${fd.get('rol')})`); toast('Usuario creado'); render(); },
   codigo: fd => { if (fd.get('c').trim()) validar(fd.get('c')); },
-  filtro: fd => { ui.f = {desde:fd.get('desde'), hasta:fd.get('hasta'), inst:fd.get('inst'), estado:fd.get('estado'), q:fd.get('q')}; render(); },
+  filtro: fd => { ui.frap = ''; ui.f = {desde:fd.get('desde'), hasta:fd.get('hasta'), inst:fd.get('inst'), estado:fd.get('estado'), q:fd.get('q')}; render(); },
   nueva: (fd, f) => { const res = crearReserva(fd.get('nro').trim(), fd.get('inst'), fd.get('fecha'), fd.get('turno'), true); if (res.error) { toast(res.error, 'error'); return; } f.reset(); comprobante(res.r); toast('Reserva registrada'); },
   modificar: (fd, f) => {
     const r = S.reservas.find(x => x.id === f.dataset.id), inst = getInst(r.instId), fe = fd.get('fecha'), t = fd.get('turno');
@@ -1132,8 +1221,20 @@ document.addEventListener('change', e => {
     rd.onload = () => { try { const d = JSON.parse(rd.result); if (!d.reservas || !d.socios || !d.inst) throw 0; if (!confirm('¿Restaurar los datos desde el archivo? Se reemplazan los actuales.')) return; S = d; log('Restauró datos desde archivo'); toast('Datos restaurados'); render(); } catch (er) { toast('El archivo no es una copia válida del sistema.', 'error'); } };
     rd.readAsText(e.target.files[0]);
   }
-  if (e.target.id === 'n_inst') { $('#n_turno').innerHTML = getInst(e.target.value).turnos.map(t => `<option>${esc(t)}</option>`).join(''); }
+  if (e.target.id === 'n_inst' || e.target.id === 'n_fecha') { $('#n_turno').innerHTML = turnoOpts(getInst($('#n_inst').value), $('#n_fecha').value); }
+  if (e.target.id === 'agfecha' && e.target.value) { ui.ag = e.target.value; render(); }
   if (e.target.dataset.tarifa) { const i = getInst(e.target.dataset.tarifa); const v = Math.max(0, Number(e.target.value) || 0); log(`Cambió la tarifa de ${i.nombre}: ${pesos(i.tarifa)} → ${pesos(v)}`); i.tarifa = v; toast('Tarifa actualizada'); }
+});
+document.addEventListener('input', e => {
+  if (e.target.id === 'n_nro') {
+    const n = e.target.value.trim(), el = $('#n_socio'); if (!el) return;
+    const s = S.socios.find(x => x.nro === n), pd = S.padron.find(x => x.nro === n);
+    if (!n) el.innerHTML = 'Escribí el número para buscar al socio.';
+    else if (s && s.activo === false) el.innerHTML = `<span style="color:var(--rojo)">⛔ ${esc(s.nombre)}: cuenta suspendida</span>`;
+    else if (s) el.innerHTML = `<span style="color:var(--verde);font-weight:600">✅ ${esc(s.nombre)}</span> · ${s.grupo.filter(g => g.estado === 'habilitado').length} familiares habilitados`;
+    else if (pd) el.innerHTML = `<span style="color:var(--verde);font-weight:600">✅ ${esc(pd.nombre)}</span> · socio sin cuenta web`;
+    else el.innerHTML = '<span style="color:var(--rojo)">❌ No existe un socio con ese número</span>';
+  }
 });
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 
