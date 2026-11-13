@@ -435,3 +435,42 @@ details.acc .cont .galeria{grid-template-columns:repeat(4,1fr)}
 .foto-grande{width:100%;border-radius:12px;display:block;image-rendering:auto}
 .thumb{width:60px;height:44px;object-fit:cover;border-radius:8px;flex:none}
 span.thumb{display:grid}
+
+/* ---------- Plano del predio ---------- */
+.plano-wrap{display:grid;grid-template-columns:1fr;gap:16px;align-items:start}
+@media(min-width:1000px){.plano-wrap{grid-template-columns:1fr 300px}}
+.plano-card{padding:12px;margin:0}
+.plano{width:100%;height:auto;display:block;border-radius:10px}
+.plano .pasto{fill:#e4f1dc}
+.plano .calle{fill:#ece4d4}
+.plano .c-lbl{font:600 13px Inter,system-ui,sans-serif;fill:#8a7d62;text-anchor:middle;letter-spacing:.08em}
+.plano .monte{fill:#6f9a62}
+.plano .arbol{fill:#5a8a4f;opacity:.9}
+.plano .camino{fill:none;stroke:#dccdb0;stroke-width:9;stroke-linecap:round;stroke-linejoin:round}
+.plano .z-base{fill:#f4f8f1;stroke:#c5d6c0;stroke-width:1.5;transition:stroke .15s,fill .15s}
+.plano .campo{fill:#d3e8c7}
+.plano .cancha{fill:#b6dba2;stroke:#9cc98a}
+.plano .z-fila{fill:#dfe9dc;stroke:#c5d6c0}
+.plano .edif{fill:#f6f3ec;stroke:#cfc6b4}
+.plano .edif-gris{fill:#edf0f2;stroke:#cfd6db}
+.plano .piso{fill:#ece0c8;stroke:#d6c7a7}
+.plano .agua{fill:#5bb8ea}.plano .agua2{fill:#8fd0f1}
+.plano .hongo{fill:#e05a47;stroke:#fff;stroke-width:1.5}
+.plano .techo{fill:#fff;stroke:#a9b8ad}
+.plano .linea{fill:none;stroke:#fff;stroke-width:1.6;opacity:.85}
+.plano .pin{fill:#dc2626}
+.plano .z-lbl{font:700 15px Inter,system-ui,sans-serif;fill:#14532d;text-anchor:middle;paint-order:stroke;stroke:#fff;stroke-width:4px;stroke-linejoin:round;pointer-events:none}
+.plano .zona{cursor:pointer;outline:none}
+.plano .zona:hover .z-base,.plano .zona:focus .z-base{stroke:#1f7a45;stroke-width:3}
+.plano .zona.sel .z-base{stroke:#1f7a45;stroke-width:4;filter:drop-shadow(0 0 6px rgba(31,122,69,.45))}
+.plano .zona.sel .z-lbl{fill:#1f7a45}
+.plano .norte circle{fill:#fff;stroke:#c5d6c0}
+.plano .norte path{fill:#1f7a45}
+.plano .norte text{font:700 12px Inter,sans-serif;fill:#14532d;text-anchor:middle}
+.plano-chips{margin-top:12px}
+.plano-info{padding:0;overflow:hidden;margin:0}
+.plano-info.vacio{padding:36px 20px}
+.pi-foto{width:100%;height:170px;object-fit:cover;display:block;cursor:zoom-in}
+div.pi-foto{cursor:default}
+.pi-body{padding:18px 20px}
+@media(min-width:1000px){.plano-info{position:sticky;top:24px}}

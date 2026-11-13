@@ -247,6 +247,52 @@ function bars(data) {
   return data.map(([l, v]) => `<div class="barra"><span>${esc(l)}</span><div class="bg"><div class="fg" style="width:${v / max * 100}%"></div></div><b>${v}</b></div>`).join('');
 }
 
+/* ===================== Plano del predio (ilustrativo) ===================== */
+const ZONAS = {
+  entrada:{t:'Entrada y guardia', d:'Ingreso principal por calle La Paz. En la guardia se controla el código QR de la reserva o la credencial de socio.', ic:'door'},
+  pileta:{t:'Piletas', d:'Dos piletas, una pileta chica y la pileta infantil con hongos, juegos de agua y toboganes.', foto:'pileta-1', tipo:'Pileta', ic:'waves'},
+  sum:{t:'SUM (salón)', d:'Salón de usos múltiples techado, junto a las piletas, con capacidad para unas 150 personas.', ic:'building'},
+  futbol11:{t:'Cancha de fútbol 11', d:'Cancha principal del predio, con iluminación.', foto:'cancha-futbol', tipo:'Cancha', ic:'ball'},
+  auxiliares:{t:'Canchas auxiliares', d:'Canchas más chicas para fútbol 5 y vóley.', foto:'cancha-voley', tipo:'Cancha', ic:'volley'},
+  quinchos:{t:'Quinchos con asador', d:'Fila de quinchos techados con asador y mesa, al fondo del predio, junto al monte.', foto:'quincho', tipo:'Quincho', ic:'flame'},
+  glorieta:{t:'Glorieta', d:'Estructura techada de forma octogonal. Uso a confirmar.', ic:'home'},
+  campo:{t:'Campo libre', d:'Gran espacio verde abierto para recreación.', ic:'grid'},
+  playon:{t:'Playón', d:'Sector de piso duro. Uso a confirmar.', ic:'grid'}
+};
+function planoSVG() {
+  const sel = k => ui.zona === k ? ' sel' : '';
+  const z = (k, inner) => `<g class="zona${sel(k)}" data-act="zona" data-z="${k}" tabindex="0" role="button" aria-label="${ZONAS[k].t}">${inner}</g>`;
+  const lbl = (x, y, t) => `<text class="z-lbl" x="${x}" y="${y}">${t}</text>`;
+  let q = ''; for (let i = 0; i < 24; i++) q += `<rect x="${238 + i * 23}" y="508" width="17" height="15" rx="2" class="techo"/>`;
+  let arboles = ''; for (let i = 0; i < 40; i++) arboles += `<circle cx="${10 + i * 25 + (i % 3) * 4}" cy="${552 + (i % 2) * 12}" r="${11 + (i % 4)}" class="arbol"/>`;
+  return `<svg class="plano" viewBox="0 0 1000 580" role="img" aria-label="Plano ilustrativo del predio">
+  <rect width="1000" height="580" class="pasto"/>
+  <rect y="0" width="1000" height="34" class="calle"/><text class="c-lbl" x="560" y="22">Calle La Paz</text>
+  <rect y="536" width="1000" height="44" class="monte"/>${arboles}
+  <path d="M300 34 L300 470 Q300 492 322 492 L790 492 Q812 492 812 470 L812 140 Q812 110 850 104 L900 100" class="camino"/>
+  ${z('pileta', `<rect x="28" y="48" width="160" height="178" rx="10" class="z-base"/><rect x="44" y="60" width="42" height="72" rx="3" class="agua"/><rect x="96" y="60" width="42" height="72" rx="3" class="agua"/><rect x="44" y="140" width="94" height="28" rx="3" class="agua2"/><ellipse cx="112" cy="197" rx="48" ry="19" class="agua"/><circle cx="96" cy="194" r="6" class="hongo"/><circle cx="124" cy="194" r="6" class="hongo"/>${lbl(108, 245, 'Piletas')}`)}
+  ${z('sum', `<rect x="196" y="58" width="92" height="80" rx="4" class="z-base edif"/>${lbl(242, 104, 'SUM')}`)}
+  ${z('glorieta', `<polygon points="248,290 272,290 289,307 289,331 272,348 248,348 231,331 231,307" class="z-base edif"/>${lbl(260, 372, 'Glorieta')}`)}
+  ${z('campo', `<rect x="330" y="48" width="230" height="292" rx="4" class="z-base campo"/>${lbl(445, 200, 'Campo libre')}`)}
+  ${z('futbol11', `<rect x="574" y="52" width="214" height="290" rx="2" class="z-base cancha"/><line x1="574" y1="197" x2="788" y2="197" class="linea"/><circle cx="681" cy="197" r="26" class="linea"/><rect x="636" y="52" width="90" height="36" class="linea"/><rect x="636" y="306" width="90" height="36" class="linea"/>${lbl(681, 240, 'Fútbol 11')}`)}
+  ${z('auxiliares', `<rect x="420" y="352" width="168" height="118" rx="2" class="z-base cancha"/><rect x="600" y="352" width="188" height="118" rx="2" class="z-base cancha"/><line x1="504" y1="352" x2="504" y2="470" class="linea"/><line x1="694" y1="352" x2="694" y2="470" class="linea"/>${lbl(604, 418, 'Canchas auxiliares')}`)}
+  ${z('quinchos', `<rect x="230" y="500" width="568" height="31" rx="6" class="z-base z-fila"/>${q}${lbl(514, 497, 'Quinchos')}`)}
+  ${z('playon', `<rect x="832" y="318" width="74" height="64" rx="3" class="z-base piso"/>${lbl(869, 400, 'Playón')}`)}
+  ${z('entrada', `<rect x="874" y="44" width="74" height="26" rx="3" class="z-base edif"/><rect x="884" y="80" width="56" height="54" rx="3" class="z-base edif"/><path d="M960 52c0-9 14-9 14 0 0 8-7 15-7 15s-7-7-7-15z" class="pin"/>${lbl(912, 152, 'Entrada')}`)}
+  <rect x="934" y="292" width="24" height="96" rx="2" class="edif-gris"/>
+  <g class="norte"><circle cx="40" cy="300" r="18"/><path d="M40 287 L46 304 L40 300 L34 304 Z"/><text x="40" y="330">N</text></g>
+  </svg>`;
+}
+function vistaPlano(publico) {
+  const k = ui.zona, Z = k && ZONAS[k];
+  const panel = Z ? `<div class="card plano-info">${Z.foto ? `<img src="${foto(Z.foto)}" alt="${Z.t}" class="pi-foto" data-act="verfoto" data-f="${Z.foto}">` : `<div class="pi-foto foto-ph">${ico(Z.ic, 40)}</div>`}
+      <div class="pi-body"><h3>${Z.t}</h3><p class="muted">${Z.d}</p>${Z.tipo ? (publico ? `<button class="btn full" data-act="acceso" data-v="login">Ingresar para reservar</button>` : `<button class="btn full" data-act="reservartipo" data-t="${Z.tipo}">Reservar</button>`) : ''}</div></div>`
+    : `<div class="card plano-info vacio"><span class="vic">${ico('pin', 28)}</span><p class="muted">Tocá un sector del plano para ver qué hay y reservarlo.</p></div>`;
+  return `<div class="plano-wrap"><div class="card plano-card">${planoSVG()}
+      <div class="chips plano-chips">${Object.entries(ZONAS).map(([kk, v]) => `<button class="chip ${k === kk ? 'on' : ''}" data-act="zona" data-z="${kk}">${v.t}</button>`).join('')}</div></div>${panel}</div>
+    <p class="tiny" style="text-align:left">Plano ilustrativo dibujado a partir de la vista satelital del predio (unas 5 hectáreas). La ubicación exacta y el uso de algunos sectores están por confirmar.</p>`;
+}
+
 /* ===================== Acceso ===================== */
 function vistaSitio() {
   const h = hoy();
@@ -259,7 +305,7 @@ function vistaSitio() {
   const desc = {Quincho:'Equipados para asados y reuniones familiares de hasta 60 personas.', Cancha:'Fútbol 5, pádel y vóley. Se reservan por hora, de 9 a 22 h.', Pileta:'Turnos de mañana y tarde durante la temporada de verano.'};
   return `<div class="sitio">
   <header class="s-head"><div class="marca"><div class="logo">${ico('shield')}</div><div><b>Complejo Policial Almudena</b><small>Reservas para socios</small></div></div>
-    <nav class="s-nav"><a data-act="ir" data-id="s-como">Cómo funciona</a><a data-act="ir" data-id="s-inst">Instalaciones</a><a data-act="ir" data-id="s-fotos">Fotos</a><a data-act="ir" data-id="s-info">Información</a></nav>
+    <nav class="s-nav"><a data-act="ir" data-id="s-como">Cómo funciona</a><a data-act="ir" data-id="s-inst">Instalaciones</a><a data-act="ir" data-id="s-fotos">Fotos</a><a data-act="ir" data-id="s-plano">Plano</a><a data-act="ir" data-id="s-info">Información</a></nav>
     <div class="s-acc"><button class="btn ghost" data-act="acceso" data-v="registro">Crear cuenta</button><button class="btn" data-act="acceso" data-v="login">Ingresar</button></div></header>
   <section class="hero"><div><span class="eyebrow">Para socios del complejo</span><h1>Reservá quinchos, canchas y pileta desde tu casa</h1>
     <p>Sin llamadas ni filas. Elegí el día, mirá qué hay libre en el momento y recibí tu comprobante con código QR.</p>
@@ -272,6 +318,7 @@ function vistaSitio() {
   <section class="s-sec" id="s-inst"><h2>Instalaciones y tarifas</h2><p class="sub">Valores vigentes para socios.</p><div class="grid3">
     ${T.map(([t, n]) => { const is = S.inst.filter(i => i.tipo === t); return `<div class="card card-foto"><img src="${foto(FOTO_T[t])}" alt="${n}" loading="lazy" data-act="verfoto" data-f="${FOTO_T[t]}"><div class="cf-body"><h3>${n}</h3><p class="muted">${desc[t]}</p>${is.map(i => `<div class="rl"><span>${esc(i.nombre)}</span><b>${i.activo ? pesos(i.tarifa) : 'En mantenimiento'}</b></div>`).join('')}</div></div>`; }).join('')}</div></section>
   <section class="s-sec" id="s-fotos"><h2>Conocé el complejo</h2><p class="sub">Tocá una foto para verla más grande.</p>${galeria()}</section>
+  <section class="s-sec" id="s-plano"><h2>Plano del predio</h2><p class="sub">Ubicá cada sector antes de venir.</p>${vistaPlano(true)}</section>
   <section class="s-sec" id="s-info"><h2>Antes de venir</h2><p class="sub">Lo importante, en pocas palabras.</p><div class="grid3">
     <div class="card"><span class="ii" style="margin-bottom:14px">${ico('clock')}</span><h3>Horarios</h3><p class="muted">${esc(INFO.horarios)}</p></div>
     <div class="card"><span class="ii" style="margin-bottom:14px">${ico('pin')}</span><h3>Ubicación</h3><p class="muted">${esc(INFO.ubicacion)}</p></div>
@@ -354,7 +401,7 @@ const V = {
     const debe = mias.filter(r => ['pendiente', 'rechazado'].includes(r.pago)).length;
     const hr = new Date().getHours(), saludo = hr < 12 ? 'Buen día' : hr < 20 ? 'Buenas tardes' : 'Buenas noches';
     const pagarProx = prox && ['pendiente', 'rechazado'].includes(prox.pago);
-    const links = [['mis', 'ticket', 'Mis reservas', 'Ver, pagar o cancelar'], ['credencial', 'idcard', 'Mi credencial', 'Para mostrar en la entrada'], ['info', 'info', 'Información', 'Horarios, tarifas y reglamento']];
+    const links = [['mis', 'ticket', 'Mis reservas', 'Ver, pagar o cancelar'], ['plano', 'pin', 'Plano del predio', 'Dónde queda cada sector'], ['credencial', 'idcard', 'Mi credencial', 'Para mostrar en la entrada'], ['info', 'info', 'Información', 'Horarios, tarifas y reglamento']];
     return `<div class="page-head"><h1>${saludo}, ${esc(s.nombre.split(' ')[0])}</h1><p class="sub">¿Qué querés hacer hoy?</p></div>
     ${debe ? `<div class="aviso aviso-amarillo">${ico('alert', 22)}<div><b>Tenés ${debe === 1 ? 'un pago pendiente' : debe + ' pagos pendientes'}</b><span>Pagá ${PAGO.plazo} para mantener tu reserva.</span></div><button class="btn" data-act="nav" data-v="mis">Pagar</button></div>` : ''}
     ${alertas.length ? `<div class="aviso">${ico(alertas[0].tipo === 'Clima' ? 'cloud' : 'wrench', 22)}<div><b>${esc(alertas[0].titulo)}</b></div><button class="link" data-act="nav" data-v="novedades">Ver más</button></div>` : ''}
@@ -452,6 +499,10 @@ const V = {
     <details class="acc"><summary>${ico('user')} Mis datos de contacto</summary><div class="cont"><form data-form="datos"><label style="margin-top:0">Correo electrónico</label><input name="email" type="email" required value="${esc(s.email)}"><label>Teléfono (WhatsApp)</label><input name="tel" inputmode="tel" value="${esc(s.tel || '')}"><button class="btn" style="margin-top:14px">Guardar</button></form></div></details>
     <details class="acc"><summary>${ico('key')} Cambiar contraseña</summary><div class="cont"><form data-form="pass"><label style="margin-top:0">Contraseña actual</label><input name="a" type="password" required autocomplete="current-password"><label>Nueva contraseña (mínimo 6 caracteres)</label><input name="n" type="password" required minlength="6" autocomplete="new-password"><label>Repetir nueva contraseña</label><input name="n2" type="password" required autocomplete="new-password"><button class="btn" style="margin-top:14px">Cambiar contraseña</button></form></div></details>
     <button class="btn ghost full" style="margin-top:8px" data-act="salir">${ico('logout', 18)} Cerrar sesión</button>`;
+  },
+
+  plano() {
+    return `<button class="back" data-act="nav" data-v="inicio">${ico('back', 18)} Inicio</button><div class="page-head"><h1>Plano del predio</h1><p class="sub">Tocá un sector para ver qué hay y reservarlo.</p></div>${vistaPlano(false)}`;
   },
 
   credencial() {
@@ -752,7 +803,7 @@ function render() {
   const app = $('#app');
   document.body.classList.toggle('con-bottom', !!ses && ses.rol === 'socio');
   if (!ses) { app.innerHTML = vistaAcceso(); return; }
-  const navAct = {familia:'perfil', credencial:'perfil', info:'perfil', novedades:'inicio', asistente:'', nueva:'reservas'}[ui.view] ?? ui.view;
+  const navAct = {familia:'perfil', credencial:'perfil', info:'perfil', novedades:'inicio', plano:'inicio', asistente:'', nueva:'reservas'}[ui.view] ?? ui.view;
   const nomCorto = ses.rol === 'socio' ? socioActual().nombre : S.staff.find(s => s.user === ses.user).nombre;
   const rolTxt = ses.rol === 'socio' ? 'Socio N° ' + ses.nro : ses.rol === 'admin' ? 'Administrador' : 'Portería';
   const ini = nomCorto.split(' ').map(x => x[0]).slice(0, 2).join('');
@@ -908,6 +959,8 @@ const ACT = {
     const prev = GALERIA[(k - 1 + GALERIA.length) % GALERIA.length][0], next = GALERIA[(k + 1) % GALERIA.length][0];
     showModal(`<img class="foto-grande" src="${foto(f)}" alt="${esc(c)}"><div class="acciones" style="justify-content:space-between;align-items:center"><button class="icon-btn" data-act="verfoto" data-f="${prev}" aria-label="Anterior">${ico('back')}</button><b>${esc(c)}</b><button class="icon-btn" data-act="verfoto" data-f="${next}" aria-label="Siguiente">${ico('chevron')}</button></div><div class="acciones" style="margin-top:8px"><button class="btn ghost full" data-act="cerrar">Cerrar</button></div>`);
   },
+  zona: b => { ui.zona = ui.zona === b.dataset.z ? null : b.dataset.z; const y = window.scrollY; render(); window.scrollTo(0, y); },
+  reservartipo: b => { ui.wiz = {paso:1}; ui.view = 'reservar'; ACT.wtipo(b); },
   ir: b => { const el = document.getElementById(b.dataset.id); if (el) el.scrollIntoView({behavior:'smooth', block:'start'}); },
   pagar: b => {
     const r = S.reservas.find(x => x.id === b.dataset.id);
