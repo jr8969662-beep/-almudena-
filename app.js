@@ -2,7 +2,7 @@
    MODO = 'socio' (index.html) o 'admin' (admin.html) */
 const MODO = window.MODO || 'socio';
 /* ===================== Utilidades ===================== */
-const KEY = 'almudena_prototipo_v3';
+const KEY = 'almudena_prototipo_v4';
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const z = n => String(n).padStart(2, '0');
@@ -66,14 +66,20 @@ const IP = {
   bell:'<path d="M6 16v-5a6 6 0 1 1 12 0v5l1.5 2h-15z"/><path d="M10 20.5a2 2 0 0 0 4 0"/>'
 };
 const ico = (n, s) => `<svg class="i" width="${s || 20}" height="${s || 20}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${IP[n] || ''}</svg>`;
-const ICONK = {q1:'flame', q2:'flame', q3:'flame', f1:'ball', f2:'ball', pd:'racket', vo:'volley', pi:'waves'};
-const ICON = Object.fromEntries(Object.entries(ICONK).map(([k, v]) => [k, `<span class="ii">${ico(v)}</span>`]));
+const ICONK = new Proxy({f1:'ball', f2:'ball', pd:'racket', vo:'volley', pi:'waves'}, {get:(o, k) => o[k] || (String(k)[0] === 'q' ? 'flame' : 'ticket')});
+const ICON = new Proxy({}, {get:(o, k) => `<span class="ii">${ico(ICONK[k])}</span>`});
 const ICON_T = {Quincho:'flame', Cancha:'ball', Pileta:'waves'};
 /* Fotos reales del complejo (carpeta fotos/) */
 const GALERIA = [['pileta-1', 'Pileta con juegos de agua'], ['pileta-2', 'Toboganes'], ['pileta-3', 'Pileta y juegos infantiles'], ['quincho', 'Quincho con asador'], ['cancha-futbol', 'Cancha de fútbol'], ['cancha-voley', 'Cancha de vóley'], ['predio', 'El predio'], ['estacionamiento', 'Estacionamiento techado']];
 const FOTO_T = {Quincho:'quincho', Cancha:'cancha-futbol', Pileta:'pileta-1'};
-const FOTO_I = {q1:'quincho', q2:'quincho', q3:'quincho', f1:'cancha-futbol', f2:'cancha-futbol', vo:'cancha-voley', pi:'pileta-3'};
+const FOTO_I = new Proxy({f1:'cancha-futbol', f2:'cancha-futbol', vo:'cancha-voley', pi:'pileta-3'}, {get:(o, k) => o[k] || (String(k)[0] === 'q' ? 'quincho' : undefined)});
 const foto = n => 'fotos/' + n + '.jpg';
+function tarifasLista() {
+  const T = S.tarifas, q = S.inst.filter(i => i.tipo === 'Quincho'), qc = q.find(i => capN(i) <= 20), qg = q.find(i => capN(i) > 20);
+  return [['Entrada adulto (desde 13 años)', pesos(T.adulto)], ['Entrada menor (6 a 12 años)', pesos(T.menor)], ['Menores de 6 años', 'Sin cargo'], ['Auto o camioneta', pesos(T.auto)], ['Moto', pesos(T.moto)],
+    ...(qc ? [[`Quincho (hasta ${capN(qc)} personas)`, pesos(qc.tarifa) + ' por turno']] : []), ...(qg ? [[`Quincho grande (hasta ${capN(qg)} personas)`, pesos(qg.tarifa) + ' por turno']] : []),
+    ...S.inst.filter(i => i.tipo === 'Cancha').map(i => [i.nombre, pesos(i.tarifa) + ' por hora'])];
+}
 const galeria = () => `<div class="galeria">${GALERIA.map(([f, c]) => `<button data-act="verfoto" data-f="${f}" aria-label="${esc(c)}"><img src="${foto(f)}" alt="${esc(c)}" loading="lazy"><span>${esc(c)}</span></button>`).join('')}</div>`;
 
 /* ===================== Datos de ejemplo ===================== */
@@ -86,7 +92,8 @@ const INFO = {
 
 const FAQ = [
   ['¿Con cuánta anticipación puedo reservar?', 'Hasta 30 días antes. Los turnos se liberan automáticamente cuando alguien cancela.'],
-  ['¿Cuántas reservas puedo tener?', 'Una por tipo de instalación (quincho, cancha o pileta) por día.'],
+  ['¿Cómo se cobra la entrada?', 'Por persona (adultos y menores de 6 a 12 años; los menores de 6 no pagan) y por vehículo. Al reservar ves el total antes de pagar.'],
+  ['¿Cuántas reservas puedo tener?', 'Una por día y horario.'],
   ['¿Cómo cancelo una reserva?', 'En “Mis reservas”, tocá “Cancelar”. Te pedimos hacerlo con 24 h de anticipación.'],
   ['¿Qué pasa si llueve?', 'Si hay alerta meteorológica se publica un aviso y las reservas al aire libre se reprograman sin costo.'],
   ['¿Pueden ir mis familiares?', 'Sí, los integrantes del grupo familiar habilitado. Podés solicitar altas desde “Mi familia”.'],
@@ -107,16 +114,19 @@ const unidad = i => i.tipo === 'Cancha' ? 'por hora' : i.tipo === 'Pileta' ? 'po
 const maskDni = d => String(d).length > 4 ? String(d).slice(0, 2) + '.***.' + String(d).slice(-3) : '***';
 
 function seed() {
-  const inst = [
-    {id:'q1', tipo:'Quincho', nombre:'Quincho 1', cap:'Hasta 30 personas', turnos:['Mediodía 11–16 h','Noche 20–01 h'], cupo:1, tarifa:18000, activo:true},
-    {id:'q2', tipo:'Quincho', nombre:'Quincho 2', cap:'Hasta 30 personas', turnos:['Mediodía 11–16 h','Noche 20–01 h'], cupo:1, tarifa:18000, activo:true},
-    {id:'q3', tipo:'Quincho', nombre:'Quincho grande', cap:'Hasta 60 personas', turnos:['Mediodía 11–16 h','Noche 20–01 h'], cupo:1, tarifa:30000, activo:true},
+  const FR = ['Mediodía 11–16 h', 'Tarde 16–20 h', 'Noche 20–01 h'];
+  const inst = [];
+  // 21 quinchos (según la vista satelital): 14 + quincho grande + 6
+  for (let i = 0; i < 21; i++) {
+    const g = i === 14, n = i < 14 ? i + 1 : i;
+    inst.push({id: g ? 'qg' : 'q' + n, tipo:'Quincho', nombre: g ? 'Quincho grande' : 'Quincho ' + n, cap: g ? 'Hasta 40 personas' : 'Hasta 15 personas', capN: g ? 40 : 15, turnos:FR, cupo:1, tarifa: g ? 30000 : 15000, activo:true, pos:i});
+  }
+  inst.push(
     {id:'f1', tipo:'Cancha', nombre:'Fútbol 5 – Cancha 1', cap:'10 jugadores', turnos:horas(9,22), cupo:1, tarifa:12000, activo:true},
     {id:'f2', tipo:'Cancha', nombre:'Fútbol 5 – Cancha 2', cap:'10 jugadores', turnos:horas(9,22), cupo:1, tarifa:12000, activo:true},
     {id:'pd', tipo:'Cancha', nombre:'Pádel', cap:'4 jugadores', turnos:horas(9,22), cupo:1, tarifa:8000, activo:true},
     {id:'vo', tipo:'Cancha', nombre:'Vóley', cap:'12 jugadores', turnos:horas(9,22), cupo:1, tarifa:5000, activo:true},
-    {id:'pi', tipo:'Pileta', nombre:'Pileta (temporada)', cap:'40 grupos familiares por turno', turnos:['Mañana 10–14 h','Tarde 14–20 h'], cupo:40, tarifa:3000, activo:true}
-  ];
+    {id:'pi', tipo:'Pileta', nombre:'Pileta (temporada)', cap:'Incluida con la entrada', turnos:['Mediodía 11–16 h', 'Tarde 16–20 h'], cupo:40, tarifa:0, activo:true});
   const padron = [
     {nro:'1001', dni:'30111222', nombre:'Juan Pérez'},
     {nro:'1002', dni:'28999111', nombre:'Ana Gómez'},
@@ -159,13 +169,15 @@ function seed() {
     {id:'n7', tipo:'Documentación', titulo:'Formulario de alta de grupo familiar', texto:'Para habilitar a un familiar se debe presentar copia del DNI y la documentación que acredite el parentesco en la administración.', fecha:now - 86400000 * 12},
     {id:'n5', tipo:'Promoción', titulo:'Pileta: abono de temporada', texto:'Los grupos familiares que abonen la temporada completa antes del 15 de diciembre tienen un 15 % de descuento.', fecha:now - 86400000 * 4}
   ];
-  const s = {inst, padron, socios, reservas, noticias, auditoria:[], staff:[{user:'admin', pass:'admin', rol:'admin', nombre:'Administración'}, {user:'porteria', pass:'1234', rol:'porteria', nombre:'Personal de portería'}]};
+  const s = {inst, padron, socios, reservas, noticias, auditoria:[], tarifas:{adulto:3000, menor:1500, auto:2000, moto:1000}, staff:[{user:'admin', pass:'admin', rol:'admin', nombre:'Administración'}, {user:'porteria', pass:'1234', rol:'porteria', nombre:'Personal de portería'}]};
   // reserva del socio demo
   const f3 = addDays(t0, 3);
   s.reservas = s.reservas.filter(r => !(r.instId === 'q2' && r.fecha === f3 && r.turno === 'Noche 20–01 h'));
-  s.reservas.push({id:'r-demo', codigo:'ALM-7KQ4-X9TP', socio:'1001', instId:'q2', fecha:f3, turno:'Noche 20–01 h', estado:'confirmada', creada:now - 86400000, ingreso:null, pago:'pendiente'});
+  s.reservas.push({id:'r-demo', codigo:'ALM-7KQ4-X9TP', socio:'1001', instId:'q2', fecha:f3, turno:'Noche 20–01 h', estado:'confirmada', creada:now - 86400000, ingreso:null, pago:'pendiente', visita:true, pers:{a:4, m:2, b:1}, veh:{auto:2, moto:0}, monto:15000 + 4 * 3000 + 2 * 1500 + 2 * 2000});
   s.reservas.forEach((r, k) => {
-    r.monto = inst.find(i => i.id === r.instId).tarifa;
+    const it = inst.find(i => i.id === r.instId);
+    if (it.tipo === 'Quincho' && !r.visita) { r.visita = true; r.pers = {a:2 + k % 9, m:k % 3, b:k % 2}; r.veh = {auto:1 + k % 2, moto:k % 5 === 0 ? 1 : 0}; r.monto = it.tarifa + r.pers.a * 3000 + r.pers.m * 1500 + r.veh.auto * 2000 + r.veh.moto * 1000; }
+    else if (r.monto == null) r.monto = it.tarifa;
     if (r.pago) return;
     r.pago = r.estado === 'cancelada' ? 'pendiente' : r.estado === 'utilizada' ? 'confirmado' : ['confirmado', 'pendiente', 'confirmado', 'confirmado', 'informado', 'confirmado', 'confirmado', 'confirmado'][k % 8];
     if (r.pago === 'informado' && r.fecha > addDays(hoy(), 4)) r.pago = 'confirmado';
@@ -186,7 +198,8 @@ let ses = null;
 const uiInicial = () => ({acceso: MODO === 'admin' ? 'login' : 'sitio', view:'', mes:hoy().slice(0, 7), wiz:{paso:1}, verCal:false, mtab:'prox', ntipo:'', chat:[], validacion:null, f:null, msg:null, q:''});
 let ui = uiInicial();
 
-const getInst = id => S.inst.find(i => i.id === id) || {nombre:'?', tipo:'?', turnos:[], cupo:1};
+const ENTRADA = {id:null, tipo:'Entrada', nombre:'Entrada general', cap:'', turnos:[], cupo:9999, tarifa:0, activo:true};
+const getInst = id => id ? (S.inst.find(i => i.id === id) || {nombre:'?', tipo:'?', turnos:[], cupo:1}) : ENTRADA;
 const instNombre = id => getInst(id).nombre;
 const socioActual = () => S.socios.find(s => s.nro === ses.nro);
 const NOMS = ['Martín','Lucía','Diego','Carolina','Jorge','Valeria','Pablo','Romina','Sergio','Natalia','Gustavo','Florencia','Ricardo','Paola','Marcelo','Silvina','Fernando','Daniela','Héctor','Gabriela'];
@@ -247,6 +260,181 @@ function bars(data) {
   return data.map(([l, v]) => `<div class="barra"><span>${esc(l)}</span><div class="bg"><div class="fg" style="width:${v / max * 100}%"></div></div><b>${v}</b></div>`).join('');
 }
 
+/* ===================== Reserva de visita (por etapas) ===================== */
+const FRANJAS = [
+  {id:'mediodia', t:'Mediodía', h:'11 a 16 h', turno:'Mediodía 11–16 h', desde:11, hasta:16, ic:'flame'},
+  {id:'tarde', t:'Tarde', h:'16 a 20 h', turno:'Tarde 16–20 h', desde:16, hasta:20, ic:'clock'},
+  {id:'noche', t:'Noche', h:'20 a 01 h', turno:'Noche 20–01 h', desde:20, hasta:25, ic:'clock'}
+];
+const franja = id => FRANJAS.find(f => f.id === id);
+const quinchos = () => S.inst.filter(i => i.tipo === 'Quincho').sort((a, b) => (a.pos || 0) - (b.pos || 0));
+const capN = i => i.capN || parseInt(String(i.cap).replace(/\D/g, ''), 10) || 15;
+const totPers = p => (p.a || 0) + (p.m || 0) + (p.b || 0);
+const persTxt = p => { if (!p) return ''; const x = []; if (p.a) x.push(p.a + (p.a > 1 ? ' adultos' : ' adulto')); if (p.m) x.push(p.m + (p.m > 1 ? ' menores' : ' menor')); if (p.b) x.push(p.b + (p.b > 1 ? ' niños menores de 6' : ' niño menor de 6')); return x.join(', '); };
+const vehTxt = v => { if (!v || (!v.auto && !v.moto)) return 'Sin vehículo'; const x = []; if (v.auto) x.push(v.auto + (v.auto > 1 ? ' autos/camionetas' : ' auto/camioneta')); if (v.moto) x.push(v.moto + (v.moto > 1 ? ' motos' : ' moto')); return x.join(', '); };
+function quinchosLibres(f, fr) { const t = franja(fr).turno; if (turnoPasado(f, t)) return 0; return quinchos().filter(q => q.activo && !ocup(q.id, f, t)).length; }
+function estadoVisita(f) {
+  if (f < hoy()) return 'pasado';
+  if (f > addDays(hoy(), 30)) return 'fuera';
+  const fr = FRANJAS.filter(x => !turnoPasado(f, x.turno));
+  if (!fr.length) return 'pasado';
+  const tot = fr.length * quinchos().filter(q => q.activo).length;
+  const lib = fr.reduce((a, x) => a + quinchosLibres(f, x.id), 0);
+  return !lib ? 'lleno' : lib / tot < 0.35 ? 'parcial' : 'libre';
+}
+function horasCancha(c, f, fr) { const F = franja(fr); return c.turnos.filter(t => { const h = inicioTurno(t); return h >= F.desde && h < Math.min(F.hasta, 22); }); }
+function cotizar(w) {
+  const T = S.tarifas, p = w.pers || {a:0}, v = w.veh || {}, it = [];
+  if (p.a) it.push(['Adultos', p.a, T.adulto]);
+  if (p.m) it.push(['Menores de 6 a 12 años', p.m, T.menor]);
+  if (p.b) it.push(['Menores de 6 años', p.b, 0]);
+  if (w.conVeh && v.auto) it.push(['Autos / camionetas', v.auto, T.auto]);
+  if (w.conVeh && v.moto) it.push(['Motos', v.moto, T.moto]);
+  if (w.quincho) it.push([instNombre(w.quincho), 1, getInst(w.quincho).tarifa]);
+  if (w.cancha) it.push([instNombre(w.cancha.id) + ' · ' + w.cancha.hora, 1, getInst(w.cancha.id).tarifa]);
+  return {items:it, total:it.reduce((s, [, c, pr]) => s + c * pr, 0)};
+}
+function hijos(r) { return S.reservas.filter(x => x.padre === r.id); }
+function propagar(r) { hijos(r).forEach(h => { h.pago = r.pago; h.pagoConf = r.pagoConf; h.estado = r.estado; if (r.ingreso) h.ingreso = r.ingreso; }); }
+function crearVisita(w) {
+  const nro = ses.nro, t = franja(w.franja).turno;
+  if (turnoPasado(w.dia, t)) return {error:'Ese horario ya comenzó. Elegí otro.'};
+  if (S.reservas.some(r => r.socio === nro && r.visita && r.fecha === w.dia && r.turno === t && r.estado === 'confirmada')) return {error:'Ya tenés una reserva para ese día y horario.'};
+  if (w.quincho && ocup(w.quincho, w.dia, t)) return {error:'Ese quincho se acaba de ocupar. Elegí otro en el mapa.', paso:3};
+  if (w.cancha && ocup(w.cancha.id, w.dia, w.cancha.hora)) return {error:'Ese horario de cancha se acaba de ocupar.', paso:3};
+  const c = cotizar(w), now = Date.now();
+  const r = {id:'v' + now.toString(36), codigo:genCodigo(), socio:nro, instId:w.quincho || null, fecha:w.dia, turno:t, estado:'confirmada', creada:now, ingreso:null,
+    visita:true, pers:{...w.pers}, veh:w.conVeh ? {...w.veh} : {auto:0, moto:0}, detalle:c.items, monto:c.total, pago:'pendiente'};
+  S.reservas.push(r);
+  if (w.cancha) S.reservas.push({id:r.id + 'c', codigo:r.codigo + '-C', socio:nro, instId:w.cancha.id, fecha:w.dia, turno:w.cancha.hora, estado:'confirmada', creada:now, ingreso:null, padre:r.id, monto:0, pago:'pendiente'});
+  log(`Nueva reserva ${r.codigo}: ${fmtF(w.dia)} ${t}, ${persTxt(r.pers)}, ${vehTxt(r.veh)}${w.quincho ? ', ' + instNombre(w.quincho) : ''}${w.cancha ? ', ' + instNombre(w.cancha.id) + ' ' + w.cancha.hora : ''} — ${pesos(r.monto)}`);
+  return {r};
+}
+
+/* Mapa del predio: modo 'info' (ilustrativo) o 'reserva' (elegir quincho/cancha) */
+function mapaPredio(modo) {
+  const R = modo === 'reserva', w = ui.wiz || {}, F = R && franja(w.franja), t = F && F.turno;
+  const pers = R ? totPers(w.pers || {}) : 0;
+  const lbl = (x, y, s, cls) => `<text class="z-lbl ${cls || ''}" x="${x}" y="${y}">${s}</text>`;
+  const zi = (k, inner) => R ? `<g class="zona-r">${inner}</g>` : `<g class="zona${ui.zona === k ? ' sel' : ''}" data-act="zona" data-z="${k}" tabindex="0" role="button" aria-label="${ZONAS[k].t}">${inner}</g>`;
+  // quinchos
+  const QL = quinchos(), unid = QL.reduce((s, q) => s + (capN(q) > 20 ? 2 : 1), 0);
+  const uw = R ? (920 - (QL.length - 1) * 5 - 14) / unid : 19;
+  let x = R ? 40 : 230, qs = '';
+  QL.forEach((q, i) => {
+    const ancho = R ? uw * (capN(q) > 20 ? 2 : 1) : (capN(q) > 20 ? 40 : 19), alto = R ? 32 : 16, y = R ? 500 : 508;
+    const num = q.nombre.replace('Quincho ', '').replace('grande', 'G');
+    if (R) {
+      const st = !q.activo ? 'mant' : w.quincho === q.id ? 'sel' : ocup(q.id, w.dia, t) ? 'ocu' : capN(q) < pers ? 'chico' : 'lib';
+      const est = {mant:'En mantenimiento', sel:'Tu elección', ocu:'Ocupado', chico:'Capacidad ' + capN(q) + ' personas', lib:'Libre · hasta ' + capN(q) + ' personas'}[st];
+      qs += `<g class="q st-${st}" ${['lib', 'sel'].includes(st) ? `data-act="wq" data-id="${q.id}" role="button" tabindex="0"` : ''}><title>${q.nombre}: ${est}</title><rect x="${x}" y="${y}" width="${ancho}" height="${alto}" rx="4"/><text x="${x + ancho / 2}" y="${y + 21}">${num}</text></g>`;
+    } else qs += `<rect x="${x}" y="${y}" width="${ancho}" height="${alto}" rx="2" class="techo"/>`;
+    x += ancho + (R ? 5 : 4); if (i === 13) x += R ? 14 : 12;
+  });
+  const fila = R ? `<g>${qs}</g>${lbl(500, 494, 'Quinchos · tocá uno libre para elegirlo')}` : zi('quinchos', `<rect x="224" y="500" width="${x - 218}" height="31" rx="6" class="z-base z-fila"/>${qs}${lbl(500, 497, 'Quinchos')}`);
+  // canchas reservables
+  const cz = (id, rx, ry, rw, rh, nombre) => {
+    if (!R) return '';
+    const c = getInst(id), hs = horasCancha(c, w.dia, w.franja), libres = hs.filter(h => !turnoPasado(w.dia, h) && !ocup(id, w.dia, h)).length;
+    const st = !c.activo ? 'mant' : (w.cancha && w.cancha.id === id) ? 'sel' : ui.canSel === id ? 'abierta' : libres ? 'lib' : 'ocu';
+    return `<g class="cz st-${st}" ${st !== 'mant' && st !== 'ocu' ? `data-act="wcan" data-id="${id}" role="button" tabindex="0"` : ''}><title>${nombre}: ${libres ? libres + ' horarios libres' : 'sin horarios'}</title><rect x="${rx}" y="${ry}" width="${rw}" height="${rh}" rx="3"/><line x1="${rx + rw / 2}" y1="${ry}" x2="${rx + rw / 2}" y2="${ry + rh}"/><text x="${rx + rw / 2}" y="${ry + rh / 2 + 5}">${nombre}</text></g>`;
+  };
+  let arboles = ''; for (let i = 0; i < 40; i++) arboles += `<circle cx="${10 + i * 25 + (i % 3) * 4}" cy="${554 + (i % 2) * 12}" r="${11 + (i % 4)}" class="arbol"/>`;
+  const piletaTxt = R ? (w.franja === 'noche' ? 'Pileta · cerrada' : 'Pileta · incluida') : 'Piletas';
+  return `<svg class="plano ${R ? 'plano-r' : ''}" viewBox="0 0 1000 580" role="img" aria-label="Mapa del predio">
+  <rect width="1000" height="580" class="pasto"/>
+  <rect y="0" width="1000" height="34" class="calle"/><text class="c-lbl" x="560" y="22">Calle La Paz</text>
+  <rect y="538" width="1000" height="42" class="monte"/>${arboles}
+  <path d="M300 34 L300 470 Q300 488 318 488 L794 488 Q812 488 812 470 L812 140 Q812 110 850 104 L900 100" class="camino"/>
+  ${zi('pileta', `<rect x="28" y="48" width="160" height="178" rx="10" class="z-base"/><rect x="44" y="60" width="42" height="72" rx="3" class="agua"/><rect x="96" y="60" width="42" height="72" rx="3" class="agua"/><rect x="44" y="140" width="94" height="28" rx="3" class="agua2"/><ellipse cx="112" cy="197" rx="48" ry="19" class="agua"/><circle cx="96" cy="194" r="6" class="hongo"/><circle cx="124" cy="194" r="6" class="hongo"/>${lbl(108, 245, piletaTxt)}`)}
+  ${zi('sum', `<rect x="196" y="58" width="92" height="80" rx="4" class="z-base edif"/>${lbl(242, 104, 'SUM')}`)}
+  ${zi('glorieta', `<polygon points="248,290 272,290 289,307 289,331 272,348 248,348 231,331 231,307" class="z-base edif"/>${lbl(260, 372, 'Glorieta')}`)}
+  ${zi('campo', `<rect x="330" y="48" width="230" height="292" rx="4" class="z-base campo"/>${lbl(445, 200, 'Campo libre')}`)}
+  ${zi('futbol11', `<rect x="574" y="52" width="214" height="290" rx="2" class="z-base cancha"/><line x1="574" y1="197" x2="788" y2="197" class="linea"/><circle cx="681" cy="197" r="26" class="linea"/><rect x="636" y="52" width="90" height="36" class="linea"/><rect x="636" y="306" width="90" height="36" class="linea"/>${lbl(681, 240, 'Fútbol 11')}`)}
+  ${R ? cz('vo', 330, 352, 80, 118, 'Vóley') + cz('f1', 420, 352, 168, 118, 'Fútbol 5 · 1') + cz('f2', 600, 352, 188, 118, 'Fútbol 5 · 2') + cz('pd', 832, 318, 74, 64, 'Pádel')
+    : zi('auxiliares', `<rect x="420" y="352" width="168" height="118" rx="2" class="z-base cancha"/><rect x="600" y="352" width="188" height="118" rx="2" class="z-base cancha"/><line x1="504" y1="352" x2="504" y2="470" class="linea"/><line x1="694" y1="352" x2="694" y2="470" class="linea"/>${lbl(604, 418, 'Canchas auxiliares')}`) + zi('playon', `<rect x="832" y="318" width="74" height="64" rx="3" class="z-base piso"/>${lbl(869, 400, 'Playón')}`)}
+  ${fila}
+  ${zi('entrada', `<rect x="874" y="44" width="74" height="26" rx="3" class="z-base edif"/><rect x="884" y="80" width="56" height="54" rx="3" class="z-base edif"/><path d="M960 52c0-9 14-9 14 0 0 8-7 15-7 15s-7-7-7-15z" class="pin"/>${lbl(912, 152, 'Entrada')}`)}
+  <rect x="934" y="292" width="24" height="96" rx="2" class="edif-gris"/>
+  <g class="norte"><circle cx="40" cy="300" r="18"/><path d="M40 287 L46 304 L40 300 L34 304 Z"/><text x="40" y="330">N</text></g>
+  </svg>`;
+}
+
+function vistaReserva() {
+  const w = ui.wiz;
+  if (!w.pers) { w.pers = {a:2, m:0, b:0}; w.veh = {auto:1, moto:0}; w.conVeh = null; }
+  const pasos = ['Fecha y horario', 'Personas', 'Lugar', 'Pago'];
+  const st = `<p class="step-m">Paso ${w.paso} de 4 · ${pasos[w.paso - 1]}</p><div class="stepper">${pasos.map((p, i) => `<div class="${i < w.paso ? 'on' : ''}"><i></i><span>${i + 1}. ${p}</span></div>`).join('')}</div>`;
+  const back = w.paso > 1 ? `<button class="back" data-act="wback">${ico('back', 18)} Volver</button>` : '';
+  const cot = cotizar(w), F = w.franja && franja(w.franja);
+  let c = '', ok = false, txtBtn = 'Continuar';
+  if (w.paso === 1) {
+    let dias = '';
+    for (let k = 0; k < 14; k++) {
+      const f = addDays(hoy(), k), e = estadoVisita(f), d = new Date(f + 'T12:00'), off = ['lleno', 'pasado', 'fuera'].includes(e);
+      dias += `<button class="dchip ${e} ${w.dia === f ? 'sel' : ''}" data-act="wdia" data-f="${f}" ${off ? 'disabled' : ''}><small>${k === 0 ? 'Hoy' : k === 1 ? 'Mañana' : cap1(d.toLocaleDateString('es-AR', {weekday:'short'}).replace('.', ''))}</small><b>${d.getDate()}</b><em>${{libre:'Libre', parcial:'Pocos', lleno:'Completo', pasado:'—'}[e] || ''}</em></button>`;
+    }
+    const frs = w.dia ? FRANJAS.map(fr => {
+      const pas = turnoPasado(w.dia, fr.turno), lib = quinchosLibres(w.dia, fr.id);
+      return `<button class="franja ${w.franja === fr.id ? 'sel' : ''}" data-act="wfr" data-f="${fr.id}" ${pas ? 'disabled' : ''}><span class="fr-ic">${ico(fr.ic, 22)}</span><span class="fr-t"><b>${fr.t}</b><small>${fr.h}</small></span><span class="fr-d">${pas ? 'Ya comenzó' : lib ? `<span class="badge b-verde"><i class="dot"></i>${lib} quinchos libres</span>` : '<span class="badge b-gris">Sin quinchos</span>'}${fr.id !== 'noche' ? '<small>Pileta incluida</small>' : ''}</span></button>`;
+    }).join('') : '';
+    c = `<h2 class="wtit">¿Cuándo venís?</h2><p class="sub">Elegí el día y el horario de tu visita.</p>
+      <label style="margin-top:4px">Día</label><div class="dias">${dias}</div>
+      <button class="link wcal-btn2" data-act="wcal">${ui.verCal ? 'Ocultar calendario' : 'Ver más fechas'}</button>
+      ${ui.verCal ? `<div class="card" style="margin-top:12px;max-width:440px">${calendario(estadoVisita)}</div>` : ''}
+      ${w.dia ? `<label style="margin-top:22px">Horario · ${fmtFL(w.dia)}</label><div class="franjas">${frs}</div>` : ''}`;
+    ok = !!(w.dia && w.franja);
+  }
+  if (w.paso === 2) {
+    const T = S.tarifas;
+    const ctr = (k, obj, t, d) => `<div class="contador"><div><b>${t}</b><small>${d}</small></div><div class="ctr"><button type="button" data-act="cnt" data-o="${obj}" data-k="${k}" data-d="-1" aria-label="Restar">−</button><span>${w[obj][k]}</span><button type="button" data-act="cnt" data-o="${obj}" data-k="${k}" data-d="1" aria-label="Sumar">+</button></div></div>`;
+    c = `<h2 class="wtit">¿Quiénes vienen?</h2><p class="sub">La entrada se cobra por persona. Contate a vos también.</p>
+      <div class="card" style="padding:6px 20px">${ctr('a', 'pers', 'Adultos', 'Desde 13 años · ' + pesos(T.adulto))}${ctr('m', 'pers', 'Menores', 'De 6 a 12 años · ' + pesos(T.menor))}${ctr('b', 'pers', 'Niños', 'Menores de 6 años · sin cargo')}</div>
+      <h3 style="margin-top:24px">¿Venís en vehículo?</h3><p class="small muted" style="margin-top:-6px">El ingreso de vehículos al predio también tiene costo.</p>
+      <div class="seg" style="max-width:360px"><button class="${w.conVeh === true ? 'on' : ''}" data-act="wveh" data-v="1">Sí</button><button class="${w.conVeh === false ? 'on' : ''}" data-act="wveh" data-v="0">No</button></div>
+      ${w.conVeh ? `<div class="card" style="padding:6px 20px">${ctr('auto', 'veh', 'Autos o camionetas', pesos(T.auto) + ' cada uno')}${ctr('moto', 'veh', 'Motos', pesos(T.moto) + ' cada una')}</div>` : ''}`;
+    ok = w.pers.a > 0 && w.conVeh !== null && (!w.conVeh || w.veh.auto + w.veh.moto > 0);
+  }
+  if (w.paso === 3) {
+    const q = w.quincho && getInst(w.quincho), libres = quinchosLibres(w.dia, w.franja);
+    const can = ui.canSel && getInst(ui.canSel);
+    const lista = quinchos().map(qq => { const s = !qq.activo ? 'mant' : w.quincho === qq.id ? 'sel' : ocup(qq.id, w.dia, F.turno) ? 'ocu' : capN(qq) < totPers(w.pers) ? 'chico' : 'lib'; return `<button class="qchip st-${s}" ${['lib', 'sel'].includes(s) ? `data-act="wq" data-id="${qq.id}"` : 'disabled'} title="${qq.nombre}">${qq.nombre.replace('Quincho ', '').replace('grande', 'Grande')}</button>`; }).join('');
+    c = `<h2 class="wtit">Elegí tu lugar</h2><p class="sub">${fmtFL(w.dia)} · ${F.t} (${F.h}) · ${totPers(w.pers)} personas. Hay <b>${libres}</b> quinchos libres.</p>
+      <div class="card mapa-card"><div class="mapa-scroll">${mapaPredio('reserva')}</div>
+        <div class="leyenda"><span><i class="lg-lib"></i>Libre</span><span><i class="lg-sel"></i>Tu elección</span><span><i class="lg-ocu"></i>Ocupado</span><span><i class="lg-chico"></i>No alcanza para tu grupo</span></div></div>
+      <div class="sel-panel">
+        <div class="card sel-box">${q ? `<div class="sb-row"><span class="ii">${ico('flame')}</span><div class="sb-t"><small>Quincho elegido</small><b>${esc(q.nombre)}</b><span>Hasta ${capN(q)} personas · ${pesos(q.tarifa)}</span></div><button class="link rojo" data-act="wq" data-id="${q.id}">Quitar</button></div>`
+          : `<div class="sb-row"><span class="ii">${ico('flame')}</span><div class="sb-t"><small>Quincho</small><b>Todavía no elegiste</b><span>Tocá un quincho verde en el mapa o en la lista.</span></div></div>`}
+          <details class="qlista" ${q ? '' : 'open'}><summary>Elegir de la lista</summary><div class="qgrid">${lista}</div></details></div>
+        <div class="card sel-box">${w.cancha ? `<div class="sb-row"><span class="ii">${ico(ICONK[w.cancha.id])}</span><div class="sb-t"><small>Cancha (opcional)</small><b>${esc(instNombre(w.cancha.id))} · ${esc(w.cancha.hora)}</b><span>${pesos(getInst(w.cancha.id).tarifa)} por hora</span></div><button class="link rojo" data-act="wcanq">Quitar</button></div>`
+          : can ? `<div class="sb-row"><span class="ii">${ico(ICONK[can.id])}</span><div class="sb-t"><small>Cancha (opcional)</small><b>${esc(can.nombre)}</b><span>Elegí la hora · ${pesos(can.tarifa)}</span></div><button class="link" data-act="wcan" data-id="${can.id}">Cerrar</button></div>
+            <div class="chips" style="margin-top:12px">${horasCancha(can, w.dia, w.franja).map(h => { const no = turnoPasado(w.dia, h) || ocup(can.id, w.dia, h); return `<button class="chip" ${no ? 'disabled style="opacity:.45"' : `data-act="wcanh" data-h="${esc(h)}"`}>${esc(h)}</button>`; }).join('') || '<span class="muted small">Sin horarios en esta franja.</span>'}</div>`
+          : `<div class="sb-row"><span class="ii">${ico('ball')}</span><div class="sb-t"><small>Cancha (opcional)</small><b>¿Querés sumar una cancha?</b><span>Tocá una cancha en el mapa: fútbol 5, vóley o pádel.</span></div></div>`}</div>
+      </div>`;
+    ok = true; txtBtn = w.quincho ? 'Continuar' : 'Continuar sin quincho';
+  }
+  if (w.paso === 4) {
+    const met = w.metodo || 'mp';
+    c = `<h2 class="wtit">Revisá y pagá</h2><p class="sub">Controlá que esté todo bien antes de confirmar.</p>
+      <div class="card"><div class="rl"><span>Día</span><b>${fmtFL(w.dia)}</b></div><div class="rl"><span>Horario</span><b>${F.t} · ${F.h}</b></div><div class="rl"><span>Personas</span><b>${persTxt(w.pers)}</b></div><div class="rl"><span>Vehículos</span><b>${vehTxt(w.conVeh ? w.veh : null)}</b></div><div class="rl"><span>Lugar</span><b>${w.quincho ? esc(instNombre(w.quincho)) : 'Solo entrada (sin quincho)'}</b></div>${w.cancha ? `<div class="rl"><span>Cancha</span><b>${esc(instNombre(w.cancha.id))} · ${esc(w.cancha.hora)}</b></div>` : ''}</div>
+      <h3 style="margin-top:22px">¿Cómo querés pagar?</h3>
+      <div class="metodos">
+        <button class="metodo ${met === 'mp' ? 'sel' : ''}" data-act="wmet" data-m="mp"><span class="radio"></span><span class="mt-t"><b>Mercado Pago</b><small>Tarjeta de crédito o débito, o dinero en cuenta. Se confirma al instante.</small></span><span class="mt-tag">Recomendado</span></button>
+        <button class="metodo ${met === 'tr' ? 'sel' : ''}" data-act="wmet" data-m="tr"><span class="radio"></span><span class="mt-t"><b>Transferencia bancaria</b><small>Transferís al alias del complejo y enviás la foto del comprobante. Se confirma cuando la administración lo revisa.</small></span></button>
+      </div>
+      <label class="check" style="margin:18px 0 0"><input type="checkbox" id="acepto"> <span>Acepto el <button type="button" class="link" data-act="verreg">reglamento del complejo</button> y las condiciones de cancelación.</span></label>`;
+    ok = true; txtBtn = `${met === 'mp' ? 'Pagar' : 'Confirmar'} ${pesos(cot.total)}`;
+  }
+  const res = `<div class="card resumen-v"><h3>Tu visita</h3>
+      <div class="rv-dato">${ico('calendar', 18)}<span>${w.dia ? fmtFL(w.dia) : '<i class="muted">Elegí un día</i>'}${F ? ' · ' + F.t : ''}</span></div>
+      ${w.paso > 1 ? `<div class="rv-dato">${ico('users', 18)}<span>${persTxt(w.pers) || '—'}</span></div>` : ''}
+      ${w.paso > 2 ? `<div class="rv-dato">${ico('pin', 18)}<span>${w.quincho ? esc(instNombre(w.quincho)) : 'Sin quincho'}${w.cancha ? ' + ' + esc(instNombre(w.cancha.id)) : ''}</span></div>` : ''}
+      ${w.paso > 1 && cot.items.length ? `<div class="rv-items">${cot.items.map(([n, q, p]) => `<div><span>${q > 1 ? q + ' × ' : ''}${esc(n)}</span><b>${p ? pesos(q * p) : 'Sin cargo'}</b></div>`).join('')}</div>` : ''}
+      <div class="rv-total"><span>Total</span><b>${pesos(cot.total)}</b></div></div>`;
+  const foot = `<div class="wiz-foot"><div class="wf-total"><small>Total</small><b>${pesos(cot.total)}</b></div><button class="btn" data-act="${w.paso === 4 ? 'confirmar' : 'wnext'}" ${ok ? '' : 'disabled'}>${txtBtn}</button></div>`;
+  return `<div class="wiz"><div class="wiz-main">${back}${st}${c}${foot}</div><aside class="wiz-res">${res}</aside></div>`;
+}
+
 /* ===================== Plano del predio (ilustrativo) ===================== */
 const ZONAS = {
   entrada:{t:'Entrada y guardia', d:'Ingreso principal por calle La Paz. En la guardia se controla el código QR de la reserva o la credencial de socio.', ic:'door'},
@@ -259,36 +447,12 @@ const ZONAS = {
   campo:{t:'Campo libre', d:'Gran espacio verde abierto para recreación.', ic:'grid'},
   playon:{t:'Playón', d:'Sector de piso duro. Uso a confirmar.', ic:'grid'}
 };
-function planoSVG() {
-  const sel = k => ui.zona === k ? ' sel' : '';
-  const z = (k, inner) => `<g class="zona${sel(k)}" data-act="zona" data-z="${k}" tabindex="0" role="button" aria-label="${ZONAS[k].t}">${inner}</g>`;
-  const lbl = (x, y, t) => `<text class="z-lbl" x="${x}" y="${y}">${t}</text>`;
-  let q = ''; for (let i = 0; i < 24; i++) q += `<rect x="${238 + i * 23}" y="508" width="17" height="15" rx="2" class="techo"/>`;
-  let arboles = ''; for (let i = 0; i < 40; i++) arboles += `<circle cx="${10 + i * 25 + (i % 3) * 4}" cy="${552 + (i % 2) * 12}" r="${11 + (i % 4)}" class="arbol"/>`;
-  return `<svg class="plano" viewBox="0 0 1000 580" role="img" aria-label="Plano ilustrativo del predio">
-  <rect width="1000" height="580" class="pasto"/>
-  <rect y="0" width="1000" height="34" class="calle"/><text class="c-lbl" x="560" y="22">Calle La Paz</text>
-  <rect y="536" width="1000" height="44" class="monte"/>${arboles}
-  <path d="M300 34 L300 470 Q300 492 322 492 L790 492 Q812 492 812 470 L812 140 Q812 110 850 104 L900 100" class="camino"/>
-  ${z('pileta', `<rect x="28" y="48" width="160" height="178" rx="10" class="z-base"/><rect x="44" y="60" width="42" height="72" rx="3" class="agua"/><rect x="96" y="60" width="42" height="72" rx="3" class="agua"/><rect x="44" y="140" width="94" height="28" rx="3" class="agua2"/><ellipse cx="112" cy="197" rx="48" ry="19" class="agua"/><circle cx="96" cy="194" r="6" class="hongo"/><circle cx="124" cy="194" r="6" class="hongo"/>${lbl(108, 245, 'Piletas')}`)}
-  ${z('sum', `<rect x="196" y="58" width="92" height="80" rx="4" class="z-base edif"/>${lbl(242, 104, 'SUM')}`)}
-  ${z('glorieta', `<polygon points="248,290 272,290 289,307 289,331 272,348 248,348 231,331 231,307" class="z-base edif"/>${lbl(260, 372, 'Glorieta')}`)}
-  ${z('campo', `<rect x="330" y="48" width="230" height="292" rx="4" class="z-base campo"/>${lbl(445, 200, 'Campo libre')}`)}
-  ${z('futbol11', `<rect x="574" y="52" width="214" height="290" rx="2" class="z-base cancha"/><line x1="574" y1="197" x2="788" y2="197" class="linea"/><circle cx="681" cy="197" r="26" class="linea"/><rect x="636" y="52" width="90" height="36" class="linea"/><rect x="636" y="306" width="90" height="36" class="linea"/>${lbl(681, 240, 'Fútbol 11')}`)}
-  ${z('auxiliares', `<rect x="420" y="352" width="168" height="118" rx="2" class="z-base cancha"/><rect x="600" y="352" width="188" height="118" rx="2" class="z-base cancha"/><line x1="504" y1="352" x2="504" y2="470" class="linea"/><line x1="694" y1="352" x2="694" y2="470" class="linea"/>${lbl(604, 418, 'Canchas auxiliares')}`)}
-  ${z('quinchos', `<rect x="230" y="500" width="568" height="31" rx="6" class="z-base z-fila"/>${q}${lbl(514, 497, 'Quinchos')}`)}
-  ${z('playon', `<rect x="832" y="318" width="74" height="64" rx="3" class="z-base piso"/>${lbl(869, 400, 'Playón')}`)}
-  ${z('entrada', `<rect x="874" y="44" width="74" height="26" rx="3" class="z-base edif"/><rect x="884" y="80" width="56" height="54" rx="3" class="z-base edif"/><path d="M960 52c0-9 14-9 14 0 0 8-7 15-7 15s-7-7-7-15z" class="pin"/>${lbl(912, 152, 'Entrada')}`)}
-  <rect x="934" y="292" width="24" height="96" rx="2" class="edif-gris"/>
-  <g class="norte"><circle cx="40" cy="300" r="18"/><path d="M40 287 L46 304 L40 300 L34 304 Z"/><text x="40" y="330">N</text></g>
-  </svg>`;
-}
 function vistaPlano(publico) {
   const k = ui.zona, Z = k && ZONAS[k];
   const panel = Z ? `<div class="card plano-info">${Z.foto ? `<img src="${foto(Z.foto)}" alt="${Z.t}" class="pi-foto" data-act="verfoto" data-f="${Z.foto}">` : `<div class="pi-foto foto-ph">${ico(Z.ic, 40)}</div>`}
-      <div class="pi-body"><h3>${Z.t}</h3><p class="muted">${Z.d}</p>${Z.tipo ? (publico ? `<button class="btn full" data-act="acceso" data-v="login">Ingresar para reservar</button>` : `<button class="btn full" data-act="reservartipo" data-t="${Z.tipo}">Reservar</button>`) : ''}</div></div>`
+      <div class="pi-body"><h3>${Z.t}</h3><p class="muted">${Z.d}</p>${Z.tipo ? (publico ? `<button class="btn full" data-act="acceso" data-v="login">Ingresar para reservar</button>` : `<button class="btn full" data-act="nuevares">Reservar</button>`) : ''}</div></div>`
     : `<div class="card plano-info vacio"><span class="vic">${ico('pin', 28)}</span><p class="muted">Tocá un sector del plano para ver qué hay y reservarlo.</p></div>`;
-  return `<div class="plano-wrap"><div class="card plano-card">${planoSVG()}
+  return `<div class="plano-wrap"><div class="card plano-card">${mapaPredio('info')}
       <div class="chips plano-chips">${Object.entries(ZONAS).map(([kk, v]) => `<button class="chip ${k === kk ? 'on' : ''}" data-act="zona" data-z="${kk}">${v.t}</button>`).join('')}</div></div>${panel}</div>
     <p class="tiny" style="text-align:left">Plano ilustrativo dibujado a partir de la vista satelital del predio (unas 5 hectáreas). La ubicación exacta y el uso de algunos sectores están por confirmar.</p>`;
 }
@@ -316,7 +480,12 @@ function vistaSitio() {
     <div class="card"><span class="num">2</span><h3>Elegí lugar, día y horario</h3><p class="muted">Solo te mostramos lo que está libre, así no hay confusiones.</p></div>
     <div class="card"><span class="num">3</span><h3>Pagá y mostrá tu QR</h3><p class="muted">Transferís, avisás con una foto del comprobante y en la entrada escanean tu QR.</p></div></div></section>
   <section class="s-sec" id="s-inst"><h2>Instalaciones y tarifas</h2><p class="sub">Valores vigentes para socios.</p><div class="grid3">
-    ${T.map(([t, n]) => { const is = S.inst.filter(i => i.tipo === t); return `<div class="card card-foto"><img src="${foto(FOTO_T[t])}" alt="${n}" loading="lazy" data-act="verfoto" data-f="${FOTO_T[t]}"><div class="cf-body"><h3>${n}</h3><p class="muted">${desc[t]}</p>${is.map(i => `<div class="rl"><span>${esc(i.nombre)}</span><b>${i.activo ? pesos(i.tarifa) : 'En mantenimiento'}</b></div>`).join('')}</div></div>`; }).join('')}</div></section>
+    ${(() => { const T2 = S.tarifas, q = S.inst.filter(i => i.tipo === 'Quincho'), qc = q.find(i => capN(i) <= 20), qg = q.find(i => capN(i) > 20);
+      const card = (f, n, d, rows) => `<div class="card card-foto"><img src="${foto(f)}" alt="${n}" loading="lazy" data-act="verfoto" data-f="${f}"><div class="cf-body"><h3>${n}</h3><p class="muted">${d}</p>${rows.map(([a, b]) => `<div class="rl"><span>${a}</span><b>${b}</b></div>`).join('')}</div></div>`;
+      return card('pileta-1', 'Entrada al predio', 'Se paga por persona y por vehículo. Incluye pileta en temporada.', [['Adulto (desde 13 años)', pesos(T2.adulto)], ['Menor (6 a 12 años)', pesos(T2.menor)], ['Menores de 6 años', 'Sin cargo'], ['Auto o camioneta', pesos(T2.auto)], ['Moto', pesos(T2.moto)]])
+        + card('quincho', 'Quinchos', `${q.length} quinchos con asador y mesa. Se reservan por turno: mediodía, tarde o noche.`, [[`Quincho (hasta ${qc ? capN(qc) : 15} personas)`, qc ? pesos(qc.tarifa) : '—'], [`Quincho grande (hasta ${qg ? capN(qg) : 40})`, qg ? pesos(qg.tarifa) : '—']])
+        + card('cancha-futbol', 'Canchas', 'Fútbol 5, pádel y vóley. Se suman a tu reserva, por hora.', S.inst.filter(i => i.tipo === 'Cancha').map(i => [i.nombre, pesos(i.tarifa)]));
+    })()}</div></section>
   <section class="s-sec" id="s-fotos"><h2>Conocé el complejo</h2><p class="sub">Tocá una foto para verla más grande.</p>${galeria()}</section>
   <section class="s-sec" id="s-plano"><h2>Plano del predio</h2><p class="sub">Ubicá cada sector antes de venir.</p>${vistaPlano(true)}</section>
   <section class="s-sec" id="s-info"><h2>Antes de venir</h2><p class="sub">Lo importante, en pocas palabras.</p><div class="grid3">
@@ -396,7 +565,7 @@ const V = {
   inicio() {
     const s = socioActual();
     const alertas = S.noticias.filter(n => ['Clima', 'Mantenimiento'].includes(n.tipo) && Date.now() - n.fecha < 3 * 86400000).sort((a, b) => b.fecha - a.fecha);
-    const mias = S.reservas.filter(r => r.socio === s.nro && r.estado === 'confirmada' && r.fecha >= hoy()).sort((a, b) => a.fecha.localeCompare(b.fecha) || inicioTurno(a.turno) - inicioTurno(b.turno));
+    const mias = S.reservas.filter(r => r.socio === s.nro && !r.padre && r.estado === 'confirmada' && r.fecha >= hoy()).sort((a, b) => a.fecha.localeCompare(b.fecha) || inicioTurno(a.turno) - inicioTurno(b.turno));
     const prox = mias[0];
     const debe = mias.filter(r => ['pendiente', 'rechazado'].includes(r.pago)).length;
     const hr = new Date().getHours(), saludo = hr < 12 ? 'Buen día' : hr < 20 ? 'Buenas tardes' : 'Buenas noches';
@@ -419,59 +588,11 @@ const V = {
     <div class="chips" style="margin-bottom:16px">${tipos.map(t => `<button class="chip ${ui.ntipo === t ? 'on' : ''}" data-act="ntipo" data-t="${t}">${t || 'Todas'}</button>`).join('')}</div>${listaNoticias(false, 0, ui.ntipo)}`;
   },
 
-  reservar() {
-    const w = ui.wiz;
-    const pasos = ['Qué', 'Cuál', 'Día', 'Horario', 'Confirmar'];
-    const st = `<div class="stepper">${pasos.map((p, i) => `<div class="${i < w.paso ? 'on' : ''}"><i></i>${p}</div>`).join('')}</div>`;
-    const back = w.paso > 1 ? `<button class="back" data-act="wback">${ico('back', 18)} Volver</button>` : '';
-    let c = '';
-    if (w.paso === 1) {
-      const T = [['Quincho', ico('flame', 26), 'Quinchos', 'Para asados y reuniones'], ['Cancha', ico('ball', 26), 'Canchas', 'Fútbol 5, pádel y vóley, por hora'], ['Pileta', ico('waves', 26), 'Pileta', 'Turno mañana o tarde, en temporada']];
-      c = `<h2 class="wtit">¿Qué querés reservar?</h2><p class="sub">Elegí una opción.</p><div class="opciones">${T.map(([t, ic, n, d]) => {
-        const is = S.inst.filter(i => i.tipo === t), act = is.some(i => i.activo), min = Math.min(...is.map(i => i.tarifa));
-        return `<button class="opcion opcion-foto" data-act="wtipo" data-t="${t}" ${act ? '' : 'disabled'}><img src="${foto(FOTO_T[t])}" alt="${n}"><span class="of-body"><span class="ic">${ic}</span><span><b>${n}</b><span class="d">${d}</span><span class="p">${act ? 'Desde ' + pesos(min) : 'Suspendido por mantenimiento'}</span></span></span></button>`;
-      }).join('')}</div>`;
-    }
-    if (w.paso === 2) {
-      const is = S.inst.filter(i => i.tipo === w.tipo);
-      c = `<h2 class="wtit">¿Cuál ${w.tipo === 'Quincho' ? 'quincho' : 'cancha'} preferís?</h2><p class="sub">Elegí el lugar.</p><div class="opciones">${is.map(i => `<button class="opcion opcion-foto" data-act="winst" data-id="${i.id}" ${i.activo ? '' : 'disabled'}>${FOTO_I[i.id] ? `<img src="${foto(FOTO_I[i.id])}" alt="${esc(i.nombre)}">` : `<span class="foto-ph">${ico(ICONK[i.id], 40)}</span>`}<span class="of-body"><span class="ic">${ICON[i.id]}</span><span><b>${esc(i.nombre)}</b><span class="d">${esc(i.cap)}</span><span class="p">${i.activo ? pesos(i.tarifa) + ' ' + unidad(i) : 'En mantenimiento'}</span></span></span></button>`).join('')}</div>`;
-    }
-    if (w.paso === 3) {
-      const inst = getInst(w.inst);
-      let dias = '';
-      for (let k = 0; k < 14; k++) {
-        const f = addDays(hoy(), k), e = estadoDia(inst, f), d = new Date(f + 'T12:00'), off = e === 'lleno' || e === 'cerrado';
-        dias += `<button class="dchip ${e} ${w.dia === f ? 'sel' : ''}" data-act="wdia" data-f="${f}" ${off ? 'disabled' : ''}><small>${k === 0 ? 'Hoy' : k === 1 ? 'Mañana' : cap1(d.toLocaleDateString('es-AR', {weekday:'short'}).replace('.', ''))}</small><b>${d.getDate()}</b><em>${{libre:'Libre', parcial:'Pocos', lleno:'Completo', cerrado:'Cerrado'}[e] || ''}</em></button>`;
-      }
-      c = `<h2 class="wtit">¿Qué día?</h2><p class="sub">${esc(inst.nombre)} · Solo se pueden elegir los días con lugar.</p><div class="dias">${dias}</div>
-      <button class="link wcal-btn" data-act="wcal">${ui.verCal ? 'Ocultar calendario' : 'Ver más fechas en el calendario'}</button>
-      <div class="cal-wrap ${ui.verCal ? 'open' : ''}"><div class="card" style="margin-top:12px;max-width:460px">${calendario(inst)}<div class="leyenda"><span><i style="background:var(--verdeb)"></i>Libre</span><span><i style="background:var(--amarillob)"></i>Pocos lugares</span><span><i style="background:var(--rojob)"></i>Completo</span></div></div></div>`;
-    }
-    if (w.paso === 4) {
-      const inst = getInst(w.inst);
-      const hs = inst.turnos.map(t => {
-        const lib = inst.cupo - ocup(inst.id, w.dia, t), pas = turnoPasado(w.dia, t), ok = lib > 0 && !pas && inst.activo;
-        return `<button class="hbtn" ${ok ? `data-act="wturno" data-t="${esc(t)}"` : 'disabled'}><b>${esc(t)}</b><span>${pas ? 'Ya pasó' : ok ? (inst.cupo > 1 ? lib + ' lugares libres' : 'Disponible') : 'Ocupado'}</span></button>`;
-      }).join('');
-      c = `<h2 class="wtit">¿En qué horario?</h2><p class="sub">${esc(inst.nombre)} · ${fmtFL(w.dia)}</p><div class="horarios">${hs}</div>`;
-    }
-    if (w.paso === 5) {
-      const inst = getInst(w.inst);
-      c = `<h2 class="wtit">Revisá y confirmá</h2><p class="sub">Si está todo bien, tocá “Confirmar reserva”.</p>
-      <div class="resumen"><table class="kv"><tr><td>Lugar</td><td><b>${esc(inst.nombre)}</b></td></tr><tr><td>Día</td><td>${fmtFL(w.dia)}</td></tr><tr><td>Horario</td><td>${esc(w.turno)}</td></tr><tr><td>Capacidad</td><td>${esc(inst.cap)}</td></tr><tr><td>Total a pagar</td><td><b>${pesos(inst.tarifa)}</b></td></tr></table></div>
-      <label class="check" style="margin:16px 0"><input type="checkbox" id="acepto"> <span>Acepto el <button type="button" class="link" data-act="verreg">reglamento del complejo</button></span></label>
-      <button class="btn grande" data-act="confirmar">Confirmar reserva</button><p class="small muted" style="text-align:center;margin-top:10px">Recibís tu QR al instante. Después pagás por transferencia ${PAGO.plazo}.</p>`;
-    }
-    const ins = w.inst ? getInst(w.inst) : null;
-    const fila = (l, v) => `<div class="rl ${v ? 'hecho' : ''}"><span>${l}</span><b>${v ? esc(v) : '<span class="muted">—</span>'}</b></div>`;
-    const res = `<div class="card"><h3>Tu reserva</h3>${fila('Tipo', w.paso > 1 ? w.tipo : '')}${fila('Lugar', w.paso > 2 && ins ? ins.nombre : '')}${fila('Día', w.paso > 3 && w.dia ? fmtFL(w.dia) : '')}${fila('Horario', w.paso > 4 ? w.turno : '')}${fila('Costo', w.paso > 2 && ins ? pesos(ins.tarifa) + ' ' + unidad(ins) : '')}</div>
-      <div class="card"><b>¿Tenés dudas?</b><p class="small muted">El asistente te ayuda en cada paso.</p><button class="btn ghost full" data-act="nav" data-v="asistente">${ico('chat', 18)} Preguntar</button></div>`;
-    return `<div class="wiz"><div class="wiz-main">${back}${st}${c}</div><aside class="wiz-res">${res}</aside></div>`;
-  },
+  reservar() { return vistaReserva(); },
 
   mis() {
     const s = socioActual();
-    const rs = S.reservas.filter(r => r.socio === s.nro);
+    const rs = S.reservas.filter(r => r.socio === s.nro && !r.padre);
     const prox = rs.filter(r => r.estado === 'confirmada' && r.fecha >= hoy()).sort((a, b) => a.fecha.localeCompare(b.fecha) || inicioTurno(a.turno) - inicioTurno(b.turno));
     const hist = rs.filter(r => !prox.includes(r)).sort((a, b) => b.fecha.localeCompare(a.fecha));
     const enHist = ui.mtab === 'hist', lista = enHist ? hist : prox;
@@ -481,7 +602,7 @@ const V = {
       const acc = futura
         ? `<button class="link rojo" data-act="cancelar" data-id="${r.id}">Cancelar</button>${pagar ? `<button class="btn" data-act="pagar" data-id="${r.id}">Pagar</button>` : `<button class="btn" data-act="verqr" data-id="${r.id}">${ico('qr', 18)} Mostrar QR</button>`}`
         : r.estado !== 'cancelada' ? `<button class="link" data-act="verqr" data-id="${r.id}">Ver comprobante</button>` : '';
-      return `<div class="rcard"><div class="rc-top">${ICON[r.instId] || ''}<div class="rc-t"><b>${esc(instNombre(r.instId))}</b><span>${fmtFL(r.fecha)} · ${esc(r.turno)}</span></div><span class="rc-monto">${pesos(r.monto || 0)}</span></div>
+      return `<div class="rcard"><div class="rc-top">${ICON[r.instId] || ''}<div class="rc-t"><b>${esc(instNombre(r.instId))}${hijos(r).length ? ' + ' + esc(instNombre(hijos(r)[0].instId)) : ''}</b><span>${fmtFL(r.fecha)} · ${esc(r.turno)}</span>${r.pers ? `<span class="rc-ex">${ico('users', 14)} ${persTxt(r.pers)} · ${vehTxt(r.veh)}</span>` : ''}</div><span class="rc-monto">${pesos(r.monto || 0)}</span></div>
         <div class="rc-foot"><div>${futura ? badgePago(r.pago) : badgeEstado(r.estado)}</div><div class="rc-acc">${acc}</div></div></div>`;
     };
     return `<div class="page-head"><h1>Mis reservas</h1></div>
@@ -521,7 +642,7 @@ const V = {
     return `<button class="back" data-act="nav" data-v="perfil">${ico('back', 18)} Mi cuenta</button><div class="page-head"><h1>Información del complejo</h1><p class="sub">Tocá un tema para ver el detalle.</p></div>
     ${acc('camera', 'Fotos del complejo', galeria(), true)}
     ${acc('clock', 'Horarios', esc(INFO.horarios))}
-    ${acc('money', 'Tarifas', ul(S.inst.map(i => `${i.nombre}: ${pesos(i.tarifa)} ${unidad(i)}${i.activo ? '' : ' (suspendida)'}`)))}
+    ${acc('money', 'Tarifas', ul(tarifasLista().map(([n, v]) => n + ': ' + v)))}
     ${acc('card', 'Cómo pagar', `<p>Transferencia o Mercado Pago a:</p>${ul(['Alias: ' + PAGO.alias, 'CBU: ' + PAGO.cbu, 'Titular: ' + PAGO.titular])}<p>Plazo: ${PAGO.plazo}. Después informá el pago desde “Mis reservas”.</p>`)}
     ${acc('pin', 'Ubicación', esc(INFO.ubicacion))}
     ${acc('checkcircle', 'Requisitos para ingresar', ul(INFO.requisitos))}
@@ -578,10 +699,10 @@ const V = {
     const val = S.reservas.filter(r => r.estado !== 'cancelada');
     const hoyR = val.filter(r => r.fecha === h).sort((a, b) => inicioTurno(a.turno) - inicioTurno(b.turno));
     const espHoy = hoyR.filter(r => r.estado === 'confirmada');
-    const porConf = val.filter(r => r.pago === 'informado').length;
+    const porConf = val.filter(r => !r.padre && r.pago === 'informado').length;
     const cobrado = val.filter(r => r.pago === 'confirmado' && r.fecha.startsWith(mes)).reduce((a, r) => a + (r.monto || 0), 0);
     const libresHoy = S.inst.filter(i => i.activo && i.cupo === 1).reduce((a, i) => a + i.turnos.filter(t => !turnoPasado(h, t) && !ocup(i.id, h, t)).length, 0);
-    const porInst = S.inst.map(i => [i.nombre, val.filter(r => r.instId === i.id && r.fecha.startsWith(mes)).length]);
+    const porInst = [['Quinchos (todos)', val.filter(r => getInst(r.instId).tipo === 'Quincho' && r.fecha.startsWith(mes)).length], ['Solo entrada', val.filter(r => r.visita && !r.instId && r.fecha.startsWith(mes)).length], ...S.inst.filter(i => i.tipo !== 'Quincho').map(i => [i.nombre, val.filter(r => r.instId === i.id && r.fecha.startsWith(mes)).length])];
     const pendFam = S.socios.reduce((a, s) => a + s.grupo.filter(g => g.estado === 'pendiente').length, 0);
     const susp = S.inst.filter(i => !i.activo);
     const tareas = [];
@@ -604,10 +725,10 @@ const V = {
   pagos() {
     const tab = ui.ptab || 'informado', q = norm(ui.pq || '');
     const G = {
-      informado: S.reservas.filter(r => r.pago === 'informado' && r.estado !== 'cancelada'),
-      pendiente: S.reservas.filter(r => r.pago === 'pendiente' && r.estado === 'confirmada'),
-      confirmado: S.reservas.filter(r => r.pago === 'confirmado' && r.estado !== 'cancelada'),
-      rechazado: S.reservas.filter(r => r.pago === 'rechazado' && r.estado !== 'cancelada')
+      informado: S.reservas.filter(r => !r.padre && r.pago === 'informado' && r.estado !== 'cancelada'),
+      pendiente: S.reservas.filter(r => !r.padre && r.pago === 'pendiente' && r.estado === 'confirmada'),
+      confirmado: S.reservas.filter(r => !r.padre && r.pago === 'confirmado' && r.estado !== 'cancelada'),
+      rechazado: S.reservas.filter(r => !r.padre && r.pago === 'rechazado' && r.estado !== 'cancelada')
     };
     const mes = hoy().slice(0, 7);
     const cobrado = G.confirmado.filter(r => r.fecha.startsWith(mes)).reduce((a, r) => a + (r.monto || 0), 0);
@@ -705,7 +826,10 @@ const V = {
   },
 
   instalaciones() {
-    return `<div class="page-head"><h1>Instalaciones</h1></div>
+    const T = S.tarifas;
+    return `<div class="page-head"><h1>Instalaciones y tarifas</h1></div>
+    <div class="card"><h3>Tarifas de entrada</h3><p class="small muted" style="margin-top:-6px">Se cobran por persona y por vehículo en cada reserva.</p>
+      <div class="filtros" style="grid-template-columns:repeat(4,1fr)">${[['adulto', 'Adulto (13+)'], ['menor', 'Menor (6 a 12)'], ['auto', 'Auto / camioneta'], ['moto', 'Moto']].map(([k, l]) => `<div><label>${l}</label><input type="number" min="0" step="100" data-tarifa-e="${k}" value="${T[k]}"></div>`).join('')}</div></div>
     <div class="card scroll"><table class="tabla"><thead><tr><th>Instalación</th><th>Tipo</th><th>Turnos</th><th>Tarifa</th><th>Estado</th></tr></thead><tbody>
     ${S.inst.map(i => `<tr><td style="display:flex;align-items:center;gap:12px">${FOTO_I[i.id] ? `<img class="thumb" src="${foto(FOTO_I[i.id])}" alt="">` : `<span class="thumb foto-ph">${ico(ICONK[i.id], 18)}</span>`}<div><b>${esc(i.nombre)}</b><br><span class="small muted">${esc(i.cap)}</span></div></td><td>${i.tipo}</td><td>${i.turnos.length}${i.cupo > 1 ? ` (cupo ${i.cupo})` : ''}</td>
       <td><input type="number" style="width:120px" data-tarifa="${i.id}" value="${i.tarifa}" min="0" step="500"></td>
@@ -764,14 +888,14 @@ const V = {
   }
 };
 
-function calendario(inst) {
+function calendario(estFn) {
   const [y, m] = ui.mes.split('-').map(Number);
   const first = new Date(y, m - 1, 1), start = (first.getDay() + 6) % 7, dias = new Date(y, m, 0).getDate();
   let h = `<div class="cal-head"><button type="button" data-act="mes" data-d="-1" ${ui.mes <= hoy().slice(0, 7) ? 'disabled' : ''}>‹</button><b>${cap1(first.toLocaleDateString('es-AR', {month:'long', year:'numeric'}))}</b><button type="button" data-act="mes" data-d="1">›</button></div><div class="cal">`;
   h += ['L','M','M','J','V','S','D'].map(x => `<div class="dow">${x}</div>`).join('');
   for (let i = 0; i < start; i++) h += '<div></div>';
   for (let d = 1; d <= dias; d++) {
-    const f = y + '-' + z(m) + '-' + z(d), e = estadoDia(inst, f), off = ['pasado','fuera','cerrado'].includes(e);
+    const f = y + '-' + z(m) + '-' + z(d), e = estFn(f), off = ['pasado','fuera','cerrado','lleno'].includes(e);
     h += `<button type="button" class="dia ${off ? '' : e} ${ui.wiz.dia === f ? 'sel' : ''}" data-act="dia" data-f="${f}" ${off ? 'disabled' : ''}>${d}</button>`;
   }
   return h + '</div>';
@@ -782,13 +906,13 @@ function turnoOpts(inst, fecha, sel) {
 }
 function filtrarReservas() {
   const f = ui.f, q = norm(f.q || '');
-  return S.reservas.filter(r => (!f.desde || r.fecha >= f.desde) && (!f.hasta || r.fecha <= f.hasta) && (!f.inst || r.instId === f.inst) && (!f.estado || r.estado === f.estado)
+  return S.reservas.filter(r => !r.padre && (!f.desde || r.fecha >= f.desde) && (!f.hasta || r.fecha <= f.hasta) && (!f.inst || r.instId === f.inst) && (!f.estado || r.estado === f.estado)
     && (!q || norm(r.socio + ' ' + r.codigo + ' ' + nombreSocio(r.socio)).includes(q))).sort((a, b) => a.fecha.localeCompare(b.fecha) || inicioTurno(a.turno) - inicioTurno(b.turno));
 }
 
 function exportCSV(rows, nombre) {
-  const head = ['Código','N° socio','Nombre','Instalación','Tipo','Fecha','Turno','Estado','Monto','Pago','Medio de pago','Creada','Ingreso'];
-  const lines = [head, ...rows.map(r => [r.codigo, r.socio, nombreSocio(r.socio), instNombre(r.instId), getInst(r.instId).tipo, fmtF(r.fecha), r.turno, r.estado, r.monto || 0, r.pago || '', r.pagoInfo ? r.pagoInfo.metodo : '', fmtDT(r.creada), r.ingreso ? fmtDT(r.ingreso) : ''])]
+  const head = ['Código','N° socio','Nombre','Lugar','Tipo','Fecha','Turno','Personas','Vehículos','Estado','Monto','Pago','Medio de pago','Creada','Ingreso'];
+  const lines = [head, ...rows.map(r => [r.codigo, r.socio, nombreSocio(r.socio), instNombre(r.instId), getInst(r.instId).tipo, fmtF(r.fecha), r.turno, persTxt(r.pers), r.pers ? vehTxt(r.veh) : '', r.estado, r.monto || 0, r.pago || '', r.pagoInfo ? r.pagoInfo.metodo : '', fmtDT(r.creada), r.ingreso ? fmtDT(r.ingreso) : ''])]
     .map(l => l.map(v => '"' + String(v).replace(/"/g, '""') + '"').join(';')).join('\r\n');
   const a = document.createElement('a');
   a.href = URL.createObjectURL(new Blob(['﻿' + lines], {type:'text/csv;charset=utf-8'}));
@@ -802,13 +926,14 @@ function render() {
   detenerCamara();
   const app = $('#app');
   document.body.classList.toggle('con-bottom', !!ses && ses.rol === 'socio');
+  document.body.classList.toggle('en-reserva', !!ses && ui.view === 'reservar');
   if (!ses) { app.innerHTML = vistaAcceso(); return; }
   const navAct = {familia:'perfil', credencial:'perfil', info:'perfil', novedades:'inicio', plano:'inicio', asistente:'', nueva:'reservas'}[ui.view] ?? ui.view;
   const nomCorto = ses.rol === 'socio' ? socioActual().nombre : S.staff.find(s => s.user === ses.user).nombre;
   const rolTxt = ses.rol === 'socio' ? 'Socio N° ' + ses.nro : ses.rol === 'admin' ? 'Administrador' : 'Portería';
   const ini = nomCorto.split(' ').map(x => x[0]).slice(0, 2).join('');
   const items = NAV[ses.rol];
-  const pend = ses.rol === 'admin' ? S.reservas.filter(r => r.pago === 'informado' && r.estado !== 'cancelada').length : 0;
+  const pend = ses.rol === 'admin' ? S.reservas.filter(r => !r.padre && r.pago === 'informado' && r.estado !== 'cancelada').length : 0;
   const cnt = k => k === 'pagos' && pend ? `<span class="cnt">${pend}</span>` : '';
   const logo = `<div class="logo">${ico('shield')}</div>`;
   const cta = ses.rol === 'admin' ? `<button class="btn full side-cta" data-act="nav" data-v="nueva">${ico('plus', 18)} Nueva reserva</button>` : '';
@@ -835,18 +960,14 @@ function responder(qRaw) {
     let h = '';
     dias.forEach(f => {
       h += `<b>${fmtFL(f)}</b><ul>`;
-      S.inst.forEach(i => {
-        if (!i.activo) { h += `<li>${esc(i.nombre)}: suspendida</li>`; return; }
-        const lib = i.turnos.filter(t => !turnoPasado(f, t) && ocup(i.id, f, t) < i.cupo);
-        h += `<li>${esc(i.nombre)}: ${lib.length ? (i.tipo === 'Cancha' ? lib.length + ' horarios libres' : lib.map(esc).join(', ')) : 'completo'}</li>`;
-      });
+      FRANJAS.forEach(fr => { const lib = quinchosLibres(f, fr.id); h += `<li>${fr.t} (${fr.h}): ${turnoPasado(f, fr.turno) ? 'ya comenzó' : lib ? lib + ' quinchos libres' : 'sin quinchos libres'}</li>`; });
       h += '</ul>';
     });
     return h + '<button class="btn" data-act="nuevares">Reservar</button>';
   }
-  if (has(/reserv|como (hago|alquilo)|quiero (un|una|el|la)|alquil|turno/)) return 'Reservar es muy simple:<ol><li>Entrá a <b>Reservar</b>.</li><li>Elegí la instalación (quincho, cancha o pileta).</li><li>Elegí el día en el calendario: verde es libre, amarillo quedan pocos turnos, rojo completo.</li><li>Tocá el horario disponible, aceptá el reglamento y confirmá.</li><li>Recibís al instante tu <b>comprobante con código QR</b>, que mostrás en la entrada.</li></ol>Se permite una reserva por tipo de instalación y por día, con hasta 30 días de anticipación.<br><button class="btn" data-act="nuevares">Empezar a reservar</button>';
+  if (has(/reserv|como (hago|alquilo)|quiero (un|una|el|la)|alquil|turno|quincho/)) return 'Reservar es muy simple, en 4 pasos:<ol><li><b>Fecha y horario:</b> elegí el día y si venís al mediodía, a la tarde o a la noche.</li><li><b>Personas:</b> indicá cuántos adultos y menores vienen, y si venís en vehículo.</li><li><b>Lugar:</b> en el mapa del predio tocá el quincho libre que quieras (en verde). Si querés, sumá una cancha.</li><li><b>Pago:</b> pagá con Mercado Pago o por transferencia.</li></ol>Al terminar recibís tu QR para mostrar en la entrada.<br><button class="btn" data-act="nuevares">Empezar a reservar</button>';
   if (has(/pago|pagar|transfer|alias|cbu|mercado ?pago|abonar|comprobante de pago/)) return `Podés pagar por transferencia o Mercado Pago:<ul><li>Alias: <b>${PAGO.alias}</b></li><li>CBU: ${PAGO.cbu}</li><li>Titular: ${esc(PAGO.titular)}</li></ul>Plazo: ${PAGO.plazo}. Después entrá a <b>Mis reservas</b>, tocá “Pagar” y enviá la foto del comprobante. La administración lo confirma y tu reserva queda como “Pagado”.<br><button class="btn" data-act="nav" data-v="mis">Ir a Mis reservas</button>`;
-  if (has(/tarifa|precio|cuesta|costo|valor|sale/)) return 'Tarifas vigentes:' + lista(S.inst.map(i => `${i.nombre}: ${pesos(i.tarifa)}${i.tipo === 'Cancha' ? ' por hora' : i.tipo === 'Pileta' ? ' por grupo y turno' : ' por turno'}`)) + 'Por ahora se abonan en la administración del complejo.';
+  if (has(/tarifa|precio|cuesta|costo|valor|sale|vehiculo|auto|persona/)) return 'Tarifas vigentes:' + lista(tarifasLista().map(([n, v]) => n + ': ' + v)) + 'Al reservar, el sistema calcula el total según las personas, los vehículos y el lugar que elijas.';
   if (has(/horario|hora|abre|abren|cierra|atencion/)) return esc(INFO.horarios);
   if (has(/reglamento|norma|regla|permit|mascota|perro|alcohol|prohib/)) return 'Puntos principales del reglamento:' + lista(INFO.reglamento) + 'El reglamento completo está publicado en Comunicados.';
   if (has(/credencial|carnet/)) return 'Tu credencial digital está en <b>Mi cuenta → Mi credencial</b>. Mostrala en la portería junto con tu DNI.<br><button class="btn" data-act="nav" data-v="credencial">Ver mi credencial</button>';
@@ -898,12 +1019,12 @@ function validar(codigo) {
   }
   else if (!r) { v = {tipo:'error', titulo:'QR inválido', html:`El código <b>${esc(c)}</b> no existe en el sistema. Posible comprobante falso o adulterado.`}; log('Intento de validación con código inexistente: ' + c); }
   else {
-    const det = `<b>${esc(nombreSocio(r.socio))}</b> (socio ${r.socio})<br>${esc(instNombre(r.instId))} · ${fmtF(r.fecha)} · ${esc(r.turno)}`;
+    const det = `<b>${esc(nombreSocio(r.socio))}</b> (socio ${r.socio})<br>${esc(instNombre(r.instId))}${hijos(r).map(c => ' + ' + esc(instNombre(c.instId)) + ' ' + esc(c.turno)).join('')} · ${fmtF(r.fecha)} · ${esc(r.turno)}${r.pers ? `<br><b>Ingresan:</b> ${persTxt(r.pers)}<br><b>Vehículos:</b> ${vehTxt(r.veh)}` : ''}`;
     if (r.estado === 'cancelada') { v = {tipo:'error', titulo:'Reserva cancelada', html:det + '<br>Esta reserva fue cancelada y no habilita el ingreso.'}; log('Validación rechazada (cancelada): ' + c); }
     else if (r.estado === 'utilizada') { v = {tipo:'warn', titulo:'QR ya utilizado', html:det + `<br>Ya se registró el ingreso ${r.ingreso ? 'el ' + fmtDT(r.ingreso) : ''}. El QR es válido una sola vez.`}; log('Validación rechazada (QR reutilizado): ' + c); }
     else if (r.fecha !== hoy()) { v = {tipo:'warn', titulo:'Fecha incorrecta', html:det + `<br>La reserva es para el <b>${fmtF(r.fecha)}</b>, no para hoy.`}; log('Validación rechazada (otra fecha): ' + c); }
     else {
-      r.estado = 'utilizada'; r.ingreso = Date.now();
+      r.estado = 'utilizada'; r.ingreso = Date.now(); propagar(r);
       const s = S.socios.find(x => x.nro === r.socio);
       const fam = s && s.grupo.filter(g => g.estado === 'habilitado').length ? '<br><span class="small">Grupo familiar habilitado: ' + s.grupo.filter(g => g.estado === 'habilitado').map(g => esc(g.nombre)).join(', ') + '</span>' : '';
       v = {tipo:'ok', titulo:'Ingreso autorizado', html:det + fam + (r.pago !== 'confirmado' ? `<br><b style="color:var(--amarillo)">Atención: ${r.pago === 'informado' ? 'Pago informado, todavía sin confirmar' : 'Pago pendiente'}: cobrar ${pesos(r.monto || 0)} o verificar en administración</b>` : '<br><span class="small">Pago confirmado</span>')};
@@ -944,14 +1065,20 @@ const ACT = {
   demo: b => entrar(b.dataset.u, b.dataset.p),
   reset: () => { if (confirm('¿Reiniciar todos los datos de demostración?')) { S = seed(); save(); ui.msg = {tipo:'ok', txt:'Datos reiniciados.'}; render(); } },
   salir: () => { log('Cierre de sesión'); ses = null; ui = uiInicial(); closeModal(); render(); },
-  nuevares: () => { ui.wiz = {paso:1}; ui.verCal = false; ui.view = 'reservar'; render(); window.scrollTo(0, 0); },
-  wtipo: b => { const is = S.inst.filter(i => i.tipo === b.dataset.t && i.activo); ui.wiz.tipo = b.dataset.t; if (is.length === 1 && S.inst.filter(i => i.tipo === b.dataset.t).length === 1) { ui.wiz.inst = is[0].id; ui.wiz.paso = 3; } else ui.wiz.paso = 2; ui.verCal = false; render(); window.scrollTo(0, 0); },
-  winst: b => { ui.wiz.inst = b.dataset.id; ui.wiz.paso = 3; ui.verCal = false; render(); window.scrollTo(0, 0); },
-  wdia: b => { ui.wiz.dia = b.dataset.f; ui.wiz.paso = 4; render(); window.scrollTo(0, 0); },
-  dia: b => { ui.wiz.dia = b.dataset.f; ui.wiz.paso = 4; render(); window.scrollTo(0, 0); },
-  wturno: b => { ui.wiz.turno = b.dataset.t; ui.wiz.paso = 5; render(); window.scrollTo(0, 0); },
-  wback: () => { const w = ui.wiz; w.paso = (w.paso === 3 && S.inst.filter(i => i.tipo === w.tipo).length === 1) ? 1 : w.paso - 1; render(); },
+  nuevares: () => { ui.wiz = {paso:1}; ui.verCal = false; ui.canSel = null; closeModal(); ui.view = 'reservar'; render(); window.scrollTo(0, 0); },
+  wdia: b => { const w = ui.wiz; if (w.dia !== b.dataset.f) { w.franja = null; w.quincho = null; w.cancha = null; } w.dia = b.dataset.f; render(); },
+  dia: b => { ACT.wdia(b); },
+  wfr: b => { const w = ui.wiz; if (w.franja !== b.dataset.f) { w.quincho = null; w.cancha = null; ui.canSel = null; } w.franja = b.dataset.f; render(); },
+  wnext: () => { const w = ui.wiz; if (w.paso === 3 && w.quincho && capN(getInst(w.quincho)) < totPers(w.pers)) w.quincho = null; w.paso = Math.min(4, w.paso + 1); ui.verCal = false; render(); window.scrollTo(0, 0); },
+  wback: () => { ui.wiz.paso = Math.max(1, ui.wiz.paso - 1); render(); window.scrollTo(0, 0); },
   wcal: () => { ui.verCal = !ui.verCal; if (ui.verCal) ui.mes = (ui.wiz.dia || hoy()).slice(0, 7); render(); },
+  cnt: b => { const w = ui.wiz, o = w[b.dataset.o], k = b.dataset.k, max = b.dataset.o === 'veh' ? 10 : 60; o[k] = Math.max(b.dataset.o === 'pers' && k === 'a' ? 1 : 0, Math.min(max, (o[k] || 0) + Number(b.dataset.d))); render(); },
+  wveh: b => { const w = ui.wiz; w.conVeh = b.dataset.v === '1'; if (w.conVeh && !w.veh.auto && !w.veh.moto) w.veh.auto = 1; render(); },
+  wq: b => { const w = ui.wiz; w.quincho = w.quincho === b.dataset.id ? null : b.dataset.id; render(); },
+  wcan: b => { ui.canSel = ui.canSel === b.dataset.id ? null : b.dataset.id; render(); },
+  wcanh: b => { ui.wiz.cancha = {id:ui.canSel, hora:b.dataset.h}; ui.canSel = null; render(); },
+  wcanq: () => { ui.wiz.cancha = null; render(); },
+  wmet: b => { ui.wiz.metodo = b.dataset.m; render(); },
   mes: b => { const [y, m] = ui.mes.split('-').map(Number); const d = new Date(y, m - 1 + Number(b.dataset.d), 1); ui.mes = d.getFullYear() + '-' + z(d.getMonth() + 1); render(); },
   mtab: b => { ui.mtab = b.dataset.t; render(); },
   verfoto: b => {
@@ -960,11 +1087,10 @@ const ACT = {
     showModal(`<img class="foto-grande" src="${foto(f)}" alt="${esc(c)}"><div class="acciones" style="justify-content:space-between;align-items:center"><button class="icon-btn" data-act="verfoto" data-f="${prev}" aria-label="Anterior">${ico('back')}</button><b>${esc(c)}</b><button class="icon-btn" data-act="verfoto" data-f="${next}" aria-label="Siguiente">${ico('chevron')}</button></div><div class="acciones" style="margin-top:8px"><button class="btn ghost full" data-act="cerrar">Cerrar</button></div>`);
   },
   zona: b => { ui.zona = ui.zona === b.dataset.z ? null : b.dataset.z; const y = window.scrollY; render(); window.scrollTo(0, y); },
-  reservartipo: b => { ui.wiz = {paso:1}; ui.view = 'reservar'; ACT.wtipo(b); },
   ir: b => { const el = document.getElementById(b.dataset.id); if (el) el.scrollIntoView({behavior:'smooth', block:'start'}); },
   pagar: b => {
     const r = S.reservas.find(x => x.id === b.dataset.id);
-    showModal(`<h3>Pagar reserva</h3><p class="small muted" style="margin-top:-6px">${esc(instNombre(r.instId))} · ${fmtFL(r.fecha)} · ${esc(r.turno)}</p>
+    showModal(`${b.dataset.nueva ? `<div class="exito">${ico('checkcircle', 20)} Tu lugar quedó reservado</div><p class="small muted" style="text-align:center;margin-top:-6px">Completá la transferencia para confirmar la reserva.</p>` : ''}<h3>Pagar reserva</h3><p class="small muted" style="margin-top:-6px">${esc(instNombre(r.instId))} · ${fmtFL(r.fecha)} · ${esc(r.turno)}</p>
       <div class="resumen" style="text-align:center;padding:14px"><span class="small muted">Monto a pagar</span><div style="font-size:30px;font-weight:800;color:var(--azul)">${pesos(r.monto || 0)}</div><span class="small muted">Plazo: ${PAGO.plazo}</span></div>
       ${r.pago === 'rechazado' ? '<div class="err">El pago anterior fue rechazado. Revisá los datos y volvé a informarlo.</div>' : ''}
       <h3 style="margin-top:18px">Paso 1 · Transferí a esta cuenta</h3>
@@ -977,9 +1103,9 @@ const ACT = {
         <div class="acciones"><button type="button" class="btn ghost" data-act="cerrar">Más tarde</button><button class="btn">Enviar aviso de pago</button></div></form>`);
   },
   copiar: b => { try { navigator.clipboard.writeText(b.dataset.txt); toast('Copiado: ' + b.dataset.txt); } catch (e) { toast(b.dataset.txt); } },
-  pconf: b => { const r = S.reservas.find(x => x.id === b.dataset.id); r.pago = 'confirmado'; r.pagoConf = {t:Date.now(), usuario:usuarioLog()}; log(`Confirmó el pago de ${r.codigo} (${pesos(r.monto || 0)}, socio ${r.socio})`); closeModal(); toast('Pago confirmado'); render(); },
-  prech: b => { const r = S.reservas.find(x => x.id === b.dataset.id); if (!confirm('¿Rechazar este aviso de pago? El socio va a ver que tiene que informarlo de nuevo.')) return; r.pago = 'rechazado'; log(`Rechazó el aviso de pago de ${r.codigo} (socio ${r.socio})`); closeModal(); toast('Pago rechazado'); render(); },
-  pefec: b => { const r = S.reservas.find(x => x.id === b.dataset.id); if (!confirm(`¿Registrar el pago en efectivo de ${pesos(r.monto || 0)}?`)) return; r.pago = 'confirmado'; r.pagoInfo = {metodo:'Efectivo en administración', operacion:'', t:Date.now(), img:null}; r.pagoConf = {t:Date.now(), usuario:usuarioLog()}; log(`Registró pago en efectivo de ${r.codigo} (${pesos(r.monto || 0)})`); closeModal(); toast('Pago registrado'); render(); },
+  pconf: b => { const r = S.reservas.find(x => x.id === b.dataset.id); r.pago = 'confirmado'; r.pagoConf = {t:Date.now(), usuario:usuarioLog()}; propagar(r); log(`Confirmó el pago de ${r.codigo} (${pesos(r.monto || 0)}, socio ${r.socio})`); closeModal(); toast('Pago confirmado'); render(); },
+  prech: b => { const r = S.reservas.find(x => x.id === b.dataset.id); if (!confirm('¿Rechazar este aviso de pago? El socio va a ver que tiene que informarlo de nuevo.')) return; r.pago = 'rechazado'; propagar(r); log(`Rechazó el aviso de pago de ${r.codigo} (socio ${r.socio})`); closeModal(); toast('Pago rechazado'); render(); },
+  pefec: b => { const r = S.reservas.find(x => x.id === b.dataset.id); if (!confirm(`¿Registrar el pago en efectivo de ${pesos(r.monto || 0)}?`)) return; r.pago = 'confirmado'; r.pagoInfo = {metodo:'Efectivo en administración', operacion:'', t:Date.now(), img:null}; r.pagoConf = {t:Date.now(), usuario:usuarioLog()}; propagar(r); log(`Registró pago en efectivo de ${r.codigo} (${pesos(r.monto || 0)})`); closeModal(); toast('Pago registrado'); render(); },
   pimg: b => { const r = S.reservas.find(x => x.id === b.dataset.id); showModal(`<h3>Comprobante de pago</h3><p class="small muted">${esc(nombreSocio(r.socio))} · ${pesos(r.monto || 0)} · ${esc(r.pagoInfo.metodo)}</p><img src="${r.pagoInfo.img}" alt="Comprobante" style="width:100%;border-radius:10px;border:1px solid var(--borde)"><div class="acciones">${r.pago === 'informado' ? `<button class="btn rojo" data-act="prech" data-id="${r.id}">Rechazar</button><button class="btn" data-act="pconf" data-id="${r.id}">Confirmar pago</button>` : '<button class="btn" data-act="cerrar">Cerrar</button>'}</div>`); },
   ptab: b => { ui.ptab = b.dataset.t; render(); },
   disp: b => { ui.ag = b.dataset.f; ui.view = 'agenda'; render(); window.scrollTo(0, 0); },
@@ -987,9 +1113,9 @@ const ACT = {
   aghoy: () => { ui.ag = hoy(); render(); },
   agnueva: b => { ui.pref = {inst:b.dataset.i, fecha:ui.ag || hoy(), turno:b.dataset.t}; closeModal(); ui.view = 'nueva'; render(); },
   agdet: b => {
-    const r = S.reservas.find(x => x.id === b.dataset.id), s = S.socios.find(x => x.nro === r.socio);
+    const r0 = S.reservas.find(x => x.id === b.dataset.id), r = r0.padre ? (S.reservas.find(x => x.id === r0.padre) || r0) : r0, s = S.socios.find(x => x.nro === r.socio);
     showModal(`<h3>${ICON[r.instId] || ''} ${esc(instNombre(r.instId))}</h3><p class="small muted" style="margin-top:-6px">${fmtFL(r.fecha)} · ${esc(r.turno)}</p>
-      <table class="kv"><tr><td>Socio</td><td><b>${esc(nombreSocio(r.socio))}</b> (N° ${r.socio})</td></tr><tr><td>Contacto</td><td>${s ? esc(s.email) + (s.tel ? '<br>' + esc(s.tel) : '') : '<span class="muted">Sin cuenta web</span>'}</td></tr>
+      <table class="kv"><tr><td>Socio</td><td><b>${esc(nombreSocio(r.socio))}</b> (N° ${r.socio})</td></tr>${r.pers ? `<tr><td>Personas</td><td>${persTxt(r.pers)}</td></tr><tr><td>Vehículos</td><td>${vehTxt(r.veh)}</td></tr>` : ''}${hijos(r).length ? `<tr><td>Incluye</td><td>${hijos(r).map(c => esc(instNombre(c.instId)) + ' · ' + esc(c.turno)).join('<br>')}</td></tr>` : ''}<tr><td>Contacto</td><td>${s ? esc(s.email) + (s.tel ? '<br>' + esc(s.tel) : '') : '<span class="muted">Sin cuenta web</span>'}</td></tr>
       <tr><td>Estado</td><td>${badgeEstado(r.estado)}</td></tr><tr><td>Pago</td><td>${badgePago(r.pago)} <b>${pesos(r.monto || 0)}</b>${r.pagoInfo ? `<br><span class="small muted">${esc(r.pagoInfo.metodo)}${r.pagoInfo.operacion ? ' · Op. ' + esc(r.pagoInfo.operacion) : ''} · ${fmtDT(r.pagoInfo.t)}</span>` : ''}${r.estado !== 'cancelada' && botonesPago(r) ? '<div style="margin-top:6px">' + botonesPago(r) + '</div>' : ''}</td></tr><tr><td>Código</td><td style="font-family:monospace">${r.codigo}</td></tr><tr><td>Creada</td><td>${fmtDT(r.creada)}</td></tr>${r.ingreso ? `<tr><td>Ingreso</td><td>${fmtDT(r.ingreso)}</td></tr>` : ''}</table>
       <div class="acciones" style="flex-wrap:wrap"><button class="btn ghost" data-act="cerrar">Cerrar</button>${r.estado !== 'cancelada' ? `<button class="btn ghost" data-act="verqr" data-id="${r.id}">Ver QR</button>` : ''}${r.estado === 'confirmada' ? `<button class="btn ghost" data-act="modificar" data-id="${r.id}">Modificar</button><button class="btn rojo" data-act="cancelar" data-id="${r.id}">Cancelar reserva</button>` : ''}</div>`);
   },
@@ -1013,9 +1139,14 @@ const ACT = {
   descreg: () => descargar('Reglamento del Complejo Policial Almudena\n\n' + INFO.reglamento.map((x, i) => (i + 1) + '. ' + x).join('\n'), 'reglamento_complejo_almudena.txt', 'text/plain'),
   confirmar: () => {
     if (!$('#acepto').checked) { toast('Marcá la casilla para aceptar el reglamento.', 'error'); return; }
-    const w = ui.wiz, res = crearReserva(ses.nro, w.inst, w.dia, w.turno, false);
-    if (res.error) { toast(res.error, 'error'); w.paso = 4; render(); return; }
-    ui.wiz = {paso:1}; ui.view = 'mis'; ui.mtab = 'prox'; render(); comprobante(res.r, true);
+    const w = ui.wiz, res = crearVisita(w), met = w.metodo || 'mp';
+    if (res.error) { toast(res.error, 'error'); if (res.paso) w.paso = res.paso; render(); return; }
+    const r = res.r;
+    ui.wiz = {paso:1}; ui.view = 'mis'; ui.mtab = 'prox'; render();
+    if (met === 'mp') {
+      showModal(`<div class="mp-proc"><div class="mp-logo">Mercado Pago</div><div class="spinner"></div><p><b>Procesando tu pago de ${pesos(r.monto)}</b></p><p class="small muted">Demostración: en la versión real se abre el checkout de Mercado Pago.</p></div>`);
+      setTimeout(() => { r.pago = 'confirmado'; r.pagoInfo = {metodo:'Mercado Pago', operacion:String(1e9 + Math.floor(Math.random() * 9e9)), t:Date.now(), img:null}; r.pagoConf = {t:Date.now(), usuario:'Mercado Pago (automático)'}; propagar(r); log(`Pago aprobado por Mercado Pago: ${r.codigo} (${pesos(r.monto)})`); render(); comprobante(r, true); }, 1600);
+    } else ACT.pagar({dataset:{id:r.id, nueva:'1'}});
   },
   verqr: b => comprobante(S.reservas.find(r => r.id === b.dataset.id)),
   cerrar: () => closeModal(),
@@ -1023,7 +1154,7 @@ const ACT = {
   cancelar: b => {
     const r = S.reservas.find(x => x.id === b.dataset.id);
     if (!confirm(`¿Cancelar la reserva de ${instNombre(r.instId)} del ${fmtF(r.fecha)} (${r.turno})?`)) return;
-    r.estado = 'cancelada'; log(`Canceló la reserva ${r.codigo}`); closeModal(); toast('Reserva cancelada. El turno quedó libre.'); render();
+    r.estado = 'cancelada'; propagar(r); log(`Canceló la reserva ${r.codigo}`); closeModal(); toast('Reserva cancelada. El turno quedó libre.'); render();
   },
   preg: b => preguntar(b.dataset.q),
   camara: () => iniciarCamara(),
@@ -1052,7 +1183,7 @@ const ACT = {
 function comprobante(r, nueva) {
   showModal(`${nueva ? `<div class="exito">${ico('checkcircle', 20)} ¡Listo! Tu reserva está confirmada</div>` : ''}<div class="comprobante"><div class="cmp-head"><div class="logo">${ico('shield')}</div><div><b>Complejo Policial Almudena</b><small>Comprobante digital de reserva</small></div></div>
     <div class="qr" data-qr="${r.codigo}"></div><div class="codigo">${r.codigo}</div>
-    <table class="kv"><tr><td>Socio</td><td>${esc(nombreSocio(r.socio))} (N° ${r.socio})</td></tr><tr><td>Instalación</td><td>${esc(instNombre(r.instId))}</td></tr><tr><td>Fecha</td><td>${fmtFL(r.fecha)}</td></tr><tr><td>Horario</td><td>${esc(r.turno)}</td></tr><tr><td>Estado</td><td>${badgeEstado(r.estado)}</td></tr><tr><td>Pago</td><td>${badgePago(r.pago)} ${pesos(r.monto || 0)}</td></tr><tr><td>Emitido</td><td>${fmtDT(r.creada)}</td></tr>${r.ingreso ? `<tr><td>Ingreso</td><td>${fmtDT(r.ingreso)}</td></tr>` : ''}</table>
+    <table class="kv"><tr><td>Socio</td><td>${esc(nombreSocio(r.socio))} (N° ${r.socio})</td></tr><tr><td>Lugar</td><td>${esc(instNombre(r.instId))}${hijos(r).map(c => '<br>' + esc(instNombre(c.instId)) + ' · ' + esc(c.turno)).join('')}</td></tr><tr><td>Fecha</td><td>${fmtFL(r.fecha)}</td></tr><tr><td>Horario</td><td>${esc(r.turno)}</td></tr>${r.pers ? `<tr><td>Personas</td><td>${persTxt(r.pers)}</td></tr><tr><td>Vehículos</td><td>${vehTxt(r.veh)}</td></tr>` : ''}<tr><td>Estado</td><td>${badgeEstado(r.estado)}</td></tr><tr><td>Pago</td><td>${badgePago(r.pago)} ${pesos(r.monto || 0)}</td></tr><tr><td>Emitido</td><td>${fmtDT(r.creada)}</td></tr>${r.ingreso ? `<tr><td>Ingreso</td><td>${fmtDT(r.ingreso)}</td></tr>` : ''}</table>
     <p class="small muted">Presentá este QR en el ingreso. Es único e intransferible y solo es válido una vez.</p></div>
     <div class="acciones no-print" style="flex-wrap:wrap"><button class="btn ghost" data-act="cerrar">Cerrar</button><button class="btn ${MODO === 'socio' && r.estado === 'confirmada' && ['pendiente', 'rechazado'].includes(r.pago) ? 'ghost' : ''}" data-act="imprimir">Descargar / imprimir</button>${MODO === 'socio' && r.estado === 'confirmada' && ['pendiente', 'rechazado'].includes(r.pago) ? `<button class="btn" data-act="pagar" data-id="${r.id}">Pagar ahora</button>` : ''}</div>`);
 }
@@ -1084,7 +1215,7 @@ const FORM = {
   pbuscar: fd => { ui.pq = fd.get('q'); render(); },
   infopago: (fd, f) => {
     const r = S.reservas.find(x => x.id === f.dataset.id), file = fd.get('img');
-    const fin = img => { r.pago = 'informado'; r.pagoInfo = {metodo:fd.get('metodo'), operacion:(fd.get('op') || '').trim(), t:Date.now(), img}; log(`Informó el pago de ${r.codigo} (${fd.get('metodo')})`); closeModal(); toast('¡Aviso enviado! La administración va a confirmar tu pago.'); render(); };
+    const fin = img => { r.pago = 'informado'; r.pagoInfo = {metodo:fd.get('metodo'), operacion:(fd.get('op') || '').trim(), t:Date.now(), img}; propagar(r); log(`Informó el pago de ${r.codigo} (${fd.get('metodo')})`); closeModal(); toast('¡Aviso enviado! La administración va a confirmar tu pago.'); render(); };
     if (file && file.size) achicarImagen(file).then(fin).catch(() => fin(null)); else fin(null);
   },
   datos: fd => { const s = socioActual(); s.email = fd.get('email').trim(); s.tel = fd.get('tel').trim(); log('Actualizó sus datos de contacto'); toast('Datos guardados'); render(); },
@@ -1119,6 +1250,7 @@ document.addEventListener('change', e => {
   }
   if (e.target.id === 'n_inst' || e.target.id === 'n_fecha') { $('#n_turno').innerHTML = turnoOpts(getInst($('#n_inst').value), $('#n_fecha').value); }
   if (e.target.id === 'agfecha' && e.target.value) { ui.ag = e.target.value; render(); }
+  if (e.target.dataset.tarifaE) { const k = e.target.dataset.tarifaE, v = Math.max(0, Number(e.target.value) || 0); log(`Cambió la tarifa de entrada (${k}): ${pesos(S.tarifas[k])} → ${pesos(v)}`); S.tarifas[k] = v; toast('Tarifa actualizada'); }
   if (e.target.dataset.tarifa) { const i = getInst(e.target.dataset.tarifa); const v = Math.max(0, Number(e.target.value) || 0); log(`Cambió la tarifa de ${i.nombre}: ${pesos(i.tarifa)} → ${pesos(v)}`); i.tarifa = v; toast('Tarifa actualizada'); }
 });
 document.addEventListener('input', e => {

@@ -13,6 +13,15 @@ Prototipo del **Sistema Web Inteligente de Gestión Integral** solicitado por la
 
 Ambos comparten `styles.css` y `app.js`. En el prototipo los datos se guardan en el navegador, así que la administración ve lo que hacen los socios **solo si se usa el mismo navegador**. En la versión real ambos sitios se conectan a la misma base de datos en un servidor.
 
+## Reserva por etapas (socio)
+
+1. **Fecha y horario:** día (próximos 14 días o calendario) y franja: mediodía (11–16 h), tarde (16–20 h) o noche (20–01 h).
+2. **Personas y vehículo:** adultos, menores de 6 a 12 años y menores de 6 (sin cargo); si viene en vehículo, cuántos autos/camionetas y motos.
+3. **Lugar:** mapa interactivo del predio con los **21 quinchos** (14 + quincho grande + 6) en colores según disponibilidad y capacidad del grupo. Opcional: sumar una cancha (fútbol 5, vóley o pádel) eligiendo la hora.
+4. **Pago:** Mercado Pago (simulado, se confirma al instante) o transferencia con comprobante.
+
+El total se calcula en vivo: entrada por persona + vehículos + quincho + cancha. Las tarifas de entrada se editan en *Administración → Instalaciones y tarifas*.
+
 ## Pagos
 
 1. El socio reserva y la reserva queda con **💲 Pago pendiente**.
