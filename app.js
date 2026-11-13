@@ -578,7 +578,7 @@ function vistaAcceso() {
     body = `<div style="text-align:center"><span class="vic" style="width:72px;height:72px">${ico('megaphone', 30)}</span>
       <h3 style="margin-top:6px">Revisá tu correo</h3>
       <p class="muted">Si <b>${esc(e)}</b> está registrado, te enviamos ${ui.recTipo === 'nro' ? 'tu <b>número de socio</b>' : 'un <b>enlace para restablecer tu contraseña</b>'}.</p>
-      <div class="pasos-mail"><div>${ico('checkcircle', 18)}<span>Abrí tu casilla de correo</span></div><div>${ico('checkcircle', 18)}<span>Buscá el mensaje de <b>Complejo Policial Almudena</b></span></div><div>${ico('checkcircle', 18)}<span>Si no lo ves, revisá <b>Spam</b> o <b>Correo no deseado</b></span></div>${ui.recTipo === 'nro' ? '' : `<div>${ico('clock', 18)} El enlace vence en <b>30 minutos</b></div>`}</div>
+      <div class="pasos-mail"><div>${ico('checkcircle', 18)}<span>Abrí tu casilla de correo</span></div><div>${ico('checkcircle', 18)}<span>Buscá el mensaje de <b>Complejo Policial Almudena</b></span></div><div>${ico('checkcircle', 18)}<span>Si no lo ves, revisá <b>Spam</b> o <b>Correo no deseado</b></span></div>${ui.recTipo === 'nro' ? '' : `<div>${ico('clock', 18)}<span>El enlace vence en <b>30 minutos</b></span></div>`}</div>
       ${ui.recMail ? `<button class="btn ghost full" style="margin-top:16px" data-act="vercorreo" data-id="${ui.recMail}">${ico('search', 18)} Ver el correo enviado (demostración)</button>` : ''}
       <div class="links" style="justify-content:space-between"><a data-act="acceso" data-v="recuperar">No me llegó, reenviar</a><a data-act="acceso" data-v="login">Volver a ingresar</a></div></div>`;
   }
