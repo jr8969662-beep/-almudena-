@@ -1,8 +1,10 @@
-/* Configuración del envío real de correos (EmailJS).
-   Completar con los datos de la cuenta de EmailJS del complejo.
-   La "Public Key" está pensada para ir en páginas web: no es una contraseña. */
+/* Configuración del envío real de correos.
+   OPCIÓN RECOMENDADA (gratis): Google Apps Script con el Gmail del complejo.
+   Ver instrucciones en correo/Codigo.gs */
 window.CONFIG_CORREO = {
-  serviceId: '',   // ej: 'service_ab12cd3'
-  templateId: '',  // ej: 'template_xy98zw7'
-  publicKey: ''    // ej: 'AbCdEfGhIjKlMnOpQ'
+  appsScriptUrl: '',          // ej: 'https://script.google.com/macros/s/AKfy.../exec'
+  clave: 'almudena-2026',     // la misma CLAVE que pusiste en Codigo.gs
+
+  /* Alternativa: EmailJS (dejar vacío si usás Apps Script) */
+  serviceId: '', templateId: '', publicKey: ''
 };

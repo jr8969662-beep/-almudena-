@@ -271,12 +271,19 @@ function nuevoToken(nro, tipo) {
   return tk;
 }
 const CC = () => window.CONFIG_CORREO || {};
-const correoReal = () => { const c = CC(); return !!(c.serviceId && c.templateId && c.publicKey && window.emailjs); };
+const usaGAS = () => !!CC().appsScriptUrl;
+const correoReal = () => { const c = CC(); return usaGAS() || !!(c.serviceId && c.templateId && c.publicKey && window.emailjs); };
 function enviarReal(c) {
   if (!correoReal()) { c.estadoEnvio = 'simulado'; return; }
   c.estadoEnvio = 'enviando';
   const html = c.html.replace(/data-act="[^"]*"/g, '').replace(/data-tk="[^"]*"/g, '');
   const texto = html.replace(/<br\s*\/?>/g, '\n').replace(/<\/p>/g, '\n\n').replace(/<[^>]+>/g, '').replace(/\n{3,}/g, '\n\n').trim();
+  if (usaGAS()) {
+    fetch(CC().appsScriptUrl, {method:'POST', mode:'no-cors', headers:{'Content-Type':'text/plain;charset=utf-8'}, body:JSON.stringify({clave:CC().clave, to:c.para, subject:c.asunto, html, text:texto})})
+      .then(() => { c.estadoEnvio = 'enviado'; save(); })
+      .catch(err => { c.estadoEnvio = 'error'; c.errorEnvio = String(err && err.message || err); save(); });
+    return;
+  }
   window.emailjs.send(CC().serviceId, CC().templateId, {to_email:c.para, subject:c.asunto, message_html:html, message:texto}, {publicKey:CC().publicKey})
     .then(() => { c.estadoEnvio = 'enviado'; save(); })
     .catch(err => { c.estadoEnvio = 'error'; c.errorEnvio = (err && (err.text || err.message)) || 'error'; save(); S.auditoria.push({t:Date.now(), usuario:'sistema', accion:`No se pudo enviar el correo a ${enmascarar(c.para)}: ${c.errorEnvio}`}); save(); });
@@ -957,7 +964,7 @@ const V = {
     <div class="card"><h3>Medidas activas</h3><ul class="small" style="padding-left:18px;line-height:1.6">
       <li>Permisos por nivel de usuario: socio, portería y administrador.</li><li>Bloqueo de 5 minutos tras 5 intentos de ingreso fallidos.</li><li>Cierre automático de sesión tras 15 minutos de inactividad.</li><li>Registro de auditoría de todas las operaciones.</li><li>Consentimiento de protección de datos personales (Ley 25.326) al registrarse.</li><li>DNI enmascarado en las vistas del socio.</li><li>En producción: HTTPS obligatorio y contraseñas cifradas en el servidor.</li></ul>
       <h3 style="margin-top:14px">Envío de correos</h3>
-      ${correoReal() ? `<div class="ok" style="margin-top:0">Envío real activado (EmailJS).</div>` : `<div class="err" style="margin-top:0;background:var(--amarillob);color:var(--amarillo)">Envío real desactivado: los correos solo se ven en la vista previa. Falta completar <b>config.js</b> con los datos de EmailJS.</div>`}
+      ${correoReal() ? `<div class="ok" style="margin-top:0">Envío real activado (${usaGAS() ? 'Gmail del complejo, gratis' : 'EmailJS'}).</div>` : `<div class="err" style="margin-top:0;background:var(--amarillob);color:var(--amarillo)">Envío real desactivado: los correos solo se ven en la vista previa. Falta completar <b>config.js</b> (ver correo/Codigo.gs).</div>`}
       <form data-form="mailprueba" class="row"><input name="to" type="email" required placeholder="Correo para probar"><button class="btn ghost">Enviar prueba</button></form>
       <h3 style="margin-top:14px">Correos enviados</h3>${(S.correos || []).slice(-6).reverse().map(c => `<div class="item" style="padding:8px 0"><div class="small"><b>${esc(c.asunto)}</b><br><span class="muted">${esc(enmascarar(c.para))} · ${fmtDT(c.t)} · ${({enviado:'Enviado ✓', error:'Error al enviar', enviando:'Enviando…', simulado:'Solo vista previa'})[c.estadoEnvio] || 'Solo vista previa'}</span></div><button class="link" data-act="vercorreo" data-id="${c.id}">Ver</button></div>`).join('') || '<p class="muted small">Todavía no se enviaron correos.</p>'}
       <h3 style="margin-top:14px">Eventos de seguridad recientes</h3>${fallos.length ? fallos.map(a => `<div class="small" style="padding:4px 0;border-bottom:1px solid var(--borde)">${fmtDT(a.t)} · ${esc(a.usuario)} · ${esc(a.accion)}</div>`).join('') : '<p class="muted small">Sin eventos.</p>'}</div></div>
