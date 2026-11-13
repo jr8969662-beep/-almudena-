@@ -260,6 +260,36 @@ function bars(data) {
   return data.map(([l, v]) => `<div class="barra"><span>${esc(l)}</span><div class="bg"><div class="fg" style="width:${v / max * 100}%"></div></div><b>${v}</b></div>`).join('');
 }
 
+/* ===================== Correos (simulados en el prototipo) ===================== */
+const REMITENTE = 'Complejo Policial Almudena <no-responder@complejoalmudena.gob.ar>';
+const enmascarar = e => { const [u, d] = String(e).split('@'); return d ? u.slice(0, 2) + '•••@' + d : e; };
+function nuevoToken(nro, tipo) {
+  const v = new Uint32Array(4); crypto.getRandomValues(v);
+  const tk = Array.from(v, x => x.toString(36)).join('');
+  S.tokens = S.tokens || {};
+  S.tokens[tk] = {nro, tipo, exp:Date.now() + 30 * 60000, usado:false};
+  return tk;
+}
+function enviarCorreo(para, asunto, html, extra) {
+  S.correos = S.correos || [];
+  const c = {id:'m' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5), para, asunto, html, t:Date.now(), ...(extra || {})};
+  S.correos.push(c); if (S.correos.length > 50) S.correos.shift();
+  S.auditoria.push({t:Date.now(), usuario:'sistema', accion:`Correo enviado a ${enmascarar(para)}: ${asunto}`}); save();
+  return c;
+}
+const linkReset = tk => location.href.split('#')[0] + '#reset=' + tk;
+function verCorreo(id) {
+  const c = (S.correos || []).find(x => x.id === id); if (!c) return;
+  showModal(`<div class="mail"><div class="mail-top"><span class="badge b-gris">Vista previa · demostración</span></div>
+    <div class="mail-h"><div class="avatar sm">${ico('shield', 16)}</div><div><b>${esc(c.asunto)}</b><small>De: ${esc(REMITENTE)}<br>Para: ${esc(c.para)} · ${fmtDT(c.t)}</small></div></div>
+    <div class="mail-body">${c.html}</div></div>
+    <p class="tiny" style="text-align:left">En la versión final este correo llega a la casilla del socio. Acá se muestra para poder probar el recorrido.</p>
+    <div class="acciones"><button class="btn ghost" data-act="cerrar">Cerrar</button></div>`);
+}
+function plantillaCorreo(titulo, parrafos, boton) {
+  return `<div class="mail-card"><div class="mail-brand">${ico('shield', 18)} Complejo Policial Almudena</div><h2>${titulo}</h2>${parrafos.map(p => `<p>${p}</p>`).join('')}${boton ? `<p style="text-align:center;margin:22px 0"><a class="mail-btn" href="${boton.href}" ${boton.act ? `data-act="${boton.act}" data-tk="${boton.tk}"` : 'target="_blank" rel="noopener"'}>${boton.txt}</a></p>` : ''}<p class="mail-pie">Si no pediste esto, ignorá este mensaje. Tu cuenta sigue segura.<br>Este es un correo automático, no lo respondas.</p></div>`;
+}
+
 /* ===================== Reserva de visita (por etapas) ===================== */
 const FRANJAS = [
   {id:'mediodia', t:'Mediodía', h:'11 a 16 h', turno:'Mediodía 11–16 h', desde:11, hasta:16, ic:'flame'},
@@ -528,15 +558,37 @@ function vistaAcceso() {
       <button class="btn full" style="margin-top:14px">Crear cuenta</button>
     </form>${m}
     <div class="links" style="justify-content:center"><a data-act="acceso" data-v="login">Ya tengo cuenta, quiero ingresar</a></div>`;
-  if (ui.acceso === 'recuperar') body = `
-    <h3>Recuperar contraseña</h3>
-    <p class="muted small">Te enviamos un enlace de un solo uso, válido por 30 minutos, al correo registrado.</p>
-    <form data-form="recuperar">
-      <label>N° de socio</label><input name="nro" required>
-      <label>Correo electrónico registrado</label><input name="email" type="email" required>
-      <button class="btn full" style="margin-top:14px">Enviar enlace</button>
-    </form>${m}
-    <div class="links" style="justify-content:center"><a data-act="acceso" data-v="login">Ya tengo cuenta, quiero ingresar</a></div>`;
+  if (ui.acceso === 'recuperar') {
+    const tipo = ui.recTipo || 'clave';
+    body = `<h3>¿Necesitás ayuda para ingresar?</h3><p class="muted small">Elegí qué te olvidaste.</p>
+    <div class="seg" style="margin-top:14px"><button class="${tipo === 'clave' ? 'on' : ''}" data-act="rectipo" data-t="clave">Mi contraseña</button><button class="${tipo === 'nro' ? 'on' : ''}" data-act="rectipo" data-t="nro">Mi número de socio</button></div>
+    ${tipo === 'clave' ? `<form data-form="recuperar"><input type="hidden" name="tipo" value="clave">
+      <label style="margin-top:0">Correo electrónico con el que te registraste</label><input name="email" type="email" required autocomplete="email" placeholder="nombre@correo.com">
+      <p class="small muted" style="margin:8px 0 0">Te vamos a enviar un enlace para crear una contraseña nueva.</p>
+      <button class="btn grande" style="margin-top:16px">Enviar enlace</button></form>`
+    : `<form data-form="recuperar"><input type="hidden" name="tipo" value="nro">
+      <label style="margin-top:0">DNI del titular</label><input name="dni" required inputmode="numeric" autocomplete="off">
+      <label>Correo electrónico con el que te registraste</label><input name="email" type="email" required autocomplete="email" placeholder="nombre@correo.com">
+      <p class="small muted" style="margin:8px 0 0">Te vamos a enviar tu número de socio por correo.</p>
+      <button class="btn grande" style="margin-top:16px">Enviar mi número de socio</button></form>`}${m}
+    <div class="links" style="justify-content:center"><a data-act="acceso" data-v="login">Volver a ingresar</a></div>`;
+  }
+  if (ui.acceso === 'enviado') {
+    const e = ui.recEmail || '';
+    body = `<div style="text-align:center"><span class="vic" style="width:72px;height:72px">${ico('megaphone', 30)}</span>
+      <h3 style="margin-top:6px">Revisá tu correo</h3>
+      <p class="muted">Si <b>${esc(e)}</b> está registrado, te enviamos ${ui.recTipo === 'nro' ? 'tu <b>número de socio</b>' : 'un <b>enlace para restablecer tu contraseña</b>'}.</p>
+      <div class="pasos-mail"><div>${ico('checkcircle', 18)}<span>Abrí tu casilla de correo</span></div><div>${ico('checkcircle', 18)}<span>Buscá el mensaje de <b>Complejo Policial Almudena</b></span></div><div>${ico('checkcircle', 18)}<span>Si no lo ves, revisá <b>Spam</b> o <b>Correo no deseado</b></span></div>${ui.recTipo === 'nro' ? '' : `<div>${ico('clock', 18)} El enlace vence en <b>30 minutos</b></div>`}</div>
+      ${ui.recMail ? `<button class="btn ghost full" style="margin-top:16px" data-act="vercorreo" data-id="${ui.recMail}">${ico('search', 18)} Ver el correo enviado (demostración)</button>` : ''}
+      <div class="links" style="justify-content:space-between"><a data-act="acceso" data-v="recuperar">No me llegó, reenviar</a><a data-act="acceso" data-v="login">Volver a ingresar</a></div></div>`;
+  }
+  if (ui.acceso === 'nuevaclave') {
+    const t = (S.tokens || {})[ui.tk], valido = t && !t.usado && t.exp > Date.now();
+    body = valido ? `<h3>Creá tu nueva contraseña</h3><p class="muted small">Para la cuenta del socio N° ${t.nro}.</p>
+      <form data-form="nuevaclave"><label>Nueva contraseña (mínimo 6 caracteres)</label><input name="n" type="password" required minlength="6" autocomplete="new-password">
+      <label>Repetir contraseña</label><input name="n2" type="password" required autocomplete="new-password"><button class="btn grande" style="margin-top:16px">Guardar contraseña</button></form>${m}`
+      : `<div style="text-align:center"><span class="vic" style="background:var(--rojob);color:var(--rojo)">${ico('alert', 28)}</span><h3>El enlace no es válido</h3><p class="muted">${t && t.usado ? 'Este enlace ya se usó.' : 'El enlace venció o es incorrecto.'} Pedí uno nuevo.</p><button class="btn grande" data-act="acceso" data-v="recuperar">Pedir un enlace nuevo</button></div>`;
+  }
   return `<div class="acceso"><div class="box">
     <div class="marca"><div class="logo">${ico('shield')}</div><div><b>Complejo Policial Almudena</b><small>${MODO === 'admin' ? 'Administración' : 'Reservas para socios'}</small></div></div>
     ${body}
@@ -872,6 +924,7 @@ const V = {
       <label>Restaurar desde un archivo</label><input type="file" id="restfile" accept=".json,application/json"></div>
     <div class="card"><h3>Medidas activas</h3><ul class="small" style="padding-left:18px;line-height:1.6">
       <li>Permisos por nivel de usuario: socio, portería y administrador.</li><li>Bloqueo de 5 minutos tras 5 intentos de ingreso fallidos.</li><li>Cierre automático de sesión tras 15 minutos de inactividad.</li><li>Registro de auditoría de todas las operaciones.</li><li>Consentimiento de protección de datos personales (Ley 25.326) al registrarse.</li><li>DNI enmascarado en las vistas del socio.</li><li>En producción: HTTPS obligatorio y contraseñas cifradas en el servidor.</li></ul>
+      <h3 style="margin-top:14px">Correos enviados</h3>${(S.correos || []).slice(-6).reverse().map(c => `<div class="item" style="padding:8px 0"><div class="small"><b>${esc(c.asunto)}</b><br><span class="muted">${esc(enmascarar(c.para))} · ${fmtDT(c.t)}</span></div><button class="link" data-act="vercorreo" data-id="${c.id}">Ver</button></div>`).join('') || '<p class="muted small">Todavía no se enviaron correos.</p>'}
       <h3 style="margin-top:14px">Eventos de seguridad recientes</h3>${fallos.length ? fallos.map(a => `<div class="small" style="padding:4px 0;border-bottom:1px solid var(--borde)">${fmtDT(a.t)} · ${esc(a.usuario)} · ${esc(a.accion)}</div>`).join('') : '<p class="muted small">Sin eventos.</p>'}</div></div>
     <div class="card" style="margin-top:14px"><h3>Usuarios del personal</h3>
       <div class="scroll"><table class="tabla"><thead><tr><th>Usuario</th><th>Nombre</th><th>Nivel</th><th>Estado</th><th></th></tr></thead><tbody>
@@ -1050,7 +1103,9 @@ function entrar(u, p) {
   if (st || so) delete S.bloqueos[u];
   ultimaAct = Date.now();
   if (st) { ses = {rol:st.rol, user:st.user}; ui.view = st.rol === 'admin' ? 'panel' : 'validar'; log('Inicio de sesión'); render(); return; }
-  if (so) { ses = {rol:'socio', nro:so.nro}; ui = uiInicial(); ui.view = 'inicio'; log('Inicio de sesión'); render(); return; }
+  if (so) { ses = {rol:'socio', nro:so.nro}; ui = uiInicial(); ui.view = 'inicio'; log('Inicio de sesión'); render();
+    if (so.debeCambiar) showModal(`<h3>Creá tu contraseña nueva</h3><p class="muted">Ingresaste con una contraseña temporal. Por seguridad, elegí una nueva para seguir.</p><form data-form="forzarpass"><label>Nueva contraseña (mínimo 6 caracteres)</label><input name="n" type="password" required minlength="6" autocomplete="new-password"><label>Repetir contraseña</label><input name="n2" type="password" required autocomplete="new-password"><button class="btn grande" style="margin-top:16px">Guardar y continuar</button></form>`);
+    return; }
   const b = S.bloqueos[u] = S.bloqueos[u] || {n:0, hasta:0};
   b.n++;
   S.auditoria.push({t:Date.now(), usuario:u || 'anónimo', accion:'Intento de ingreso fallido'});
@@ -1061,7 +1116,7 @@ function entrar(u, p) {
 
 const ACT = {
   nav: b => { ui.view = b.dataset.v; closeModal(); render(); window.scrollTo(0, 0); },
-  acceso: b => { ui.acceso = b.dataset.v; ui.msg = null; render(); },
+  acceso: b => { if (b.dataset.v === 'recuperar') ui.recTipo = ui.recTipo || 'clave'; ui.acceso = b.dataset.v; ui.msg = null; render(); },
   demo: b => entrar(b.dataset.u, b.dataset.p),
   reset: () => { if (confirm('¿Reiniciar todos los datos de demostración?')) { S = seed(); save(); ui.msg = {tipo:'ok', txt:'Datos reiniciados.'}; render(); } },
   salir: () => { log('Cierre de sesión'); ses = null; ui = uiInicial(); closeModal(); render(); },
@@ -1087,6 +1142,9 @@ const ACT = {
     showModal(`<img class="foto-grande" src="${foto(f)}" alt="${esc(c)}"><div class="acciones" style="justify-content:space-between;align-items:center"><button class="icon-btn" data-act="verfoto" data-f="${prev}" aria-label="Anterior">${ico('back')}</button><b>${esc(c)}</b><button class="icon-btn" data-act="verfoto" data-f="${next}" aria-label="Siguiente">${ico('chevron')}</button></div><div class="acciones" style="margin-top:8px"><button class="btn ghost full" data-act="cerrar">Cerrar</button></div>`);
   },
   zona: b => { ui.zona = ui.zona === b.dataset.z ? null : b.dataset.z; const y = window.scrollY; render(); window.scrollTo(0, y); },
+  rectipo: b => { ui.recTipo = b.dataset.t; ui.msg = null; render(); },
+  vercorreo: b => verCorreo(b.dataset.id),
+  abrirtoken: b => { closeModal(); ses = null; ui = uiInicial(); ui.tk = b.dataset.tk; ui.acceso = 'nuevaclave'; render(); window.scrollTo(0, 0); },
   ir: b => { const el = document.getElementById(b.dataset.id); if (el) el.scrollIntoView({behavior:'smooth', block:'start'}); },
   pagar: b => {
     const r = S.reservas.find(x => x.id === b.dataset.id);
@@ -1172,7 +1230,19 @@ const ACT = {
   delnot: b => { const n = S.noticias.find(x => x.id === b.dataset.id); if (!confirm('¿Eliminar “' + n.titulo + '”?')) return; S.noticias = S.noticias.filter(x => x !== n); log('Eliminó la publicación: ' + n.titulo); render(); },
   aprobar: b => { const s = S.socios.find(x => x.nro === b.dataset.n), g = s.grupo[+b.dataset.i]; g.estado = 'habilitado'; log(`Aprobó familiar ${g.nombre} del socio ${s.nro}`); toast('Familiar habilitado'); render(); },
   togglesocio: b => { const s = S.socios.find(x => x.nro === b.dataset.n); s.activo = s.activo === false; log(`${s.activo ? 'Habilitó' : 'Suspendió'} la cuenta del socio ${s.nro}`); toast('Cuenta ' + (s.activo ? 'habilitada' : 'suspendida')); render(); },
-  resetpass: b => { const s = S.socios.find(x => x.nro === b.dataset.n); const v = new Uint32Array(1); crypto.getRandomValues(v); s.pass = String(100000 + v[0] % 900000); log(`Restableció la contraseña del socio ${s.nro}`); showModal(`<h3>Contraseña restablecida</h3><p>Contraseña temporal para <b>${esc(s.nombre)}</b> (socio ${s.nro}):</p><p class="codigo">${s.pass}</p><p class="small muted">Entregala al socio y pedile que la cambie desde “Mi cuenta”. En producción se envía por correo.</p><div class="acciones"><button class="btn" data-act="cerrar">Listo</button></div>`); },
+  resetpass: b => {
+    const s = S.socios.find(x => x.nro === b.dataset.n); const v = new Uint32Array(1); crypto.getRandomValues(v);
+    s.pass = String(100000 + v[0] % 900000); s.debeCambiar = true;
+    const mail = enviarCorreo(s.email, 'Tu contraseña temporal', plantillaCorreo('Tu contraseña temporal', [`Hola ${esc(s.nombre.split(' ')[0])}:`, 'La administración del complejo restableció tu contraseña. Ingresá con estos datos y el sistema te va a pedir que crees una contraseña nueva:', `Número de socio: <b>${s.nro}</b><br>Contraseña temporal: <span class="mail-nro">${s.pass}</span>`], {href:location.href.split('#')[0].replace('admin.html', 'index.html'), txt:'Ir al sitio de reservas'}));
+    log(`Restableció la contraseña del socio ${s.nro} y la envió por correo a ${enmascarar(s.email)}`);
+    const cuerpo = `Hola ${s.nombre.split(' ')[0]}, la administración del Complejo Policial Almudena restableció tu contraseña.\n\nNúmero de socio: ${s.nro}\nContraseña temporal: ${s.pass}\n\nAl ingresar te vamos a pedir que crees una nueva.`;
+    const tel = (s.tel || '').replace(/\D/g, '');
+    showModal(`<div class="exito">${ico('checkcircle', 20)} Correo enviado a ${esc(enmascarar(s.email))}</div><h3>Contraseña restablecida</h3><p class="muted">Le enviamos a <b>${esc(s.nombre)}</b> (socio ${s.nro}) un correo con una contraseña temporal. Al ingresar, el sistema le va a pedir que la cambie.</p>
+      <div class="resumen" style="text-align:center;padding:12px"><small class="muted">Contraseña temporal</small><div class="codigo">${s.pass}</div></div>
+      <p class="small muted" style="margin-top:12px">¿El socio no recibe correos? Mandásela por otro medio:</p>
+      <div class="chips"><a class="btn-sm" href="mailto:${encodeURIComponent(s.email)}?subject=${encodeURIComponent('Tu contraseña temporal - Complejo Policial Almudena')}&body=${encodeURIComponent(cuerpo.replace(/\\n/g, '\n'))}">${ico('megaphone', 16)} Desde mi correo</a>${tel ? `<a class="btn-sm" target="_blank" rel="noopener" href="https://wa.me/54${tel}?text=${encodeURIComponent(cuerpo.replace(/\\n/g, '\n'))}">${ico('chat', 16)} Por WhatsApp</a>` : ''}<button class="btn-sm" data-act="vercorreo" data-id="${mail.id}">${ico('search', 16)} Ver correo enviado</button></div>
+      <div class="acciones"><button class="btn" data-act="cerrar">Listo</button></div>`);
+  },
   togglestaff: b => { const u = S.staff.find(x => x.user === b.dataset.u); u.activo = u.activo === false; log(`${u.activo ? 'Habilitó' : 'Suspendió'} al usuario ${u.user}`); render(); },
   backup: () => { if (autoBackup(true)) { log('Copia de seguridad manual'); toast('Copia de seguridad creada'); } else toast('No hay espacio para la copia. Descargala como archivo.', 'error'); render(); },
   descbk: () => { descargar(JSON.stringify(S), `copia_almudena_${hoy()}.json`, 'application/json'); log('Descargó copia de seguridad'); },
@@ -1206,9 +1276,38 @@ const FORM = {
     ui.acceso = 'login'; ui.msg = {tipo:'ok', txt:`Cuenta creada para ${pad.nombre}. Ya podés ingresar con tu N° de socio.`}; render();
   },
   recuperar: fd => {
-    const s = S.socios.find(x => x.nro === fd.get('nro').trim() && x.email.toLowerCase() === fd.get('email').trim().toLowerCase());
-    if (s) S.auditoria.push({t:Date.now(), usuario:'Socio ' + s.nro, accion:'Solicitud de recuperación de contraseña'}), save();
-    ui.msg = {tipo:'ok', txt:'Si los datos son correctos, vas a recibir un enlace de recuperación en tu correo en los próximos minutos. (Simulado en el prototipo.)'}; render();
+    const tipo = fd.get('tipo'), email = fd.get('email').trim().toLowerCase();
+    const s = S.socios.find(x => x.email.toLowerCase() === email && (tipo === 'clave' || x.dni === (fd.get('dni') || '').trim()));
+    let mail = null;
+    if (s && tipo === 'clave') {
+      const tk = nuevoToken(s.nro, 'reset');
+      mail = enviarCorreo(s.email, 'Restablecé tu contraseña', plantillaCorreo('Restablecé tu contraseña', [`Hola ${esc(s.nombre.split(' ')[0])}:`, 'Recibimos un pedido para restablecer la contraseña de tu cuenta de socio. Tocá el botón para crear una nueva. El enlace vence en 30 minutos y se puede usar una sola vez.'], {href:linkReset(tk), act:'abrirtoken', tk, txt:'Crear contraseña nueva'}));
+      S.auditoria.push({t:Date.now(), usuario:'Socio ' + s.nro, accion:'Solicitó restablecer su contraseña'});
+    }
+    if (s && tipo === 'nro') {
+      mail = enviarCorreo(s.email, 'Tu número de socio', plantillaCorreo('Tu número de socio', [`Hola ${esc(s.nombre.split(' ')[0])}:`, `Tu número de socio del Complejo Policial Almudena es:`, `<span class="mail-nro">${s.nro}</span>`, 'Con este número (o con tu DNI) y tu contraseña podés ingresar al sitio de reservas.']));
+      S.auditoria.push({t:Date.now(), usuario:'Socio ' + s.nro, accion:'Solicitó recordar su número de socio'});
+    }
+    if (!s) S.auditoria.push({t:Date.now(), usuario:email, accion:'Pedido de recuperación con datos no registrados'});
+    save();
+    ui.recEmail = email; ui.recMail = mail ? mail.id : null; ui.acceso = 'enviado'; ui.msg = null; render();
+  },
+  nuevaclave: fd => {
+    const t = (S.tokens || {})[ui.tk];
+    if (!t || t.usado || t.exp < Date.now()) { render(); return; }
+    if (fd.get('n').length < 6) { ui.msg = {tipo:'err', txt:'La contraseña debe tener al menos 6 caracteres.'}; render(); return; }
+    if (fd.get('n') !== fd.get('n2')) { ui.msg = {tipo:'err', txt:'Las contraseñas no coinciden.'}; render(); return; }
+    const s = S.socios.find(x => x.nro === t.nro); s.pass = fd.get('n'); s.debeCambiar = false; t.usado = true;
+    S.auditoria.push({t:Date.now(), usuario:'Socio ' + s.nro, accion:'Restableció su contraseña con el enlace del correo'});
+    enviarCorreo(s.email, 'Tu contraseña fue cambiada', plantillaCorreo('Tu contraseña fue cambiada', [`Hola ${esc(s.nombre.split(' ')[0])}:`, 'Te confirmamos que la contraseña de tu cuenta se cambió correctamente. Si no fuiste vos, comunicate de inmediato con la administración del complejo.']));
+    save(); history.replaceState(null, '', location.pathname); ui.tk = null;
+    ui.acceso = 'login'; ui.msg = {tipo:'ok', txt:'¡Listo! Ya podés ingresar con tu nueva contraseña.'}; render();
+  },
+  forzarpass: fd => {
+    const s = socioActual();
+    if (fd.get('n').length < 6) { toast('Mínimo 6 caracteres.', 'error'); return; }
+    if (fd.get('n') !== fd.get('n2')) { toast('Las contraseñas no coinciden.', 'error'); return; }
+    s.pass = fd.get('n'); s.debeCambiar = false; log('Cambió la contraseña temporal'); closeModal(); toast('Contraseña actualizada');
   },
   familiar: fd => { const s = socioActual(); s.grupo.push({nombre:fd.get('nombre').trim(), dni:fd.get('dni').trim(), parentesco:fd.get('parentesco'), estado:'pendiente'}); log('Solicitó alta de familiar: ' + fd.get('nombre').trim()); toast('Solicitud enviada a la administración'); render(); },
   chat: fd => preguntar(fd.get('q')),
@@ -1296,4 +1395,5 @@ setInterval(() => {
 
 load();
 autoBackup(false);
+{ const m = location.hash.match(/^#reset=([a-z0-9]+)/i); if (m && MODO === 'socio') { ui.tk = m[1]; ui.acceso = 'nuevaclave'; } }
 render();
