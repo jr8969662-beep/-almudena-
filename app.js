@@ -544,20 +544,36 @@ function vistaAcceso() {
     <div class="links" style="justify-content:center"><a data-act="acceso" data-v="sitio">Volver al inicio</a></div>
     <div class="demo">Demostración: <button class="link" data-act="demo" data-u="1001" data-p="1234">entrar como socio de prueba</button></div>
     <p class="small muted" style="text-align:center;margin-top:12px"><a href="admin.html" style="color:var(--gris)">Acceso para el personal del complejo</a></p>`}`;
-  if (ui.acceso === 'registro') body = `
-    <h3>Crear tu cuenta</h3>
-    <p class="muted small">Verificamos que tu número de socio y tu DNI coincidan con el padrón. (Para probar: socio 1003, DNI 33444555.)</p>
+  if (ui.acceso === 'registro') {
+    const tipo = ui.regTipo || 'socio';
+    const consent = `<label class="check" style="margin-top:14px"><input type="checkbox" name="consent" value="1"> <span>Acepto que mis datos se usen solo para la gestión del complejo, conforme a la Ley 25.326 de Protección de Datos Personales.</span></label>`;
+    body = `<h3>Crear tu cuenta</h3><p class="muted small">¿Ya sos socio del complejo o querés asociarte?</p>
+    <div class="seg" style="margin-top:14px"><button class="${tipo === 'socio' ? 'on' : ''}" data-act="regtipo" data-t="socio">Ya soy socio</button><button class="${tipo === 'nuevo' ? 'on' : ''}" data-act="regtipo" data-t="nuevo">Quiero asociarme</button></div>
+    ${tipo === 'socio' ? `<p class="small muted" style="margin:0 0 4px">Buscamos tu número de socio con tu DNI. No hace falta que lo sepas. (Para probar: DNI 33444555.)</p>
     <form data-form="registro">
-      <label>N° de socio</label><input name="nro" required inputmode="numeric">
-      <label>DNI del titular</label><input name="dni" required inputmode="numeric">
-      <label>Correo electrónico</label><input name="email" type="email" required>
-      <label>Teléfono (WhatsApp)</label><input name="tel" inputmode="tel">
-      <label>Contraseña (mínimo 6 caracteres)</label><input name="p" type="password" required minlength="6">
-      <label>Repetir contraseña</label><input name="p2" type="password" required>
-      <label class="check" style="margin-top:12px"><input type="checkbox" name="consent" value="1"> <span>Acepto que mis datos se usen solo para la gestión del complejo, conforme a la Ley 25.326 de Protección de Datos Personales.</span></label>
-      <button class="btn full" style="margin-top:14px">Crear cuenta</button>
-    </form>${m}
+      <label>DNI</label><input name="dni" required inputmode="numeric" autocomplete="off">
+      <label>Correo electrónico</label><input name="email" type="email" required autocomplete="email">
+      <label>Teléfono (WhatsApp)</label><input name="tel" inputmode="tel" autocomplete="tel">
+      <label>Contraseña (mínimo 6 caracteres)</label><input name="p" type="password" required minlength="6" autocomplete="new-password">
+      <label>Repetir contraseña</label><input name="p2" type="password" required autocomplete="new-password">
+      ${consent}<button class="btn grande" style="margin-top:16px">Crear cuenta</button></form>`
+    : `<p class="small muted" style="margin:0 0 4px">Completá la solicitud. La administración la revisa y, si se aprueba, te enviamos por correo tu <b>número de socio</b> y un enlace para crear tu contraseña.</p>
+    <form data-form="solicitud">
+      <div class="grid2"><div><label>Nombre</label><input name="nombre" required autocomplete="given-name"></div><div><label>Apellido</label><input name="apellido" required autocomplete="family-name"></div></div>
+      <label>DNI</label><input name="dni" required inputmode="numeric" autocomplete="off">
+      <label>Condición</label><select name="cond" required><option value="">Elegí una opción</option><option>Personal policial en actividad</option><option>Personal policial retirado</option><option>Pensionado/a policial</option><option>Familiar de personal policial</option></select>
+      <label>Legajo policial (si corresponde)</label><input name="legajo" inputmode="numeric">
+      <label>Correo electrónico</label><input name="email" type="email" required autocomplete="email">
+      <label>Teléfono (WhatsApp)</label><input name="tel" inputmode="tel" required autocomplete="tel">
+      <label>Foto del DNI (frente)</label><input type="file" name="img" accept="image/*">
+      ${consent}<button class="btn grande" style="margin-top:16px">Enviar solicitud</button></form>`}${m}
     <div class="links" style="justify-content:center"><a data-act="acceso" data-v="login">Ya tengo cuenta, quiero ingresar</a></div>`;
+  }
+  if (ui.acceso === 'solenviada') body = `<div style="text-align:center"><span class="vic" style="width:72px;height:72px">${ico('checkcircle', 32)}</span>
+    <h3 style="margin-top:6px">¡Solicitud enviada!</h3><p class="muted">Recibimos tu pedido para asociarte. La administración lo va a revisar y te va a responder por correo a <b>${esc(ui.recEmail || '')}</b>.</p>
+    <div class="pasos-mail"><div>${ico('clock', 18)}<span>La revisión puede demorar unos días hábiles</span></div><div>${ico('idcard', 18)}<span>Si se aprueba, te llega tu <b>número de socio</b></span></div><div>${ico('key', 18)}<span>Y un enlace para <b>crear tu contraseña</b></span></div></div>
+    ${ui.recMail ? `<button class="btn ghost full" style="margin-top:16px" data-act="vercorreo" data-id="${ui.recMail}">${ico('search', 18)} Ver el correo de confirmación (demostración)</button>` : ''}
+    <div class="links" style="justify-content:center"><a data-act="acceso" data-v="sitio">Volver al inicio</a></div></div>`;
   if (ui.acceso === 'recuperar') {
     const tipo = ui.recTipo || 'clave';
     body = `<h3>¿Necesitás ayuda para ingresar?</h3><p class="muted small">Elegí qué te olvidaste.</p>
@@ -584,7 +600,7 @@ function vistaAcceso() {
   }
   if (ui.acceso === 'nuevaclave') {
     const t = (S.tokens || {})[ui.tk], valido = t && !t.usado && t.exp > Date.now();
-    body = valido ? `<h3>Creá tu nueva contraseña</h3><p class="muted small">Para la cuenta del socio N° ${t.nro}.</p>
+    body = valido ? `<h3>${t.tipo === 'alta' ? 'Activá tu cuenta' : 'Creá tu nueva contraseña'}</h3><p class="muted small">${t.tipo === 'alta' ? `Tu número de socio es <b>${t.nro}</b>. Elegí una contraseña para ingresar.` : `Para la cuenta del socio N° ${t.nro}.`}</p>
       <form data-form="nuevaclave"><label>Nueva contraseña (mínimo 6 caracteres)</label><input name="n" type="password" required minlength="6" autocomplete="new-password">
       <label>Repetir contraseña</label><input name="n2" type="password" required autocomplete="new-password"><button class="btn grande" style="margin-top:16px">Guardar contraseña</button></form>${m}`
       : `<div style="text-align:center"><span class="vic" style="background:var(--rojob);color:var(--rojo)">${ico('alert', 28)}</span><h3>El enlace no es válido</h3><p class="muted">${t && t.usado ? 'Este enlace ya se usó.' : 'El enlace venció o es incorrecto.'} Pedí uno nuevo.</p><button class="btn grande" data-act="acceso" data-v="recuperar">Pedir un enlace nuevo</button></div>`;
@@ -759,6 +775,8 @@ const V = {
     const susp = S.inst.filter(i => !i.activo);
     const tareas = [];
     if (porConf) tareas.push(['card', `${porConf} pagos para confirmar`, 'Los socios avisaron que pagaron', 'pagos']);
+    const nSol = (S.solicitudes || []).filter(x => x.estado === 'pendiente').length;
+    if (nSol) tareas.push(['idcard', `${nSol} solicitud${nSol > 1 ? 'es' : ''} para asociarse`, 'Personas nuevas que quieren ser socias', 'socios']);
     if (pendFam) tareas.push(['users', `${pendFam} familiar${pendFam > 1 ? 'es' : ''} para aprobar`, 'Solicitudes de grupo familiar', 'socios']);
     if (susp.length) tareas.push(['wrench', `${susp.length} instalación${susp.length > 1 ? 'es' : ''} en mantenimiento`, susp.map(i => i.nombre).join(', '), 'instalaciones']);
     const hr = new Date().getHours(), saludo = hr < 12 ? 'Buen día' : hr < 20 ? 'Buenas tardes' : 'Buenas noches';
@@ -904,7 +922,9 @@ const V = {
     const q = norm(ui.q || '');
     const lista = S.socios.filter(s => !q || norm(s.nombre + ' ' + s.nro + ' ' + s.dni).includes(q));
     const sinCuenta = S.padron.filter(p => !S.socios.some(s => s.nro === p.nro)).length;
+    const sols = (S.solicitudes || []).filter(x => x.estado === 'pendiente');
     return `<div class="page-head"><h1>Socios</h1></div>
+    <div class="card"><h3>Solicitudes para asociarse (${sols.length})</h3>${sols.length ? sols.map(x => `<div class="item"><div style="display:flex;gap:12px;align-items:center">${x.img ? `<img class="thumb" src="${x.img}" alt="DNI" data-act="verdni" data-id="${x.id}" style="cursor:zoom-in">` : `<span class="thumb foto-ph">${ico('idcard', 18)}</span>`}<div><b>${esc(x.nombre)}</b> · DNI ${esc(x.dni)}<br><span class="small muted">${esc(x.cond)}${x.legajo ? ' · Legajo ' + esc(x.legajo) : ''} · ${esc(x.email)} · ${esc(x.tel)} · ${fmtDT(x.t)}</span></div></div><div class="acc"><button class="btn-sm ok" data-act="solok" data-id="${x.id}">${ico('check', 16)} Aprobar</button><button class="btn-sm rojo" data-act="solno" data-id="${x.id}">Rechazar</button></div></div>`).join('') : '<p class="muted">No hay solicitudes nuevas.</p>'}</div>
     <div class="card"><h3>Solicitudes de grupo familiar (${pend.length})</h3>${pend.length ? pend.map(p => `<div class="item"><div><b>${esc(p.g.nombre)}</b> · ${esc(p.g.parentesco)} · DNI ${esc(p.g.dni)}<br><span class="small muted">Titular: ${esc(p.s.nombre)} (socio ${p.s.nro})</span></div><div class="acc"><button class="btn-sm" data-act="aprobar" data-n="${p.s.nro}" data-i="${p.gi}">Aprobar</button><button class="btn-sm rojo" data-act="rechazar" data-n="${p.s.nro}" data-i="${p.gi}">Rechazar</button></div></div>`).join('') : '<p class="muted">No hay solicitudes pendientes.</p>'}</div>
     <div class="card"><div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;align-items:center"><h3 style="margin:0">Socios con cuenta (${S.socios.length})</h3><span class="small muted">En padrón sin cuenta: ${sinCuenta}</span></div>
     <form data-form="buscarsocio" class="row"><input name="q" value="${esc(ui.q || '')}" placeholder="Buscar por nombre, N° o DNI"><button class="btn ghost">Buscar</button></form>
@@ -1145,6 +1165,26 @@ const ACT = {
   rectipo: b => { ui.recTipo = b.dataset.t; ui.msg = null; render(); },
   vercorreo: b => verCorreo(b.dataset.id),
   abrirtoken: b => { closeModal(); ses = null; ui = uiInicial(); ui.tk = b.dataset.tk; ui.acceso = 'nuevaclave'; render(); window.scrollTo(0, 0); },
+  regtipo: b => { ui.regTipo = b.dataset.t; ui.msg = null; render(); },
+  verdni: b => { const x = S.solicitudes.find(y => y.id === b.dataset.id); showModal(`<h3>DNI de ${esc(x.nombre)}</h3><img class="foto-grande" src="${x.img}" alt="DNI"><div class="acciones"><button class="btn ghost" data-act="cerrar">Cerrar</button></div>`); },
+  solok: b => {
+    const x = S.solicitudes.find(y => y.id === b.dataset.id);
+    const nro = String(Math.max(1000, ...S.padron.map(p => parseInt(p.nro, 10) || 0)) + 1);
+    S.padron.push({nro, dni:x.dni, nombre:x.nombre});
+    S.socios.push({nro, dni:x.dni, nombre:x.nombre, email:x.email, tel:x.tel, pass:null, alta:Date.now(), grupo:[]});
+    x.estado = 'aprobada'; x.nro = nro;
+    const tk = nuevoToken(nro, 'alta'); S.tokens[tk].exp = Date.now() + 7 * 86400000;
+    const mail = enviarCorreo(x.email, '¡Bienvenido/a! Ya sos socio del complejo', plantillaCorreo('¡Bienvenido/a al Complejo Policial Almudena!', [`Hola ${esc(x.nombre.split(' ')[0])}:`, 'Tu solicitud fue aprobada. Este es tu número de socio:', `<span class="mail-nro">${nro}</span>`, 'Tocá el botón para crear tu contraseña y activar tu cuenta. El enlace vence en 7 días.'], {href:linkReset(tk).replace('admin.html', 'index.html'), act:MODO === 'socio' ? 'abrirtoken' : '', tk, txt:'Crear mi contraseña'}));
+    log(`Aprobó la solicitud de ${x.nombre} (DNI ${x.dni}): socio N° ${nro}`);
+    showModal(`<div class="exito">${ico('checkcircle', 20)} Socio N° ${nro} creado</div><p>Le enviamos a <b>${esc(x.nombre)}</b> un correo a ${esc(enmascarar(x.email))} con su número de socio y el enlace para crear su contraseña.</p><div class="acciones"><button class="btn ghost" data-act="vercorreo" data-id="${mail.id}">Ver correo enviado</button><button class="btn" data-act="cerrar">Listo</button></div>`);
+    render();
+  },
+  solno: b => {
+    const x = S.solicitudes.find(y => y.id === b.dataset.id); if (!confirm(`¿Rechazar la solicitud de ${x.nombre}?`)) return;
+    x.estado = 'rechazada';
+    enviarCorreo(x.email, 'Sobre tu solicitud', plantillaCorreo('Sobre tu solicitud', [`Hola ${esc(x.nombre.split(' ')[0])}:`, 'Revisamos tu solicitud y por el momento no pudo ser aprobada. Para más información, comunicate con la administración del complejo.']));
+    log(`Rechazó la solicitud de ${x.nombre} (DNI ${x.dni})`); toast('Solicitud rechazada'); render();
+  },
   ir: b => { const el = document.getElementById(b.dataset.id); if (el) el.scrollIntoView({behavior:'smooth', block:'start'}); },
   pagar: b => {
     const r = S.reservas.find(x => x.id === b.dataset.id);
@@ -1261,19 +1301,38 @@ function comprobante(r, nueva) {
 const FORM = {
   login: fd => entrar(fd.get('u'), fd.get('p')),
   registro: fd => {
-    const nro = fd.get('nro').trim(), dni = fd.get('dni').trim(), p = fd.get('p');
-    const pad = S.padron.find(x => x.nro === nro);
+    const dni = fd.get('dni').trim().replace(/\D/g, ''), p = fd.get('p');
+    const pad = S.padron.find(x => x.dni === dni);
     let err = null;
-    if (!pad) err = 'El número de socio no figura en el padrón de socios activos.';
-    else if (pad.dni !== dni) err = 'El DNI no coincide con el titular de ese número de socio.';
-    else if (S.socios.some(s => s.nro === nro)) err = 'Ese socio ya tiene una cuenta. Usá “Olvidé mi contraseña”.';
+    if (!pad) err = 'Tu DNI no figura en el padrón de socios. Si todavía no sos socio, elegí “Quiero asociarme”.';
+    else if (S.socios.some(s => s.nro === pad.nro && s.pass)) err = 'Ya existe una cuenta con ese DNI. Usá “Olvidé mi contraseña”.';
     else if (p.length < 6) err = 'La contraseña debe tener al menos 6 caracteres.';
     else if (p !== fd.get('p2')) err = 'Las contraseñas no coinciden.';
     else if (!fd.get('consent')) err = 'Tenés que aceptar la política de protección de datos personales.';
     if (err) { ui.msg = {tipo:'err', txt:err}; render(); return; }
-    S.socios.push({nro, dni, nombre:pad.nombre, email:fd.get('email').trim(), tel:fd.get('tel').trim(), pass:p, alta:Date.now(), grupo:[]});
-    S.auditoria.push({t:Date.now(), usuario:'Socio ' + nro, accion:'Registro de cuenta nueva (validado contra padrón)'}); save();
-    ui.acceso = 'login'; ui.msg = {tipo:'ok', txt:`Cuenta creada para ${pad.nombre}. Ya podés ingresar con tu N° de socio.`}; render();
+    const ex = S.socios.find(s => s.nro === pad.nro);
+    if (ex) Object.assign(ex, {email:fd.get('email').trim(), tel:fd.get('tel').trim(), pass:p});
+    else S.socios.push({nro:pad.nro, dni, nombre:pad.nombre, email:fd.get('email').trim(), tel:fd.get('tel').trim(), pass:p, alta:Date.now(), grupo:[]});
+    S.auditoria.push({t:Date.now(), usuario:'Socio ' + pad.nro, accion:'Registro de cuenta (DNI validado contra padrón)'}); save();
+    ui.acceso = 'login'; ui.msg = {tipo:'ok', txt:`¡Cuenta creada, ${pad.nombre.split(' ')[0]}! Tu número de socio es ${pad.nro}. Podés ingresar con ese número o con tu DNI.`}; render();
+  },
+  solicitud: fd => {
+    const dni = fd.get('dni').trim().replace(/\D/g, ''), email = fd.get('email').trim(), file = fd.get('img');
+    let err = null;
+    if (dni.length < 7) err = 'Revisá el DNI.';
+    else if (S.padron.some(x => x.dni === dni)) err = 'Ese DNI ya es socio. Elegí “Ya soy socio” para crear tu cuenta.';
+    else if ((S.solicitudes || []).some(x => x.dni === dni && x.estado === 'pendiente')) err = 'Ya hay una solicitud en revisión con ese DNI.';
+    else if (!fd.get('consent')) err = 'Tenés que aceptar la política de protección de datos personales.';
+    if (err) { ui.msg = {tipo:'err', txt:err}; render(); return; }
+    const fin = img => {
+      const nombre = cap1(fd.get('nombre').trim()) + ' ' + cap1(fd.get('apellido').trim());
+      S.solicitudes = S.solicitudes || [];
+      S.solicitudes.push({id:'s' + Date.now().toString(36), nombre, dni, cond:fd.get('cond'), legajo:(fd.get('legajo') || '').trim(), email, tel:fd.get('tel').trim(), img, estado:'pendiente', t:Date.now()});
+      S.auditoria.push({t:Date.now(), usuario:email, accion:`Solicitud para asociarse: ${nombre} (DNI ${dni})`});
+      const mail = enviarCorreo(email, 'Recibimos tu solicitud', plantillaCorreo('Recibimos tu solicitud', [`Hola ${esc(cap1(fd.get('nombre').trim()))}:`, 'Gracias por querer sumarte al Complejo Policial Almudena. La administración va a revisar tus datos y te va a responder a este correo.', 'Si se aprueba, te vamos a enviar tu número de socio y un enlace para crear tu contraseña.']));
+      ui.recEmail = email; ui.recMail = mail.id; ui.acceso = 'solenviada'; ui.msg = null; render(); window.scrollTo(0, 0);
+    };
+    if (file && file.size) achicarImagen(file).then(fin).catch(() => fin(null)); else fin(null);
   },
   recuperar: fd => {
     const tipo = fd.get('tipo'), email = fd.get('email').trim().toLowerCase();
