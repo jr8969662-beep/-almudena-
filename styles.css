@@ -583,3 +583,11 @@ div.pi-foto{cursor:default}
 .mail-nro{display:inline-block;font-family:ui-monospace,monospace;font-size:22px;font-weight:800;letter-spacing:2px;color:var(--azul);background:var(--verdeb);padding:6px 14px;border-radius:8px}
 .mail-pie{font-size:12px;color:var(--gris);border-top:1px solid var(--borde);padding-top:12px;margin-top:16px}
 a.btn-sm{text-decoration:none}
+
+/* ---------- Barra Atrás ---------- */
+.atras-bar{display:flex;align-items:center;gap:12px;margin:0 0 18px;padding-bottom:14px;border-bottom:1px solid var(--borde)}
+.atras{display:inline-flex;align-items:center;gap:6px;background:#fff;border:1px solid #cfdcd3;border-radius:99px;padding:7px 14px 7px 10px;font-weight:600;color:var(--azul2);font-size:14px;box-shadow:var(--sombra)}
+.atras:hover{border-color:var(--azul2);background:var(--verdeb)}
+.atras-a{font-size:13px;color:var(--gris);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.atras-a b{color:var(--texto);font-weight:600}
+.acceso .atras-bar{margin:-8px 0 18px}

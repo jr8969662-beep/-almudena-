@@ -395,7 +395,7 @@ function vistaReserva() {
   if (!w.pers) { w.pers = {a:2, m:0, b:0}; w.veh = {auto:1, moto:0}; w.conVeh = null; }
   const pasos = ['Fecha y horario', 'Personas', 'Lugar', 'Pago'];
   const st = `<p class="step-m">Paso ${w.paso} de 4 · ${pasos[w.paso - 1]}</p><div class="stepper">${pasos.map((p, i) => `<div class="${i < w.paso ? 'on' : ''}"><i></i><span>${i + 1}. ${p}</span></div>`).join('')}</div>`;
-  const back = w.paso > 1 ? `<button class="back" data-act="wback">${ico('back', 18)} Volver</button>` : '';
+  const back = '';
   const cot = cotizar(w), F = w.franja && franja(w.franja);
   let c = '', ok = false, txtBtn = 'Continuar';
   if (w.paso === 1) {
@@ -605,7 +605,7 @@ function vistaAcceso() {
       <label>Repetir contraseña</label><input name="n2" type="password" required autocomplete="new-password"><button class="btn grande" style="margin-top:16px">Guardar contraseña</button></form>${m}`
       : `<div style="text-align:center"><span class="vic" style="background:var(--rojob);color:var(--rojo)">${ico('alert', 28)}</span><h3>El enlace no es válido</h3><p class="muted">${t && t.usado ? 'Este enlace ya se usó.' : 'El enlace venció o es incorrecto.'} Pedí uno nuevo.</p><button class="btn grande" data-act="acceso" data-v="recuperar">Pedir un enlace nuevo</button></div>`;
   }
-  return `<div class="acceso"><div class="box">
+  return `<div class="acceso"><div class="box">${barraAtras()}
     <div class="marca"><div class="logo">${ico('shield')}</div><div><b>Complejo Policial Almudena</b><small>${MODO === 'admin' ? 'Administración' : 'Reservas para socios'}</small></div></div>
     ${body}
     <p class="tiny"><a data-act="reset">Reiniciar datos de demostración</a></p>
@@ -652,7 +652,7 @@ const V = {
 
   novedades() {
     const tipos = ['', ...TIPOS_NOT.filter(t => S.noticias.some(n => n.tipo === t))];
-    return `<button class="back" data-act="nav" data-v="inicio">${ico('back', 18)} Inicio</button><div class="page-head"><h1>Novedades</h1><p class="sub">Comunicados oficiales del complejo.</p></div>
+    return `<div class="page-head"><h1>Novedades</h1><p class="sub">Comunicados oficiales del complejo.</p></div>
     <div class="chips" style="margin-bottom:16px">${tipos.map(t => `<button class="chip ${ui.ntipo === t ? 'on' : ''}" data-act="ntipo" data-t="${t}">${t || 'Todas'}</button>`).join('')}</div>${listaNoticias(false, 0, ui.ntipo)}`;
   },
 
@@ -691,12 +691,12 @@ const V = {
   },
 
   plano() {
-    return `<button class="back" data-act="nav" data-v="inicio">${ico('back', 18)} Inicio</button><div class="page-head"><h1>Plano del predio</h1><p class="sub">Tocá un sector para ver qué hay y reservarlo.</p></div>${vistaPlano(false)}`;
+    return `<div class="page-head"><h1>Plano del predio</h1><p class="sub">Tocá un sector para ver qué hay y reservarlo.</p></div>${vistaPlano(false)}`;
   },
 
   credencial() {
     const s = socioActual(), fam = s.grupo.filter(g => g.estado === 'habilitado');
-    return `<button class="back" data-act="nav" data-v="perfil">${ico('back', 18)} Mi cuenta</button><div class="page-head"><h1>Mi credencial</h1><p class="sub">Mostrala en la entrada junto con tu DNI.</p></div>
+    return `<div class="page-head"><h1>Mi credencial</h1><p class="sub">Mostrala en la entrada junto con tu DNI.</p></div>
     <div class="credencial"><div class="cmp-head" style="justify-content:center;margin:0"><div class="logo">${ico('shield')}</div><div style="text-align:left"><b>Complejo Policial Almudena</b><small style="color:#cfe7d7">Credencial de socio</small></div></div>
       <div class="qrbox"><div class="qr" data-qr="CPA-SOCIO-${s.nro}"></div></div><b style="font-size:20px;display:block">${esc(s.nombre)}</b><div style="opacity:.9">Socio N° ${s.nro}</div>
       <div class="small" style="opacity:.8;margin-top:10px">${fam.length ? 'Grupo familiar: ' + fam.map(g => esc(g.nombre)).join(', ') : 'Sin grupo familiar cargado'}</div></div>
@@ -707,7 +707,7 @@ const V = {
     const acc = (i, t, html, open) => `<details class="acc" ${open ? 'open' : ''}><summary>${ico(i)} ${t}</summary><div class="cont">${html}</div></details>`;
     const ul = a => '<ul>' + a.map(x => '<li>' + esc(x) + '</li>').join('') + '</ul>';
     const docs = S.noticias.filter(n => ['Reglamento', 'Documentación'].includes(n.tipo));
-    return `<button class="back" data-act="nav" data-v="perfil">${ico('back', 18)} Mi cuenta</button><div class="page-head"><h1>Información del complejo</h1><p class="sub">Tocá un tema para ver el detalle.</p></div>
+    return `<div class="page-head"><h1>Información del complejo</h1><p class="sub">Tocá un tema para ver el detalle.</p></div>
     ${acc('camera', 'Fotos del complejo', galeria(), true)}
     ${acc('clock', 'Horarios', esc(INFO.horarios))}
     ${acc('money', 'Tarifas', ul(tarifasLista().map(([n, v]) => n + ': ' + v)))}
@@ -721,7 +721,7 @@ const V = {
 
   familia() {
     const s = socioActual();
-    return `<button class="back" data-act="nav" data-v="perfil">${ico('back', 18)} Mi cuenta</button><div class="page-head"><h1>Mi grupo familiar</h1><p class="sub">Las personas que pueden ingresar con vos.</p></div>
+    return `<div class="page-head"><h1>Mi grupo familiar</h1><p class="sub">Las personas que pueden ingresar con vos.</p></div>
     <div class="card"><h3>Titular</h3><div class="item"><div><b>${esc(s.nombre)}</b><br><span class="small muted">Socio N° ${s.nro} · DNI ${maskDni(s.dni)}</span></div><span class="badge b-verde">Habilitado</span></div></div>
     <div class="card"><h3>Integrantes</h3>${s.grupo.length ? s.grupo.map(g => `<div class="item"><div><b>${esc(g.nombre)}</b><br><span class="small muted">${esc(g.parentesco)} · DNI ${maskDni(g.dni)}</span></div>${g.estado === 'habilitado' ? '<span class="badge b-verde">Habilitado</span>' : '<span class="badge b-amarillo">Pendiente de aprobación</span>'}</div>`).join('') : '<p class="muted">No hay integrantes cargados.</p>'}</div>
     <div class="card"><h3>Solicitar alta de un familiar</h3><p class="small muted">La administración verifica la documentación antes de habilitarlo.</p>
@@ -994,12 +994,47 @@ function exportCSV(rows, nombre) {
   toast('Archivo exportado: ' + nombre);
 }
 
+/* ===================== Historial (botón Atrás) ===================== */
+let navStack = [], navActual = null, navRestaurando = false;
+const NOMBRES = {novedades:'Novedades', plano:'Plano del predio', credencial:'Mi credencial', info:'Información', familia:'Mi grupo familiar', asistente:'Ayuda', nueva:'Nueva reserva',
+  sitio:'Inicio', login:'Ingresar', registro:'Crear cuenta', recuperar:'Recuperar acceso', enviado:'Recuperar acceso', solenviada:'Solicitud', nuevaclave:'Nueva contraseña'};
+const PASOS = ['Fecha y horario', 'Personas', 'Lugar', 'Pago'];
+function navSnap() {
+  const quien = ses ? ses.rol + ':' + (ses.nro || ses.user) : 'out';
+  const paso = ses && ui.view === 'reservar' && ui.wiz ? ui.wiz.paso : 0;
+  return {k:[quien, ses ? ui.view : ui.acceso, paso].join('|'), quien, view:ui.view, acceso:ui.acceso, paso};
+}
+function navNombre(s) {
+  if (!s) return '';
+  if (s.quien === 'out') return NOMBRES[s.acceso] || 'Anterior';
+  if (s.view === 'reservar' && s.paso) return 'Paso ' + s.paso + ': ' + PASOS[s.paso - 1];
+  const n = ses && (NAV[ses.rol] || []).find(x => x[0] === s.view);
+  return n ? n[1] : (NOMBRES[s.view] || 'Anterior');
+}
+function navRegistrar() {
+  const s = navSnap();
+  if (navActual && navActual.quien !== s.quien) navStack = [];
+  else if (!navRestaurando && navActual && navActual.k !== s.k) { navStack.push(navActual); if (navStack.length > 40) navStack.shift(); try { history.pushState({n:navStack.length}, ''); } catch (e) {} }
+  navActual = s;
+}
+function navAtras() {
+  const prev = navStack.pop(); if (!prev) return;
+  navRestaurando = true;
+  ui.view = prev.view; ui.acceso = prev.acceso; ui.msg = null;
+  if (prev.paso && ui.wiz) ui.wiz.paso = prev.paso;
+  closeModal(); render(); window.scrollTo(0, 0);
+  navRestaurando = false;
+}
+window.addEventListener('popstate', () => { if (navStack.length) navAtras(); });
+const barraAtras = () => navStack.length ? `<div class="atras-bar"><button class="atras" data-act="atras" aria-label="Volver atrás">${ico('back', 18)}<span>Atrás</span></button><span class="atras-a">Volver a <b>${esc(navNombre(navStack[navStack.length - 1]))}</b></span></div>` : '';
+
 /* ===================== Render ===================== */
 function render() {
   detenerCamara();
   const app = $('#app');
   document.body.classList.toggle('con-bottom', !!ses && ses.rol === 'socio');
   document.body.classList.toggle('en-reserva', !!ses && ui.view === 'reservar');
+  navRegistrar();
   if (!ses) { app.innerHTML = vistaAcceso(); return; }
   const navAct = {familia:'perfil', credencial:'perfil', info:'perfil', novedades:'inicio', plano:'inicio', asistente:'', nueva:'reservas'}[ui.view] ?? ui.view;
   const nomCorto = ses.rol === 'socio' ? socioActual().nombre : S.staff.find(s => s.user === ses.user).nombre;
@@ -1016,7 +1051,7 @@ function render() {
   const top = `<header class="top"><div class="marca">${logo}<div><b>Complejo Almudena</b><small>${esc(rolTxt)}</small></div></div>${ses.rol !== 'socio' ? `<button class="icon-btn" data-act="salir" aria-label="Cerrar sesión">${ico('logout', 18)}</button>` : ''}</header>`;
   const tabs = `<nav class="tabs ${ses.rol === 'socio' ? 'socio' : ''}">${items.filter(n => n[0] !== '_').map(([k, l]) => `<button class="tab ${navAct === k ? 'on' : ''}" data-act="nav" data-v="${k}">${ico(ICONOS[k], 22)}<span>${l}</span>${cnt(k)}</button>`).join('')}</nav>`;
   const fab = ses.rol === 'socio' && ui.view !== 'asistente' ? `<button class="fab" data-act="nav" data-v="asistente" aria-label="Ayuda">${ico('chat', 22)}<span>¿Necesitás ayuda?</span></button>` : '';
-  app.innerHTML = `<div class="layout">${side}<div class="contenido">${top}${tabs}<main>${V[ui.view]()}</main></div></div>${fab}`;
+  app.innerHTML = `<div class="layout">${side}<div class="contenido">${top}${tabs}<main>${barraAtras()}${V[ui.view]()}</main></div></div>${fab}`;
   pintarQR();
   const m = $('#msgs'); if (m) m.scrollTop = m.scrollHeight;
 }
@@ -1185,6 +1220,7 @@ const ACT = {
     enviarCorreo(x.email, 'Sobre tu solicitud', plantillaCorreo('Sobre tu solicitud', [`Hola ${esc(x.nombre.split(' ')[0])}:`, 'Revisamos tu solicitud y por el momento no pudo ser aprobada. Para más información, comunicate con la administración del complejo.']));
     log(`Rechazó la solicitud de ${x.nombre} (DNI ${x.dni})`); toast('Solicitud rechazada'); render();
   },
+  atras: () => { const n = navStack.length; try { history.back(); } catch (e) {} setTimeout(() => { if (navStack.length === n) navAtras(); }, 120); },
   ir: b => { const el = document.getElementById(b.dataset.id); if (el) el.scrollIntoView({behavior:'smooth', block:'start'}); },
   pagar: b => {
     const r = S.reservas.find(x => x.id === b.dataset.id);
