@@ -18,6 +18,58 @@ const pesos = n => '$ ' + Number(n).toLocaleString('es-AR');
 const norm = s => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
 const horas = (a, b) => { const r = []; for (let h = a; h < b; h++) r.push(z(h) + ':00'); return r; };
 
+/* ===================== Íconos (SVG de línea) ===================== */
+const IP = {
+  home:'<path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M9.5 21v-6h5v6"/>',
+  calendar:'<rect x="3" y="4.5" width="18" height="17" rx="2.5"/><path d="M16 2.5v4M8 2.5v4M3 10h18"/>',
+  ticket:'<path d="M3 7.5A1.5 1.5 0 0 1 4.5 6h15A1.5 1.5 0 0 1 21 7.5V10a2 2 0 0 0 0 4v2.5a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 16.5V14a2 2 0 0 0 0-4z"/><path d="M14 6v12" stroke-dasharray="2 2.5"/>',
+  user:'<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/>',
+  chat:'<path d="M21 12a8 8 0 0 1-11.6 7.1L4 20.5l1.4-4.8A8 8 0 1 1 21 12z"/>',
+  info:'<circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/>',
+  help:'<circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6v.4M12 17v.5"/>',
+  users:'<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.5 3-6 6.5-6s6.5 2.5 6.5 6"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14c2 .7 3.5 2.8 3.5 6"/>',
+  card:'<rect x="2.5" y="5" width="19" height="14" rx="2.5"/><path d="M2.5 10h19M6.5 15h4"/>',
+  grid:'<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>',
+  clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+  plus:'<path d="M12 5v14M5 12h14"/>',
+  search:'<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>',
+  megaphone:'<path d="M3 11v2a1 1 0 0 0 1 1h3l6 4V6L7 10H4a1 1 0 0 0-1 1z"/><path d="M17 8.5a5 5 0 0 1 0 7"/>',
+  building:'<path d="M4 21V5a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1v16"/><path d="M15 9h4a1 1 0 0 1 1 1v11M2 21h20M8 8h3M8 12h3M8 16h3"/>',
+  shield:'<path d="M12 3 4.5 6v6c0 4.5 3.2 8 7.5 9 4.3-1 7.5-4.5 7.5-9V6z"/><path d="m9 12 2 2 4-4"/>',
+  list:'<path d="M8 6h13M8 12h13M8 18h13M3.5 6h.01M3.5 12h.01M3.5 18h.01"/>',
+  logout:'<path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3"/><path d="M10 17l-5-5 5-5M5 12h11"/>',
+  chevron:'<path d="m9 6 6 6-6 6"/>',
+  back:'<path d="m15 6-6 6 6 6"/>',
+  flame:'<path d="M12 21c-4 0-7-2.8-7-6.6 0-3.4 2.6-5.6 4-8.4.6 2 1.8 3 3 3.4C12 6.5 13 4.5 14.5 3c.5 3 4.5 5.5 4.5 11.4 0 3.8-3 6.6-7 6.6z"/>',
+  ball:'<circle cx="12" cy="12" r="9"/><path d="m12 7.5 3.8 2.8-1.4 4.5H9.6l-1.4-4.5z"/><path d="M12 3v4.5M20.6 9.5l-4.8.8M17.3 19.3l-2.9-4.5M6.7 19.3l2.9-4.5M3.4 9.5l4.8.8"/>',
+  racket:'<ellipse cx="10" cy="9" rx="6" ry="6.5"/><path d="m14.2 13.8 6.3 6.3"/><path d="M7 7h.01M10 6h.01M13 8h.01M8 10.5h.01M11 11h.01"/>',
+  volley:'<circle cx="12" cy="12" r="9"/><path d="M12 3c-1.5 4-1 8.5 3.5 12.5M3.6 9.5c4.2-.3 8.6 1.5 11 6.2M20.6 10.5c-3.8 1-6.8 4-7.8 10.3"/>',
+  waves:'<path d="M2 16c2 0 2-1.5 4-1.5s2 1.5 4 1.5 2-1.5 4-1.5 2 1.5 4 1.5 2-1.5 4-1.5"/><path d="M2 20.5c2 0 2-1.5 4-1.5s2 1.5 4 1.5 2-1.5 4-1.5 2 1.5 4 1.5 2-1.5 4-1.5"/><path d="M8.5 13V5.5a2 2 0 0 1 4 0M15.5 13V5.5a2 2 0 0 0-3-1.7M8.5 9h7"/>',
+  check:'<path d="m5 12.5 4.5 4.5L19 7.5"/>',
+  checkcircle:'<circle cx="12" cy="12" r="9"/><path d="m8 12.5 3 3 5-6"/>',
+  alert:'<path d="M10.3 4 2.6 17.5A2 2 0 0 0 4.3 20.5h15.4a2 2 0 0 0 1.7-3L13.7 4a2 2 0 0 0-3.4 0z"/><path d="M12 9.5v4M12 17v.5"/>',
+  xcircle:'<circle cx="12" cy="12" r="9"/><path d="m9 9 6 6M15 9l-6 6"/>',
+  download:'<path d="M12 4v11M7 10l5 5 5-5M4 20h16"/>',
+  qr:'<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3h-3zM20.5 14v.01M14 20.5h.01M17 20.5h3.5V17"/>',
+  idcard:'<rect x="2.5" y="5" width="19" height="14" rx="2.5"/><circle cx="8.5" cy="11" r="2.2"/><path d="M5.5 16c.5-1.7 1.6-2.5 3-2.5s2.5.8 3 2.5M14 10h4.5M14 13.5h3"/>',
+  cloud:'<path d="M7 16.5a4.5 4.5 0 1 1 .9-8.9A6 6 0 0 1 19.5 9.5 3.5 3.5 0 0 1 18 16.5z"/><path d="m10 19-1 2M14 19l-1 2"/>',
+  wrench:'<path d="M14.7 6.3a4 4 0 0 0 5 5l-8.2 8.2a2.1 2.1 0 0 1-3-3z"/><path d="M14.7 6.3 17 4l3 3-2.3 2.3"/>',
+  camera:'<path d="M4 7.5h3l1.5-2h7l1.5 2h3v12H4z"/><circle cx="12" cy="13" r="3.5"/>',
+  door:'<path d="M5 21V4a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v17M3 21h18M15 12h.01"/>',
+  chart:'<path d="M4 20V11M10 20V5M16 20v-6M21 20H3"/>',
+  doc:'<path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4M9 12h6M9 16h6"/>',
+  pin:'<path d="M12 21s7-6.2 7-12a7 7 0 0 0-14 0c0 5.8 7 12 7 12z"/><circle cx="12" cy="9" r="2.5"/>',
+  money:'<rect x="2.5" y="6" width="19" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M6 9.5v.01M18 14.5v.01"/>',
+  key:'<circle cx="8" cy="15" r="4"/><path d="m11 12 9-9M17 6l3 3"/>',
+  copy:'<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3"/>',
+  book:'<path d="M4 4.5A1.5 1.5 0 0 1 5.5 3H20v15H5.5A1.5 1.5 0 0 0 4 19.5z"/><path d="M4 19.5A1.5 1.5 0 0 0 5.5 21H20v-3"/>',
+  bell:'<path d="M6 16v-5a6 6 0 1 1 12 0v5l1.5 2h-15z"/><path d="M10 20.5a2 2 0 0 0 4 0"/>'
+};
+const ico = (n, s) => `<svg class="i" width="${s || 20}" height="${s || 20}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${IP[n] || ''}</svg>`;
+const ICONK = {q1:'flame', q2:'flame', q3:'flame', f1:'ball', f2:'ball', pd:'racket', vo:'volley', pi:'waves'};
+const ICON = Object.fromEntries(Object.entries(ICONK).map(([k, v]) => [k, `<span class="ii">${ico(v)}</span>`]));
+const ICON_T = {Quincho:'flame', Cancha:'ball', Pileta:'waves'};
+
 /* ===================== Datos de ejemplo ===================== */
 const INFO = {
   horarios: 'Martes a domingo de 9 a 22 h. Los lunes el complejo permanece cerrado por mantenimiento. Atención administrativa: martes a viernes de 9 a 13 h.',
@@ -36,16 +88,15 @@ const FAQ = [
   ['¿Qué presento en la entrada?', 'El código QR de tu reserva (desde el celular o impreso) y tu DNI.']
 ];
 const PAGO = {alias:'ALMUDENA.RESERVAS', cbu:'0000003100012345678901', titular:'Div. Complejo Pol. Almudena', plazo:'hasta 48 h antes del turno'};
-const badgePago = p => ({pendiente:'<span class="badge b-amarillo">💲 Pago pendiente</span>', informado:'<span class="badge b-azul">🕓 Pago en revisión</span>', confirmado:'<span class="badge b-verde">✅ Pagado</span>', rechazado:'<span class="badge b-rojo">⛔ Pago rechazado</span>'}[p || 'pendiente']);
-const icoPago = p => ({pendiente:'💲', informado:'🕓', confirmado:'✅', rechazado:'⛔'}[p || 'pendiente']);
+const badgePago = p => ({pendiente:'<span class="badge b-amarillo"><i class="dot"></i>Pago pendiente</span>', informado:'<span class="badge b-azul"><i class="dot"></i>Pago en revisión</span>', confirmado:'<span class="badge b-verde"><i class="dot"></i>Pagado</span>', rechazado:'<span class="badge b-rojo"><i class="dot"></i>Pago rechazado</span>'}[p || 'pendiente']);
+const icoPago = p => `<i class="dot d-${({pendiente:'amarillo', informado:'azul', confirmado:'verde', rechazado:'rojo'})[p || 'pendiente']}"></i>`;
 function botonesPago(r) {
   let b = '';
-  if (r.pagoInfo && r.pagoInfo.img) b += `<button class="btn-sm" data-act="pimg" data-id="${r.id}">🧾 Comprobante</button> `;
-  if (r.pago === 'informado') b += `<button class="btn-sm" style="background:var(--verdeb);border-color:#a7e0bd;color:var(--verde)" data-act="pconf" data-id="${r.id}">✔ Confirmar</button> <button class="btn-sm rojo" data-act="prech" data-id="${r.id}">Rechazar</button>`;
-  if ((r.pago === 'pendiente' || r.pago === 'rechazado') && r.estado !== 'cancelada') b += `<button class="btn-sm" data-act="pefec" data-id="${r.id}">💵 Registrar pago en efectivo</button>`;
+  if (r.pagoInfo && r.pagoInfo.img) b += `<button class="btn-sm" data-act="pimg" data-id="${r.id}">Ver comprobante</button> `;
+  if (r.pago === 'informado') b += `<button class="btn-sm ok" data-act="pconf" data-id="${r.id}">${ico('check', 16)} Confirmar</button> <button class="btn-sm rojo" data-act="prech" data-id="${r.id}">Rechazar</button>`;
+  if ((r.pago === 'pendiente' || r.pago === 'rechazado') && r.estado !== 'cancelada') b += `<button class="btn-sm" data-act="pefec" data-id="${r.id}">Cobrado en efectivo</button>`;
   return b;
 }
-const ICON = {q1:'🍖', q2:'🍖', q3:'🍖', f1:'⚽', f2:'⚽', pd:'🎾', vo:'🏐', pi:'🏊'};
 const unidad = i => i.tipo === 'Cancha' ? 'por hora' : i.tipo === 'Pileta' ? 'por grupo y turno' : 'por turno';
 const maskDni = d => String(d).length > 4 ? String(d).slice(0, 2) + '.***.' + String(d).slice(-3) : '***';
 
@@ -192,36 +243,33 @@ function bars(data) {
 
 /* ===================== Acceso ===================== */
 function vistaSitio() {
-  const ns = S.noticias.slice().sort((a, b) => b.fecha - a.fecha).slice(0, 3);
   const h = hoy();
-  const T = [['Quincho', '🍖', 'Quinchos'], ['Cancha', '⚽', 'Canchas'], ['Pileta', '🏊', 'Pileta']];
-  const dispo = T.map(([t, ic, n]) => {
+  const T = [['Quincho', 'Quinchos'], ['Cancha', 'Canchas'], ['Pileta', 'Pileta']];
+  const dispo = T.map(([t, n]) => {
     const is = S.inst.filter(i => i.tipo === t && i.activo);
     const lib = is.reduce((a, i) => a + i.turnos.filter(tu => !turnoPasado(h, tu) && ocup(i.id, h, tu) < i.cupo).length, 0);
-    return `<div class="dispo"><span><span style="font-size:22px">${ic}</span> <b>${n}</b></span>${lib ? `<span class="badge b-verde">${lib} turnos libres</span>` : '<span class="badge b-gris">Sin turnos hoy</span>'}</div>`;
+    return `<div class="dispo"><span><span class="ii sm">${ico(ICON_T[t])}</span>${n}</span>${lib ? `<span class="badge b-verde"><i class="dot"></i>${lib} turnos libres</span>` : '<span class="badge b-gris">Sin turnos hoy</span>'}</div>`;
   }).join('');
-  const desc = {Quincho:'Quinchos equipados para asados y reuniones familiares de hasta 60 personas.', Cancha:'Fútbol 5, pádel y vóley. Se reservan por hora, de 9 a 22 h.', Pileta:'Turnos de mañana y tarde durante la temporada de verano.'};
+  const desc = {Quincho:'Equipados para asados y reuniones familiares de hasta 60 personas.', Cancha:'Fútbol 5, pádel y vóley. Se reservan por hora, de 9 a 22 h.', Pileta:'Turnos de mañana y tarde durante la temporada de verano.'};
   return `<div class="sitio">
-  <header class="s-head"><div class="marca"><div class="logo">CPA</div><div><b>Complejo Policial Almudena</b><small>Div. Complejo Pol. Almudena (DPyRI) · Salta</small></div></div>
-    <nav class="s-nav"><a data-act="ir" data-id="s-como">Cómo reservar</a><a data-act="ir" data-id="s-inst">Instalaciones</a><a data-act="ir" data-id="s-nov">Novedades</a><a data-act="ir" data-id="s-info">Información</a></nav>
-    <div class="s-acc"><button class="btn ghost" data-act="acceso" data-v="registro">Registrarme</button><button class="btn" data-act="acceso" data-v="login">Ingresar</button></div></header>
-  <section class="hero"><div><span class="badge-proto">PROTOTIPO</span><h1>Reservá quinchos, canchas y pileta sin llamar ni hacer filas</h1>
-    <p>El sistema online para los socios del Complejo Policial Almudena. Elegí el día, mirá la disponibilidad en el momento y recibí tu comprobante con código QR.</p>
-    <div class="chips"><button class="btn" data-act="acceso" data-v="login">Ingresar como socio</button><button class="btn ghost" data-act="acceso" data-v="registro">Crear mi cuenta</button></div></div>
-    <div class="hero-card"><h3>Disponibilidad de hoy</h3><p class="small muted" style="margin-top:-4px">${fmtFL(h)} · se actualiza en tiempo real</p>${dispo}</div></section>
-  <section class="s-sec" id="s-como"><h2>Cómo reservar en 3 pasos</h2><p class="sub">Desde la computadora, la tablet o el celular.</p><div class="grid3">
-    <div class="card"><span class="num">1</span><h3>Ingresá</h3><p class="muted">Con tu número de socio o DNI y tu contraseña. Si es tu primera vez, registrate en un minuto.</p></div>
-    <div class="card"><span class="num">2</span><h3>Elegí lugar, día y horario</h3><p class="muted">El calendario te muestra en colores qué está libre. Los horarios ocupados se bloquean solos.</p></div>
-    <div class="card"><span class="num">3</span><h3>Mostrá tu QR</h3><p class="muted">Recibís el comprobante al instante. En la entrada el personal lo escanea y listo.</p></div></div></section>
-  <section class="s-sec" id="s-inst"><h2>Instalaciones</h2><p class="sub">Tarifas vigentes para socios.</p><div class="grid3">
-    ${T.map(([t, ic, n]) => { const is = S.inst.filter(i => i.tipo === t); return `<div class="card"><span class="icg">${ic}</span><h3>${n}</h3><p class="muted">${desc[t]}</p>${is.map(i => `<div class="rl"><span>${esc(i.nombre)}</span><b>${i.activo ? pesos(i.tarifa) : 'En mantenimiento'}</b></div>`).join('')}</div>`; }).join('')}</div></section>
-  <section class="s-sec" id="s-nov"><h2>Novedades</h2><p class="sub">Comunicados oficiales del complejo.</p><div class="grid3">
-    ${ns.map(n => `<div class="card noticia ${esc(n.tipo)}">${badgeNot(n.tipo)}<h3 style="margin:10px 0 0">${esc(n.titulo)}</h3><p>${esc(n.texto)}</p><p class="small muted">${fmtDT(n.fecha)}</p></div>`).join('')}</div></section>
-  <section class="s-sec" id="s-info"><h2>Información útil</h2><p class="sub">Lo que tenés que saber antes de venir.</p><div class="grid3">
-    <div class="card"><span class="icg">🕘</span><h3>Horarios</h3><p class="muted">${esc(INFO.horarios)}</p></div>
-    <div class="card"><span class="icg">📍</span><h3>Ubicación</h3><p class="muted">${esc(INFO.ubicacion)}</p></div>
-    <div class="card"><span class="icg">✅</span><h3>Requisitos para ingresar</h3><ul class="muted" style="padding-left:18px;margin:0">${INFO.requisitos.map(x => '<li>' + esc(x) + '</li>').join('')}</ul></div></div></section>
-  <footer class="s-foot">Complejo Policial Almudena · Sistema de Gestión Integral · Prototipo de demostración con datos de ejemplo</footer></div>`;
+  <header class="s-head"><div class="marca"><div class="logo">${ico('shield')}</div><div><b>Complejo Policial Almudena</b><small>Reservas para socios</small></div></div>
+    <nav class="s-nav"><a data-act="ir" data-id="s-como">Cómo funciona</a><a data-act="ir" data-id="s-inst">Instalaciones y tarifas</a><a data-act="ir" data-id="s-info">Información</a></nav>
+    <div class="s-acc"><button class="btn ghost" data-act="acceso" data-v="registro">Crear cuenta</button><button class="btn" data-act="acceso" data-v="login">Ingresar</button></div></header>
+  <section class="hero"><div><span class="eyebrow">Para socios del complejo</span><h1>Reservá quinchos, canchas y pileta desde tu casa</h1>
+    <p>Sin llamadas ni filas. Elegí el día, mirá qué hay libre en el momento y recibí tu comprobante con código QR.</p>
+    <div class="chips"><button class="btn" data-act="acceso" data-v="login">Ingresar y reservar ${ico('chevron', 18)}</button><button class="btn ghost" data-act="acceso" data-v="registro">Es mi primera vez</button></div></div>
+    <div class="hero-card"><h3 style="margin-bottom:2px">Disponible hoy</h3><p class="small muted">${fmtFL(h)}</p>${dispo}</div></section>
+  <section class="s-sec" id="s-como"><h2>Así de fácil</h2><p class="sub">Tres pasos, desde la computadora o el celular.</p><div class="grid3">
+    <div class="card"><span class="num">1</span><h3>Ingresá</h3><p class="muted">Con tu número de socio o DNI. Si es tu primera vez, creá tu cuenta en un minuto.</p></div>
+    <div class="card"><span class="num">2</span><h3>Elegí lugar, día y horario</h3><p class="muted">Solo te mostramos lo que está libre, así no hay confusiones.</p></div>
+    <div class="card"><span class="num">3</span><h3>Pagá y mostrá tu QR</h3><p class="muted">Transferís, avisás con una foto del comprobante y en la entrada escanean tu QR.</p></div></div></section>
+  <section class="s-sec" id="s-inst"><h2>Instalaciones y tarifas</h2><p class="sub">Valores vigentes para socios.</p><div class="grid3">
+    ${T.map(([t, n]) => { const is = S.inst.filter(i => i.tipo === t); return `<div class="card"><span class="ii" style="margin-bottom:14px">${ico(ICON_T[t])}</span><h3>${n}</h3><p class="muted">${desc[t]}</p>${is.map(i => `<div class="rl"><span>${esc(i.nombre)}</span><b>${i.activo ? pesos(i.tarifa) : 'En mantenimiento'}</b></div>`).join('')}</div>`; }).join('')}</div></section>
+  <section class="s-sec" id="s-info"><h2>Antes de venir</h2><p class="sub">Lo importante, en pocas palabras.</p><div class="grid3">
+    <div class="card"><span class="ii" style="margin-bottom:14px">${ico('clock')}</span><h3>Horarios</h3><p class="muted">${esc(INFO.horarios)}</p></div>
+    <div class="card"><span class="ii" style="margin-bottom:14px">${ico('pin')}</span><h3>Ubicación</h3><p class="muted">${esc(INFO.ubicacion)}</p></div>
+    <div class="card"><span class="ii" style="margin-bottom:14px">${ico('checkcircle')}</span><h3>Para ingresar</h3><ul class="muted" style="padding-left:18px;margin:0">${INFO.requisitos.map(x => '<li>' + esc(x) + '</li>').join('')}</ul></div></div></section>
+  <footer class="s-foot">Complejo Policial Almudena · Div. Complejo Pol. Almudena (DPyRI) · Salta<br><span style="opacity:.7">Versión de demostración con datos de ejemplo</span></footer></div>`;
 }
 
 function vistaAcceso() {
@@ -229,24 +277,23 @@ function vistaAcceso() {
   const m = ui.msg ? `<div class="${ui.msg.tipo}">${esc(ui.msg.txt)}</div>` : '';
   let body = '';
   if (ui.acceso === 'login') body = `
-    <h3>${MODO === 'admin' ? 'Ingreso del personal' : 'Ingresar'}</h3>
+    <h3>${MODO === 'admin' ? 'Ingreso del personal' : 'Ingresá a tu cuenta'}</h3><p class="muted small">${MODO === 'admin' ? 'Solo para personal autorizado del complejo.' : 'Usá tu número de socio o tu DNI.'}</p>
     <form data-form="login">
       <label>${MODO === 'admin' ? 'Usuario' : 'N° de socio o DNI'}</label><input name="u" required autocomplete="username">
       <label>Contraseña</label><input name="p" type="password" required autocomplete="current-password">
-      <button class="btn full" style="margin-top:14px">Ingresar</button>
+      <button class="btn grande" style="margin-top:18px">Ingresar</button>
     </form>${m}
     ${MODO === 'admin' ? `<p class="small muted" style="text-align:center;margin-top:14px">¿Olvidaste tu contraseña? Pedí el restablecimiento a un administrador.</p>
-    <div class="demo"><b>Cuentas de demostración</b> (prototipo):
+    <div class="demo">Demostración: entrá sin contraseña como
       <div class="chips"><button class="chip" data-act="demo" data-u="admin" data-p="admin">Administrador</button><button class="chip" data-act="demo" data-u="porteria" data-p="1234">Portería</button></div></div>
-    <div class="links" style="justify-content:center"><a href="index.html">← Ir al sitio de socios</a></div>`
-    : `<div class="links"><a data-act="acceso" data-v="registro">Registrarme</a><a data-act="acceso" data-v="recuperar">Olvidé mi contraseña</a></div>
-    <div class="links" style="justify-content:center"><a data-act="acceso" data-v="sitio">← Volver al sitio</a></div>
-    <div class="demo"><b>Cuenta de demostración</b> (prototipo):
-      <div class="chips"><button class="chip" data-act="demo" data-u="1001" data-p="1234">Entrar como Socio 1001</button></div></div>
+    <div class="links" style="justify-content:center"><a href="index.html">Ir al sitio de socios</a></div>`
+    : `<div class="links"><a data-act="acceso" data-v="registro">Crear cuenta</a><a data-act="acceso" data-v="recuperar">Olvidé mi contraseña</a></div>
+    <div class="links" style="justify-content:center"><a data-act="acceso" data-v="sitio">Volver al inicio</a></div>
+    <div class="demo">Demostración: <button class="link" data-act="demo" data-u="1001" data-p="1234">entrar como socio de prueba</button></div>
     <p class="small muted" style="text-align:center;margin-top:12px"><a href="admin.html" style="color:var(--gris)">Acceso para el personal del complejo</a></p>`}`;
   if (ui.acceso === 'registro') body = `
-    <h3>Formulario de registro</h3>
-    <p class="muted small">El sistema valida automáticamente que el número de socio y el DNI coincidan con el padrón. Para probar usá socio 1003 y DNI 33444555.</p>
+    <h3>Crear tu cuenta</h3>
+    <p class="muted small">Verificamos que tu número de socio y tu DNI coincidan con el padrón. (Para probar: socio 1003, DNI 33444555.)</p>
     <form data-form="registro">
       <label>N° de socio</label><input name="nro" required inputmode="numeric">
       <label>DNI del titular</label><input name="dni" required inputmode="numeric">
@@ -257,7 +304,7 @@ function vistaAcceso() {
       <label class="check" style="margin-top:12px"><input type="checkbox" name="consent" value="1"> <span>Acepto que mis datos se usen solo para la gestión del complejo, conforme a la Ley 25.326 de Protección de Datos Personales.</span></label>
       <button class="btn full" style="margin-top:14px">Crear cuenta</button>
     </form>${m}
-    <div class="links"><a data-act="acceso" data-v="login">← Volver al ingreso</a></div>`;
+    <div class="links" style="justify-content:center"><a data-act="acceso" data-v="login">Ya tengo cuenta, quiero ingresar</a></div>`;
   if (ui.acceso === 'recuperar') body = `
     <h3>Recuperar contraseña</h3>
     <p class="muted small">Te enviamos un enlace de un solo uso, válido por 30 minutos, al correo registrado.</p>
@@ -266,20 +313,20 @@ function vistaAcceso() {
       <label>Correo electrónico registrado</label><input name="email" type="email" required>
       <button class="btn full" style="margin-top:14px">Enviar enlace</button>
     </form>${m}
-    <div class="links"><a data-act="acceso" data-v="login">← Volver al ingreso</a></div>`;
+    <div class="links" style="justify-content:center"><a data-act="acceso" data-v="login">Ya tengo cuenta, quiero ingresar</a></div>`;
   return `<div class="acceso"><div class="box">
-    <div class="marca"><div class="logo">CPA</div><div><b>Complejo Policial Almudena</b><small style="color:var(--gris)">${MODO === 'admin' ? 'Administración' : 'Reservas para socios'} <span class="badge-proto">PROTOTIPO</span></small></div></div>
+    <div class="marca"><div class="logo">${ico('shield')}</div><div><b>Complejo Policial Almudena</b><small>${MODO === 'admin' ? 'Administración' : 'Reservas para socios'}</small></div></div>
     ${body}
-    <p class="small muted" style="text-align:center;margin-top:16px"><a data-act="reset" style="cursor:pointer;text-decoration:underline">Reiniciar datos de demostración</a></p>
+    <p class="tiny"><a data-act="reset">Reiniciar datos de demostración</a></p>
   </div></div>`;
 }
 
 /* ===================== Vistas ===================== */
-const ICONOS = {pagos:'💳', disponibilidad:'🟢', agenda:'📆', inicio:'🏠', reservar:'📅', mis:'🎟️', asistente:'💬', perfil:'👤', validar:'📷', ingresos:'🚪', panel:'📊', reservas:'🗂️', nueva:'➕', instalaciones:'🏟️', comunicados:'📢', socios:'👥', seguridad:'🔒', auditoria:'📜'};
+const ICONOS = {inicio:'home', reservar:'calendar', mis:'ticket', perfil:'user', asistente:'chat', validar:'qr', ingresos:'door', panel:'home', pagos:'card', disponibilidad:'grid', agenda:'clock', reservas:'list', nueva:'plus', socios:'users', instalaciones:'building', comunicados:'megaphone', seguridad:'shield', auditoria:'doc'};
 const NAV = {
-  socio:[['inicio','Inicio','🏠'],['reservar','Reservar','📅'],['mis','Mis reservas','🎟️'],['asistente','Asistente','💬'],['perfil','Mi cuenta','👤']],
+  socio:[['inicio','Inicio'],['reservar','Reservar'],['mis','Mis reservas'],['perfil','Mi cuenta']],
   porteria:[['validar','Validar QR'],['ingresos','Ingresos de hoy']],
-  admin:[['_','Principal'],['panel','Inicio'],['disponibilidad','Disponibilidad'],['agenda','Agenda del día'],['pagos','Pagos'],['reservas','Reservas'],['nueva','Nueva reserva'],['_','Gestión'],['socios','Socios'],['instalaciones','Instalaciones'],['comunicados','Comunicados'],['_','Sistema'],['seguridad','Seguridad'],['auditoria','Auditoría']]
+  admin:[['_','Principal'],['panel','Inicio'],['pagos','Pagos'],['disponibilidad','Disponibilidad'],['agenda','Agenda del día'],['_','Gestión'],['reservas','Reservas'],['socios','Socios'],['instalaciones','Instalaciones'],['comunicados','Comunicados'],['_','Sistema'],['seguridad','Seguridad'],['auditoria','Auditoría']]
 };
 
 function listaNoticias(admin, limite, tipo) {
@@ -287,44 +334,46 @@ function listaNoticias(admin, limite, tipo) {
   if (tipo) ns = ns.filter(n => n.tipo === tipo);
   if (limite) ns = ns.slice(0, limite);
   if (!ns.length) return '<p class="muted">No hay publicaciones.</p>';
-  return ns.map(n => `<div class="card noticia ${esc(n.tipo)}">
-    <div style="display:flex;justify-content:space-between;gap:8px;align-items:center">${badgeNot(n.tipo)}<span class="small muted">${fmtDT(n.fecha)}</span></div>
-    <h3 style="margin:8px 0 0">${esc(n.titulo)}</h3><p>${esc(n.texto)}</p>
-    ${admin ? `<div style="margin-top:10px"><button class="btn-sm rojo" data-act="delnot" data-id="${n.id}">Eliminar</button></div>` : ''}</div>`).join('');
+  return ns.map(n => `<div class="card noticia ${esc(n.tipo)}"><span class="tipo">${esc(n.tipo)}</span><h3>${esc(n.titulo)}</h3><p>${esc(n.texto)}</p>
+    <div class="fecha">${fmtDT(n.fecha)}${admin ? ` · <button class="link rojo" data-act="delnot" data-id="${n.id}">Eliminar</button>` : ''}</div></div>`).join('');
 }
 
 const V = {
   inicio() {
     const s = socioActual();
-    const alertas = S.noticias.filter(n => ['Clima', 'Mantenimiento'].includes(n.tipo) && Date.now() - n.fecha < 3 * 86400000);
-    const prox = S.reservas.filter(r => r.socio === s.nro && r.estado === 'confirmada' && r.fecha >= hoy()).sort((a, b) => a.fecha.localeCompare(b.fecha) || inicioTurno(a.turno) - inicioTurno(b.turno))[0];
+    const alertas = S.noticias.filter(n => ['Clima', 'Mantenimiento'].includes(n.tipo) && Date.now() - n.fecha < 3 * 86400000).sort((a, b) => b.fecha - a.fecha);
+    const mias = S.reservas.filter(r => r.socio === s.nro && r.estado === 'confirmada' && r.fecha >= hoy()).sort((a, b) => a.fecha.localeCompare(b.fecha) || inicioTurno(a.turno) - inicioTurno(b.turno));
+    const prox = mias[0];
+    const debe = mias.filter(r => ['pendiente', 'rechazado'].includes(r.pago)).length;
     const hr = new Date().getHours(), saludo = hr < 12 ? 'Buen día' : hr < 20 ? 'Buenas tardes' : 'Buenas noches';
-    const tiles = [['nuevares', '📅', 'Reservar', 'Quinchos, canchas y pileta', 'prim'], ['mis', '🎟️', 'Mis reservas', 'Ver mi QR o cancelar'], ['credencial', '🪪', 'Mi credencial', 'Credencial digital de socio'],
-      ['asistente', '💬', 'Preguntar', 'Asistente virtual las 24 h'], ['info', 'ℹ️', 'Información', 'Horarios, tarifas, reglamento'], ['familia', '👨‍👩‍👧', 'Mi familia', 'Grupo familiar habilitado']];
-    const debe = S.reservas.filter(r => r.socio === s.nro && r.estado === 'confirmada' && r.fecha >= hoy() && ['pendiente', 'rechazado'].includes(r.pago)).length;
-    const alHtml = (debe ? `<div class="alerta" style="background:#fff7e0"><span style="font-size:22px">💲</span><div style="flex:1"><b>Tenés ${debe} reserva${debe > 1 ? 's' : ''} con pago pendiente</b>Pagá por transferencia o Mercado Pago e informá el pago desde “Mis reservas”.</div><button class="btn-sm" data-act="nav" data-v="mis">Pagar</button></div>` : '') + alertas.map(a => `<div class="alerta"><span style="font-size:22px">${a.tipo === 'Clima' ? '⛈️' : '🛠️'}</span><div><b>${esc(a.titulo)}</b>${esc(a.texto)}</div></div>`).join('');
-    return `<div class="home"><div class="home-main"><div class="solo-movil">${alHtml}</div>
-    <h2 class="hola">${saludo}, ${esc(s.nombre.split(' ')[0])} 👋</h2><p class="sub">¿Qué querés hacer hoy?</p>
-    ${prox ? `<div class="prox"><div><small>Tu próxima reserva</small><b>${ICON[prox.instId] || ''} ${esc(instNombre(prox.instId))}</b>${fmtFL(prox.fecha)} · ${esc(prox.turno)}<div style="margin-top:6px">${badgePago(prox.pago)}</div></div><button class="btn" data-act="verqr" data-id="${prox.id}">Mostrar QR</button></div>` : ''}
-    <div class="tiles">${tiles.map(([v, ic, t, d, c]) => `<button class="tile ${c || ''}" ${v === 'nuevares' ? 'data-act="nuevares"' : `data-act="nav" data-v="${v}"`}><span class="ic">${ic}</span><b>${t}</b><span class="d">${d}</span></button>`).join('')}</div>
-    </div><div class="home-side"><div class="solo-pc">${alHtml}</div><div style="display:flex;justify-content:space-between;align-items:center"><h3 class="sec" style="margin-top:6px">Novedades</h3><button class="link" data-act="nav" data-v="novedades">Ver todas</button></div>${listaNoticias(false, 3)}</div></div>`;
+    const pagarProx = prox && ['pendiente', 'rechazado'].includes(prox.pago);
+    const links = [['mis', 'ticket', 'Mis reservas', 'Ver, pagar o cancelar'], ['credencial', 'idcard', 'Mi credencial', 'Para mostrar en la entrada'], ['info', 'info', 'Información', 'Horarios, tarifas y reglamento']];
+    return `<div class="page-head"><h1>${saludo}, ${esc(s.nombre.split(' ')[0])}</h1><p class="sub">¿Qué querés hacer hoy?</p></div>
+    ${debe ? `<div class="aviso aviso-amarillo">${ico('alert', 22)}<div><b>Tenés ${debe === 1 ? 'un pago pendiente' : debe + ' pagos pendientes'}</b><span>Pagá ${PAGO.plazo} para mantener tu reserva.</span></div><button class="btn" data-act="nav" data-v="mis">Pagar</button></div>` : ''}
+    ${alertas.length ? `<div class="aviso">${ico(alertas[0].tipo === 'Clima' ? 'cloud' : 'wrench', 22)}<div><b>${esc(alertas[0].titulo)}</b></div><button class="link" data-act="nav" data-v="novedades">Ver más</button></div>` : ''}
+    <div class="home"><div class="home-main">
+      <button class="cta" data-act="nuevares"><div class="cta-ic">${ico('calendar', 28)}</div><div><b>Hacer una reserva</b><span>Quinchos, canchas o pileta, en 4 pasos</span></div>${ico('chevron', 24)}</button>
+      ${prox ? `<div class="card"><div class="card-label">Tu próxima reserva</div><div class="prox-row">${ICON[prox.instId]}<div><b>${esc(instNombre(prox.instId))}</b><span>${fmtFL(prox.fecha)} · ${esc(prox.turno)}</span></div></div>
+        <div class="prox-foot">${badgePago(prox.pago)}<button class="btn" data-act="${pagarProx ? 'pagar' : 'verqr'}" data-id="${prox.id}">${pagarProx ? 'Pagar ' + pesos(prox.monto || 0) : ico('qr', 18) + ' Mostrar QR'}</button></div></div>` : ''}
+      <div class="lista-links">${links.map(([v, i, t, d]) => `<button class="link-row" data-act="nav" data-v="${v}"><span class="lr-ic">${ico(i)}</span><span class="lr-t"><b>${t}</b><small>${d}</small></span>${ico('chevron')}</button>`).join('')}</div>
+    </div><div class="home-side"><div class="sec-head"><h3>Novedades</h3><button class="link" data-act="nav" data-v="novedades">Ver todas</button></div>${listaNoticias(false, 2)}</div></div>`;
   },
 
   novedades() {
     const tipos = ['', ...TIPOS_NOT.filter(t => S.noticias.some(n => n.tipo === t))];
-    return `<button class="back" data-act="nav" data-v="inicio">← Inicio</button><h2>Comunicados y novedades</h2>
-    <div class="chips" style="margin-bottom:14px">${tipos.map(t => `<button class="chip ${ui.ntipo === t ? 'on' : ''}" data-act="ntipo" data-t="${t}">${t || 'Todas'}</button>`).join('')}</div>${listaNoticias(false, 0, ui.ntipo)}`;
+    return `<button class="back" data-act="nav" data-v="inicio">${ico('back', 18)} Inicio</button><div class="page-head"><h1>Novedades</h1><p class="sub">Comunicados oficiales del complejo.</p></div>
+    <div class="chips" style="margin-bottom:16px">${tipos.map(t => `<button class="chip ${ui.ntipo === t ? 'on' : ''}" data-act="ntipo" data-t="${t}">${t || 'Todas'}</button>`).join('')}</div>${listaNoticias(false, 0, ui.ntipo)}`;
   },
 
   reservar() {
     const w = ui.wiz;
     const pasos = ['Qué', 'Cuál', 'Día', 'Horario', 'Confirmar'];
     const st = `<div class="stepper">${pasos.map((p, i) => `<div class="${i < w.paso ? 'on' : ''}"><i></i>${p}</div>`).join('')}</div>`;
-    const back = w.paso > 1 ? '<button class="back" data-act="wback">← Volver</button>' : '';
+    const back = w.paso > 1 ? `<button class="back" data-act="wback">${ico('back', 18)} Volver</button>` : '';
     let c = '';
     if (w.paso === 1) {
-      const T = [['Quincho', '🍖', 'Quinchos', 'Para asados y reuniones'], ['Cancha', '⚽', 'Canchas', 'Fútbol 5, pádel y vóley, por hora'], ['Pileta', '🏊', 'Pileta', 'Turno mañana o tarde, en temporada']];
-      c = `<h2 class="wtit">¿Qué querés reservar?</h2><p class="sub">Tocá una opción para empezar.</p><div class="opciones">${T.map(([t, ic, n, d]) => {
+      const T = [['Quincho', ico('flame', 26), 'Quinchos', 'Para asados y reuniones'], ['Cancha', ico('ball', 26), 'Canchas', 'Fútbol 5, pádel y vóley, por hora'], ['Pileta', ico('waves', 26), 'Pileta', 'Turno mañana o tarde, en temporada']];
+      c = `<h2 class="wtit">¿Qué querés reservar?</h2><p class="sub">Elegí una opción.</p><div class="opciones">${T.map(([t, ic, n, d]) => {
         const is = S.inst.filter(i => i.tipo === t), act = is.some(i => i.activo), min = Math.min(...is.map(i => i.tarifa));
         return `<button class="opcion" data-act="wtipo" data-t="${t}" ${act ? '' : 'disabled'}><span class="ic">${ic}</span><span><b>${n}</b><span class="d">${d}</span><span class="p">${act ? 'Desde ' + pesos(min) : 'Suspendido por mantenimiento'}</span></span></button>`;
       }).join('')}</div>`;
@@ -340,9 +389,9 @@ const V = {
         const f = addDays(hoy(), k), e = estadoDia(inst, f), d = new Date(f + 'T12:00'), off = e === 'lleno' || e === 'cerrado';
         dias += `<button class="dchip ${e} ${w.dia === f ? 'sel' : ''}" data-act="wdia" data-f="${f}" ${off ? 'disabled' : ''}><small>${k === 0 ? 'Hoy' : k === 1 ? 'Mañana' : cap1(d.toLocaleDateString('es-AR', {weekday:'short'}).replace('.', ''))}</small><b>${d.getDate()}</b><em>${{libre:'Libre', parcial:'Pocos', lleno:'Completo', cerrado:'Cerrado'}[e] || ''}</em></button>`;
       }
-      c = `<h2 class="wtit">¿Qué día?</h2><p class="sub">${ICON[inst.id]} ${esc(inst.nombre)} · deslizá para ver más días.</p><div class="dias">${dias}</div>
-      <button class="link wcal-btn" data-act="wcal">${ui.verCal ? 'Ocultar calendario' : '📅 Ver calendario completo (hasta 30 días)'}</button>
-      <div class="cal-wrap ${ui.verCal ? 'open' : ''}"><div class="card" style="margin-top:12px;max-width:460px"><p class="small muted" style="margin:0 0 4px">O elegí en el calendario (hasta 30 días):</p>${calendario(inst)}<div class="leyenda"><span><i style="background:var(--verdeb);border:1px solid #a7e0bd"></i>Libre</span><span><i style="background:var(--amarillob);border:1px solid #f0d58c"></i>Pocos turnos</span><span><i style="background:var(--rojob);border:1px solid #f3b4b4"></i>Completo</span></div></div></div>`;
+      c = `<h2 class="wtit">¿Qué día?</h2><p class="sub">${esc(inst.nombre)} · Solo se pueden elegir los días con lugar.</p><div class="dias">${dias}</div>
+      <button class="link wcal-btn" data-act="wcal">${ui.verCal ? 'Ocultar calendario' : 'Ver más fechas en el calendario'}</button>
+      <div class="cal-wrap ${ui.verCal ? 'open' : ''}"><div class="card" style="margin-top:12px;max-width:460px">${calendario(inst)}<div class="leyenda"><span><i style="background:var(--verdeb)"></i>Libre</span><span><i style="background:var(--amarillob)"></i>Pocos lugares</span><span><i style="background:var(--rojob)"></i>Completo</span></div></div></div>`;
     }
     if (w.paso === 4) {
       const inst = getInst(w.inst);
@@ -350,19 +399,19 @@ const V = {
         const lib = inst.cupo - ocup(inst.id, w.dia, t), pas = turnoPasado(w.dia, t), ok = lib > 0 && !pas && inst.activo;
         return `<button class="hbtn" ${ok ? `data-act="wturno" data-t="${esc(t)}"` : 'disabled'}><b>${esc(t)}</b><span>${pas ? 'Ya pasó' : ok ? (inst.cupo > 1 ? lib + ' lugares libres' : 'Disponible') : 'Ocupado'}</span></button>`;
       }).join('');
-      c = `<h2 class="wtit">¿En qué horario?</h2><p class="sub">${ICON[inst.id]} ${esc(inst.nombre)} · ${fmtFL(w.dia)}</p><div class="horarios">${hs}</div>`;
+      c = `<h2 class="wtit">¿En qué horario?</h2><p class="sub">${esc(inst.nombre)} · ${fmtFL(w.dia)}</p><div class="horarios">${hs}</div>`;
     }
     if (w.paso === 5) {
       const inst = getInst(w.inst);
       c = `<h2 class="wtit">Revisá y confirmá</h2><p class="sub">Si está todo bien, tocá “Confirmar reserva”.</p>
-      <div class="resumen"><table class="kv"><tr><td>Lugar</td><td><b>${ICON[inst.id]} ${esc(inst.nombre)}</b></td></tr><tr><td>Día</td><td>${fmtFL(w.dia)}</td></tr><tr><td>Horario</td><td>${esc(w.turno)}</td></tr><tr><td>Capacidad</td><td>${esc(inst.cap)}</td></tr><tr><td>Costo</td><td>${pesos(inst.tarifa)} <span class="small muted">(se abona en el complejo)</span></td></tr></table></div>
+      <div class="resumen"><table class="kv"><tr><td>Lugar</td><td><b>${esc(inst.nombre)}</b></td></tr><tr><td>Día</td><td>${fmtFL(w.dia)}</td></tr><tr><td>Horario</td><td>${esc(w.turno)}</td></tr><tr><td>Capacidad</td><td>${esc(inst.cap)}</td></tr><tr><td>Total a pagar</td><td><b>${pesos(inst.tarifa)}</b></td></tr></table></div>
       <label class="check" style="margin:16px 0"><input type="checkbox" id="acepto"> <span>Acepto el <button type="button" class="link" data-act="verreg">reglamento del complejo</button></span></label>
-      <button class="btn grande" data-act="confirmar">✔ Confirmar reserva</button><p class="small muted" style="text-align:center">Vas a recibir tu comprobante con código QR al instante. Después pagás por transferencia o Mercado Pago (${PAGO.plazo}) e informás el pago con una foto del comprobante.</p>`;
+      <button class="btn grande" data-act="confirmar">Confirmar reserva</button><p class="small muted" style="text-align:center;margin-top:10px">Recibís tu QR al instante. Después pagás por transferencia ${PAGO.plazo}.</p>`;
     }
     const ins = w.inst ? getInst(w.inst) : null;
     const fila = (l, v) => `<div class="rl ${v ? 'hecho' : ''}"><span>${l}</span><b>${v ? esc(v) : '<span class="muted">—</span>'}</b></div>`;
     const res = `<div class="card"><h3>Tu reserva</h3>${fila('Tipo', w.paso > 1 ? w.tipo : '')}${fila('Lugar', w.paso > 2 && ins ? ins.nombre : '')}${fila('Día', w.paso > 3 && w.dia ? fmtFL(w.dia) : '')}${fila('Horario', w.paso > 4 ? w.turno : '')}${fila('Costo', w.paso > 2 && ins ? pesos(ins.tarifa) + ' ' + unidad(ins) : '')}</div>
-      <div class="card"><b>¿Necesitás ayuda?</b><p class="small muted">El asistente responde tus dudas y te guía en cada paso.</p><button class="btn ghost full" data-act="nav" data-v="asistente">💬 Abrir asistente</button></div>`;
+      <div class="card"><b>¿Tenés dudas?</b><p class="small muted">El asistente te ayuda en cada paso.</p><button class="btn ghost full" data-act="nav" data-v="asistente">${ico('chat', 18)} Preguntar</button></div>`;
     return `<div class="wiz"><div class="wiz-main">${back}${st}${c}</div><aside class="wiz-res">${res}</aside></div>`;
   },
 
@@ -371,52 +420,60 @@ const V = {
     const rs = S.reservas.filter(r => r.socio === s.nro);
     const prox = rs.filter(r => r.estado === 'confirmada' && r.fecha >= hoy()).sort((a, b) => a.fecha.localeCompare(b.fecha) || inicioTurno(a.turno) - inicioTurno(b.turno));
     const hist = rs.filter(r => !prox.includes(r)).sort((a, b) => b.fecha.localeCompare(a.fecha));
-    const lista = ui.mtab === 'hist' ? hist : prox;
-    const card = r => `<div class="rcard"><span class="ic">${ICON[r.instId] || '📍'}</span><div class="info"><b>${esc(instNombre(r.instId))}</b> ${badgeEstado(r.estado)}<br><span class="small muted">${fmtFL(r.fecha)} · ${esc(r.turno)} · ${pesos(r.monto || 0)}${r.ingreso ? '<br>Ingresó ' + fmtDT(r.ingreso) : ''}</span>${r.estado !== 'cancelada' ? '<br>' + badgePago(r.pago) : ''}</div>
-      ${r.estado === 'confirmada' && r.fecha >= hoy() ? `<div class="acc">${['pendiente', 'rechazado'].includes(r.pago) ? `<button class="btn" data-act="pagar" data-id="${r.id}">💲 Pagar</button>` : ''}<button class="btn ${['pendiente', 'rechazado'].includes(r.pago) ? 'ghost' : ''}" data-act="verqr" data-id="${r.id}">Mostrar QR</button><button class="btn ghost" data-act="cancelar" data-id="${r.id}">Cancelar</button></div>` : r.estado !== 'cancelada' ? `<button class="btn-sm" data-act="verqr" data-id="${r.id}">Ver comprobante</button>` : ''}</div>`;
-    return `<h2>Mis reservas</h2>
-    <div class="seg"><button class="${ui.mtab !== 'hist' ? 'on' : ''}" data-act="mtab" data-t="prox">Próximas (${prox.length})</button><button class="${ui.mtab === 'hist' ? 'on' : ''}" data-act="mtab" data-t="hist">Historial (${hist.length})</button></div>
-    ${lista.length ? lista.map(card).join('') : `<div class="card vacio"><div class="ic">${ui.mtab === 'hist' ? '🗂️' : '📅'}</div><p>${ui.mtab === 'hist' ? 'Todavía no tenés historial.' : 'No tenés reservas próximas.'}</p>${ui.mtab === 'hist' ? '' : '<button class="btn" data-act="nuevares">Hacer una reserva</button>'}</div>`}`;
+    const enHist = ui.mtab === 'hist', lista = enHist ? hist : prox;
+    const card = r => {
+      const pagar = ['pendiente', 'rechazado'].includes(r.pago);
+      const futura = r.estado === 'confirmada' && r.fecha >= hoy();
+      const acc = futura
+        ? `<button class="link rojo" data-act="cancelar" data-id="${r.id}">Cancelar</button>${pagar ? `<button class="btn" data-act="pagar" data-id="${r.id}">Pagar</button>` : `<button class="btn" data-act="verqr" data-id="${r.id}">${ico('qr', 18)} Mostrar QR</button>`}`
+        : r.estado !== 'cancelada' ? `<button class="link" data-act="verqr" data-id="${r.id}">Ver comprobante</button>` : '';
+      return `<div class="rcard"><div class="rc-top">${ICON[r.instId] || ''}<div class="rc-t"><b>${esc(instNombre(r.instId))}</b><span>${fmtFL(r.fecha)} · ${esc(r.turno)}</span></div><span class="rc-monto">${pesos(r.monto || 0)}</span></div>
+        <div class="rc-foot"><div>${futura ? badgePago(r.pago) : badgeEstado(r.estado)}</div><div class="rc-acc">${acc}</div></div></div>`;
+    };
+    return `<div class="page-head"><h1>Mis reservas</h1></div>
+    <div class="seg"><button class="${!enHist ? 'on' : ''}" data-act="mtab" data-t="prox">Próximas (${prox.length})</button><button class="${enHist ? 'on' : ''}" data-act="mtab" data-t="hist">Anteriores (${hist.length})</button></div>
+    ${lista.length ? lista.map(card).join('') : `<div class="card vacio"><span class="vic">${ico(enHist ? 'list' : 'calendar', 28)}</span><p class="muted">${enHist ? 'Todavía no tenés reservas anteriores.' : 'No tenés reservas próximas.'}</p>${enHist ? '' : '<button class="btn" data-act="nuevares">Hacer una reserva</button>'}</div>`}`;
   },
 
   perfil() {
     const s = socioActual();
     const ini = s.nombre.split(' ').map(x => x[0]).slice(0, 2).join('');
-    return `<h2>Mi cuenta</h2>
-    <div class="card" style="display:flex;gap:14px;align-items:center"><div class="avatar">${esc(ini)}</div><div><b style="font-size:17px">${esc(s.nombre)}</b><br><span class="muted small">Socio N° ${s.nro} · DNI ${maskDni(s.dni)}</span></div></div>
-    <div class="tiles"><button class="tile" data-act="nav" data-v="credencial"><span class="ic">🪪</span><b>Mi credencial</b><span class="d">Mostrala en la entrada</span></button><button class="tile" data-act="nav" data-v="familia"><span class="ic">👨‍👩‍👧</span><b>Mi familia</b><span class="d">${s.grupo.filter(g => g.estado === 'habilitado').length} habilitados</span></button><button class="tile" data-act="nav" data-v="info"><span class="ic">ℹ️</span><b>Información</b><span class="d">Reglamento y más</span></button></div>
-    <div class="card"><h3>Mis datos de contacto</h3><form data-form="datos"><label>Correo electrónico</label><input name="email" type="email" required value="${esc(s.email)}"><label>Teléfono (WhatsApp)</label><input name="tel" inputmode="tel" value="${esc(s.tel || '')}"><button class="btn" style="margin-top:12px">Guardar cambios</button></form></div>
-    <div class="card"><h3>Cambiar contraseña</h3><form data-form="pass"><label>Contraseña actual</label><input name="a" type="password" required autocomplete="current-password"><label>Nueva contraseña (mínimo 6 caracteres)</label><input name="n" type="password" required minlength="6" autocomplete="new-password"><label>Repetir nueva contraseña</label><input name="n2" type="password" required autocomplete="new-password"><button class="btn" style="margin-top:12px">Cambiar contraseña</button></form></div>
-    <button class="btn ghost full" data-act="salir">Cerrar sesión</button>`;
+    const links = [['credencial', 'idcard', 'Mi credencial digital', 'Mostrala en la entrada'], ['familia', 'users', 'Mi grupo familiar', s.grupo.filter(g => g.estado === 'habilitado').length + ' integrantes habilitados'], ['info', 'info', 'Información del complejo', 'Horarios, tarifas, reglamento y preguntas'], ['asistente', 'chat', 'Ayuda', 'Preguntale al asistente virtual']];
+    return `<div class="page-head"><h1>Mi cuenta</h1></div>
+    <div class="card perfil-head"><div class="avatar">${esc(ini)}</div><div><b>${esc(s.nombre)}</b><span>Socio N° ${s.nro} · DNI ${maskDni(s.dni)}</span></div></div>
+    <div class="lista-links">${links.map(([v, i, t, d]) => `<button class="link-row" data-act="nav" data-v="${v}"><span class="lr-ic">${ico(i)}</span><span class="lr-t"><b>${t}</b><small>${d}</small></span>${ico('chevron')}</button>`).join('')}</div>
+    <details class="acc"><summary>${ico('user')} Mis datos de contacto</summary><div class="cont"><form data-form="datos"><label style="margin-top:0">Correo electrónico</label><input name="email" type="email" required value="${esc(s.email)}"><label>Teléfono (WhatsApp)</label><input name="tel" inputmode="tel" value="${esc(s.tel || '')}"><button class="btn" style="margin-top:14px">Guardar</button></form></div></details>
+    <details class="acc"><summary>${ico('key')} Cambiar contraseña</summary><div class="cont"><form data-form="pass"><label style="margin-top:0">Contraseña actual</label><input name="a" type="password" required autocomplete="current-password"><label>Nueva contraseña (mínimo 6 caracteres)</label><input name="n" type="password" required minlength="6" autocomplete="new-password"><label>Repetir nueva contraseña</label><input name="n2" type="password" required autocomplete="new-password"><button class="btn" style="margin-top:14px">Cambiar contraseña</button></form></div></details>
+    <button class="btn ghost full" style="margin-top:8px" data-act="salir">${ico('logout', 18)} Cerrar sesión</button>`;
   },
 
   credencial() {
     const s = socioActual(), fam = s.grupo.filter(g => g.estado === 'habilitado');
-    return `<button class="back" data-act="nav" data-v="perfil">← Mi cuenta</button><h2>Mi credencial digital</h2>
-    <div class="credencial"><div class="cmp-head" style="justify-content:center;margin:0"><div class="logo">CPA</div><div style="text-align:left"><b>Complejo Policial Almudena</b><small style="color:#cfe0f5">Credencial de socio</small></div></div>
-      <div class="qrbox"><div class="qr" data-qr="CPA-SOCIO-${s.nro}"></div></div><b style="font-size:20px;display:block">${esc(s.nombre)}</b><div>Socio N° ${s.nro}</div>
-      <div class="small" style="opacity:.85;margin-top:8px">${fam.length ? 'Grupo familiar: ' + fam.map(g => esc(g.nombre)).join(', ') : 'Sin grupo familiar cargado'}</div></div>
-    <p class="muted small" style="text-align:center;margin-top:12px">Mostrala en la portería junto con tu DNI. Para usar una instalación reservada, mostrá el QR de la reserva.</p>`;
+    return `<button class="back" data-act="nav" data-v="perfil">${ico('back', 18)} Mi cuenta</button><div class="page-head"><h1>Mi credencial</h1><p class="sub">Mostrala en la entrada junto con tu DNI.</p></div>
+    <div class="credencial"><div class="cmp-head" style="justify-content:center;margin:0"><div class="logo">${ico('shield')}</div><div style="text-align:left"><b>Complejo Policial Almudena</b><small style="color:#cfe7d7">Credencial de socio</small></div></div>
+      <div class="qrbox"><div class="qr" data-qr="CPA-SOCIO-${s.nro}"></div></div><b style="font-size:20px;display:block">${esc(s.nombre)}</b><div style="opacity:.9">Socio N° ${s.nro}</div>
+      <div class="small" style="opacity:.8;margin-top:10px">${fam.length ? 'Grupo familiar: ' + fam.map(g => esc(g.nombre)).join(', ') : 'Sin grupo familiar cargado'}</div></div>
+    <p class="muted small" style="text-align:center;margin-top:14px">Para usar una instalación reservada, mostrá el QR de esa reserva (en “Mis reservas”).</p>`;
   },
 
   info() {
-    const acc = (t, html, open) => `<details class="acc" ${open ? 'open' : ''}><summary>${t}</summary><div class="cont">${html}</div></details>`;
+    const acc = (i, t, html, open) => `<details class="acc" ${open ? 'open' : ''}><summary>${ico(i)} ${t}</summary><div class="cont">${html}</div></details>`;
     const ul = a => '<ul>' + a.map(x => '<li>' + esc(x) + '</li>').join('') + '</ul>';
     const docs = S.noticias.filter(n => ['Reglamento', 'Documentación'].includes(n.tipo));
-    return `<h2>Información del complejo</h2><p class="sub">Tocá cada tema para ver el detalle.</p>
-    ${acc('🕘 Horarios de atención', esc(INFO.horarios), true)}
-    ${acc('💲 Tarifas', ul(S.inst.map(i => `${i.nombre}: ${pesos(i.tarifa)} ${unidad(i)}${i.activo ? '' : ' (suspendida)'}`)))}
-    ${acc('📍 Ubicación', esc(INFO.ubicacion))}
-    ${acc('✅ Requisitos para ingresar', ul(INFO.requisitos))}
-    ${acc('📘 Reglamento del complejo', ul(INFO.reglamento) + '<button class="btn-sm" data-act="descreg">Descargar reglamento</button>')}
-    ${acc('❓ Preguntas frecuentes', FAQ.map(([q, a]) => `<p><b>${esc(q)}</b><br>${esc(a)}</p>`).join(''))}
-    ${acc('📄 Documentación institucional', docs.length ? docs.map(d => `<p><b>${esc(d.titulo)}</b><br>${esc(d.texto)}</p>`).join('') : '<p class="muted">No hay documentos publicados.</p>')}
-    <div class="card" style="text-align:center;margin-top:14px"><p style="margin-top:0">¿No encontrás lo que buscás?</p><button class="btn" data-act="nav" data-v="asistente">💬 Preguntale al asistente</button></div>`;
+    return `<button class="back" data-act="nav" data-v="perfil">${ico('back', 18)} Mi cuenta</button><div class="page-head"><h1>Información del complejo</h1><p class="sub">Tocá un tema para ver el detalle.</p></div>
+    ${acc('clock', 'Horarios', esc(INFO.horarios), true)}
+    ${acc('money', 'Tarifas', ul(S.inst.map(i => `${i.nombre}: ${pesos(i.tarifa)} ${unidad(i)}${i.activo ? '' : ' (suspendida)'}`)))}
+    ${acc('card', 'Cómo pagar', `<p>Transferencia o Mercado Pago a:</p>${ul(['Alias: ' + PAGO.alias, 'CBU: ' + PAGO.cbu, 'Titular: ' + PAGO.titular])}<p>Plazo: ${PAGO.plazo}. Después informá el pago desde “Mis reservas”.</p>`)}
+    ${acc('pin', 'Ubicación', esc(INFO.ubicacion))}
+    ${acc('checkcircle', 'Requisitos para ingresar', ul(INFO.requisitos))}
+    ${acc('book', 'Reglamento', ul(INFO.reglamento) + `<button class="btn-sm" data-act="descreg">${ico('download', 16)} Descargar</button>`)}
+    ${acc('help', 'Preguntas frecuentes', FAQ.map(([q, a]) => `<p><b>${esc(q)}</b><br>${esc(a)}</p>`).join(''))}
+    ${acc('doc', 'Documentación', docs.length ? docs.map(d => `<p><b>${esc(d.titulo)}</b><br>${esc(d.texto)}</p>`).join('') : '<p class="muted">No hay documentos publicados.</p>')}`;
   },
 
   familia() {
     const s = socioActual();
-    return `<button class="back" data-act="nav" data-v="perfil">← Mi cuenta</button><h2>Mi grupo familiar</h2>
+    return `<button class="back" data-act="nav" data-v="perfil">${ico('back', 18)} Mi cuenta</button><div class="page-head"><h1>Mi grupo familiar</h1><p class="sub">Las personas que pueden ingresar con vos.</p></div>
     <div class="card"><h3>Titular</h3><div class="item"><div><b>${esc(s.nombre)}</b><br><span class="small muted">Socio N° ${s.nro} · DNI ${maskDni(s.dni)}</span></div><span class="badge b-verde">Habilitado</span></div></div>
     <div class="card"><h3>Integrantes</h3>${s.grupo.length ? s.grupo.map(g => `<div class="item"><div><b>${esc(g.nombre)}</b><br><span class="small muted">${esc(g.parentesco)} · DNI ${maskDni(g.dni)}</span></div>${g.estado === 'habilitado' ? '<span class="badge b-verde">Habilitado</span>' : '<span class="badge b-amarillo">Pendiente de aprobación</span>'}</div>`).join('') : '<p class="muted">No hay integrantes cargados.</p>'}</div>
     <div class="card"><h3>Solicitar alta de un familiar</h3><p class="small muted">La administración verifica la documentación antes de habilitarlo.</p>
@@ -427,31 +484,31 @@ const V = {
 
   asistente() {
     if (!ui.chat.length) ui.chat.push({de:'bot', html:'¡Hola! Soy el asistente virtual del Complejo Policial Almudena. Puedo responderte sobre <b>horarios, tarifas, reglamento, disponibilidad, actividades, eventos, requisitos de ingreso y ubicación</b>, y guiarte para hacer una reserva. ¿En qué te ayudo?'});
-    const sugs = ['¿Qué hay libre mañana?', '¿Cuánto cuesta un quincho?', '¿Cómo reservo?', 'Horarios', 'Requisitos para ingresar', 'Reglamento', 'Próximos eventos', '¿Dónde queda?'];
-    return `<h2>Asistente virtual</h2>
+    const sugs = ['¿Cómo reservo?', '¿Qué hay libre mañana?', '¿Cómo pago?', '¿Cuánto cuesta?', 'Horarios', 'Requisitos para ingresar'];
+    return `<div class="page-head"><h1>Ayuda</h1><p class="sub">Escribí tu pregunta o tocá una de las sugerencias.</p></div>
     <div class="card chat"><div class="msgs" id="msgs">${ui.chat.map(m => `<div class="msg ${m.de}">${m.html}</div>`).join('')}</div>
       <div class="sugs">${sugs.map(x => `<button class="chip" data-act="preg" data-q="${esc(x)}">${esc(x)}</button>`).join('')}</div>
       <form data-form="chat" class="chatform"><input name="q" id="chatq" placeholder="Escribí tu consulta…" autocomplete="off"><button class="btn">Enviar</button></form></div>
-    <p class="small muted">Prototipo: responde con reglas y con los datos cargados en el sistema (tarifas, disponibilidad y comunicados reales del sistema). En la versión final se conecta a un modelo de inteligencia artificial.</p>`;
+    <p class="tiny" style="text-align:left">Versión de demostración: responde con la información cargada en el sistema.</p>`;
   },
 
   validar() {
     const v = ui.validacion;
-    const ico = {ok:'✅', warn:'⚠️', error:'⛔'};
-    return `<h2>Validar ingreso</h2>
+    const icv = {ok:ico('checkcircle', 34), warn:ico('alert', 34), error:ico('xcircle', 34)};
+    return `<div class="page-head"><h1>Validar ingreso</h1></div>
     <div class="grid2"><div class="card"><h3>Escanear código QR</h3>
       <div class="cam"><video id="video" playsinline muted></video><div class="cam-ph" id="camph">Cámara apagada</div></div>
       <button class="btn full" type="button" data-act="camara">Activar cámara</button>
       <form data-form="codigo" class="row"><input name="c" placeholder="O ingresá el código: ALM-XXXX-XXXX" autocomplete="off"><button class="btn ghost">Validar</button></form>
       <p class="small muted">Para probar: en “Ingresos de hoy” podés simular el escaneo de una reserva.</p></div>
-    <div class="card resultado ${v ? v.tipo : ''}">${v ? `<div class="icono">${ico[v.tipo]}</div><h3>${esc(v.titulo)}</h3><p>${v.html}</p><p class="small muted">${fmtDT(v.t)}</p>` : '<p class="muted">El resultado de la validación aparece acá.</p>'}</div></div>`;
+    <div class="card resultado ${v ? v.tipo : ''}">${v ? `<div class="icono">${icv[v.tipo]}</div><h3>${esc(v.titulo)}</h3><p>${v.html}</p><p class="small muted">${fmtDT(v.t)}</p>` : '<p class="muted">El resultado de la validación aparece acá.</p>'}</div></div>`;
   },
 
   ingresos() {
     const h = hoy();
     const rs = S.reservas.filter(r => r.fecha === h && r.estado !== 'cancelada').sort((a, b) => inicioTurno(a.turno) - inicioTurno(b.turno));
     const dentro = rs.filter(r => r.estado === 'utilizada'), esperan = rs.filter(r => r.estado === 'confirmada');
-    return `<h2>Ingresos de hoy</h2>
+    return `<div class="page-head"><h1>Ingresos de hoy</h1></div>
     <div class="kpis"><div class="kpi"><b>${rs.length}</b><span>Reservas del día</span></div><div class="kpi"><b>${dentro.length}</b><span>Ingresos registrados</span></div><div class="kpi"><b>${esperan.length}</b><span>Pendientes de ingreso</span></div><div class="kpi"><b>${fmtH(Date.now())}</b><span>Hora actual</span></div></div>
     <div class="card"><h3>Pendientes de ingreso</h3>${esperan.length ? esperan.map(r => `<div class="item"><div><b>${esc(instNombre(r.instId))}</b> · ${esc(r.turno)}<br><span class="small muted">${esc(nombreSocio(r.socio))} (socio ${r.socio}) · ${r.codigo}</span></div><button class="btn-sm" data-act="simular" data-c="${r.codigo}">Simular escaneo</button></div>`).join('') : '<p class="muted">No hay ingresos pendientes.</p>'}</div>
     <div class="card"><h3>Ingresos registrados</h3>${dentro.length ? dentro.map(r => `<div class="item"><div><b>${esc(instNombre(r.instId))}</b> · ${esc(r.turno)}<br><span class="small muted">${esc(nombreSocio(r.socio))} · ${r.codigo}</span></div><span class="badge b-azul">Ingresó ${r.ingreso ? fmtH(r.ingreso) : ''}</span></div>`).join('') : '<p class="muted">Todavía no se registraron ingresos.</p>'}</div>`;
@@ -460,37 +517,29 @@ const V = {
   panel() {
     const h = hoy(), mes = h.slice(0, 7), anio = h.slice(0, 4);
     const val = S.reservas.filter(r => r.estado !== 'cancelada');
-    const activas = S.reservas.filter(r => r.estado === 'confirmada' && r.fecha >= h).length;
-    const delMes = val.filter(r => r.fecha.startsWith(mes)).length;
-    const hoyR = S.reservas.filter(r => r.fecha === h && r.estado !== 'cancelada').sort((a, b) => inicioTurno(a.turno) - inicioTurno(b.turno));
-    const ingHoy = hoyR.filter(r => r.estado === 'utilizada').length, espHoy = hoyR.filter(r => r.estado === 'confirmada');
-    let tot = 0, oc = 0;
-    for (let i = 0; i < 7; i++) { const f = addDays(h, i); S.inst.filter(x => x.cupo === 1).forEach(x => x.turnos.forEach(t => { tot++; if (ocup(x.id, f, t)) oc++; })); }
+    const hoyR = val.filter(r => r.fecha === h).sort((a, b) => inicioTurno(a.turno) - inicioTurno(b.turno));
+    const espHoy = hoyR.filter(r => r.estado === 'confirmada');
+    const porConf = val.filter(r => r.pago === 'informado').length;
+    const cobrado = val.filter(r => r.pago === 'confirmado' && r.fecha.startsWith(mes)).reduce((a, r) => a + (r.monto || 0), 0);
+    const libresHoy = S.inst.filter(i => i.activo && i.cupo === 1).reduce((a, i) => a + i.turnos.filter(t => !turnoPasado(h, t) && !ocup(i.id, h, t)).length, 0);
     const porInst = S.inst.map(i => [i.nombre, val.filter(r => r.instId === i.id && r.fecha.startsWith(mes)).length]);
-    const meses = []; const d = new Date(); d.setDate(1);
-    for (let i = 5; i >= 0; i--) { const x = new Date(d.getFullYear(), d.getMonth() - i, 1); const k = x.getFullYear() + '-' + z(x.getMonth() + 1); meses.push([cap1(x.toLocaleDateString('es-AR', {month:'short', year:'2-digit'})), val.filter(r => r.fecha.startsWith(k)).length]); }
-    const cancel = S.reservas.filter(r => r.estado === 'cancelada' && r.fecha.startsWith(mes)).length;
     const pendFam = S.socios.reduce((a, s) => a + s.grupo.filter(g => g.estado === 'pendiente').length, 0);
     const susp = S.inst.filter(i => !i.activo);
     const tareas = [];
-    if (pendFam) tareas.push(['👨‍👩‍👧', `${pendFam} solicitud${pendFam > 1 ? 'es' : ''} de grupo familiar para revisar`, 'socios', 'Revisar']);
-    if (susp.length) tareas.push(['🛠️', `${susp.length} instalación${susp.length > 1 ? 'es' : ''} en mantenimiento: ${susp.map(i => i.nombre).join(', ')}`, 'instalaciones', 'Ver']);
-    const porConf = S.reservas.filter(r => r.pago === 'informado' && r.estado !== 'cancelada').length;
-    const cobrado = S.reservas.filter(r => r.pago === 'confirmado' && r.estado !== 'cancelada' && r.fecha.startsWith(mes)).reduce((a, r) => a + (r.monto || 0), 0);
-    if (porConf) tareas.unshift(['💳', `${porConf} pagos informados por socios esperan tu confirmación`, 'pagos', 'Revisar pagos']);
-    if (espHoy.length) tareas.push(['🚪', `${espHoy.length} reservas de hoy todavía no ingresaron`, 'agenda', 'Ver agenda']);
+    if (porConf) tareas.push(['card', `${porConf} pagos para confirmar`, 'Los socios avisaron que pagaron', 'pagos']);
+    if (pendFam) tareas.push(['users', `${pendFam} familiar${pendFam > 1 ? 'es' : ''} para aprobar`, 'Solicitudes de grupo familiar', 'socios']);
+    if (susp.length) tareas.push(['wrench', `${susp.length} instalación${susp.length > 1 ? 'es' : ''} en mantenimiento`, susp.map(i => i.nombre).join(', '), 'instalaciones']);
     const hr = new Date().getHours(), saludo = hr < 12 ? 'Buen día' : hr < 20 ? 'Buenas tardes' : 'Buenas noches';
-    const acciones = [['pagos', '💳', `Pagos por confirmar (${porConf})`, '¿Llegó el pago? Revisalo acá'], ['disponibilidad', '🟢', 'Lugares disponibles', 'Próximos 14 días de un vistazo'], ['agenda', '📆', 'Agenda del día', 'Quién reservó cada turno'], ['nueva', '➕', 'Nueva reserva', 'Para socios que llaman o vienen']];
-    return `<h2 class="hola">${saludo} 👋</h2><p class="sub">Resumen del complejo y accesos rápidos.</p>
-    <div class="tiles cuatro">${acciones.map(([v, ic, t, ds], i) => `<button class="tile ${i === 0 ? 'prim' : ''}" data-act="nav" data-v="${v}"><span class="ic">${ic}</span><b>${t}</b><span class="d">${ds}</span></button>`).join('')}</div>
-    <div class="kpis"><div class="kpi"><b>${hoyR.length}</b><span>Reservas de hoy</span></div><div class="kpi"><b>${ingHoy}</b><span>Ya ingresaron hoy</span></div><div class="kpi"><b>${pesos(cobrado)}</b><span>Cobrado este mes</span></div><div class="kpi"><b>${Math.round(oc / tot * 100)} %</b><span>Ocupación próximos 7 días</span></div></div>
-    <div class="grid2"><div class="card"><h3>Tareas pendientes</h3>${tareas.length ? tareas.map(([ic, t, v, b]) => `<div class="item"><div style="display:flex;gap:10px;align-items:center"><span style="font-size:22px">${ic}</span><span>${esc(t)}</span></div><button class="btn-sm" data-act="nav" data-v="${v}">${b}</button></div>`).join('') : '<p class="muted">✅ No hay tareas pendientes.</p>'}</div>
-      <div class="card"><div style="display:flex;justify-content:space-between;align-items:center"><h3 style="margin:0">Próximos ingresos de hoy</h3><button class="link" data-act="nav" data-v="agenda">Agenda completa</button></div>
-      ${espHoy.length ? espHoy.slice(0, 6).map(r => `<div class="item"><div>${ICON[r.instId] || ''} <b>${esc(instNombre(r.instId))}</b> · ${esc(r.turno)}<br><span class="small muted">${esc(nombreSocio(r.socio))} (socio ${r.socio})</span></div><button class="btn-sm" data-act="agdet" data-id="${r.id}">Detalle</button></div>`).join('') : '<p class="muted">No quedan ingresos pendientes para hoy.</p>'}</div></div>
-    <div class="grid2" style="margin-top:14px"><div class="card"><h3>Uso por instalación (mes actual)</h3>${bars(porInst)}</div>
-      <div class="card"><h3>Reservas por mes</h3>${bars(meses)}<p class="small muted">Reservas este mes: <b>${delMes}</b> · Cancelaciones: <b>${cancel}</b> · Socios con cuenta: <b>${S.socios.length}</b> de 7.335</p></div></div>
-    <div class="card" style="margin-top:14px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap"><div><h3 style="margin:0">Reportes</h3><span class="small muted">Se descargan en CSV y se abren con Excel.</span></div>
-      <div class="chips"><button class="btn" data-act="rep" data-p="${mes}">⬇ Reporte mensual (${mes})</button><button class="btn ghost" data-act="rep" data-p="${anio}">⬇ Reporte anual (${anio})</button></div></div>`;
+    return `<div class="page-head"><h1>${saludo}</h1><p class="sub">${cap1(new Date().toLocaleDateString('es-AR', {weekday:'long', day:'numeric', month:'long'}))} · Resumen del complejo</p></div>
+    <div class="kpis">
+      <button class="kpi kpi-btn ${porConf ? 'dest' : ''}" data-act="nav" data-v="pagos"><b>${porConf}</b><span>Pagos por confirmar</span></button>
+      <button class="kpi kpi-btn" data-act="nav" data-v="agenda"><b>${hoyR.length}</b><span>Reservas de hoy</span></button>
+      <button class="kpi kpi-btn" data-act="nav" data-v="disponibilidad"><b>${libresHoy}</b><span>Turnos libres hoy</span></button>
+      <div class="kpi"><b>${pesos(cobrado)}</b><span>Cobrado este mes</span></div></div>
+    <div class="grid2"><div class="card"><h3>Para hacer</h3>${tareas.length ? `<div class="lista-links" style="box-shadow:none;margin:0">${tareas.map(([i, t, d, v]) => `<button class="link-row" data-act="nav" data-v="${v}"><span class="lr-ic">${ico(i)}</span><span class="lr-t"><b>${esc(t)}</b><small>${esc(d)}</small></span>${ico('chevron')}</button>`).join('')}</div>` : `<div class="vacio" style="padding:20px"><span class="vic">${ico('check', 28)}</span><p class="muted">Todo al día. No hay tareas pendientes.</p></div>`}</div>
+      <div class="card"><div class="sec-head"><h3>Llegan hoy</h3><button class="link" data-act="nav" data-v="agenda">Ver agenda</button></div>
+      ${espHoy.length ? espHoy.slice(0, 5).map(r => `<div class="item"><div style="display:flex;gap:12px;align-items:center"><span class="ii sm">${ico(ICONK[r.instId])}</span><div><b>${esc(instNombre(r.instId))}</b> · ${esc(r.turno)}<br><span class="small muted">${esc(nombreSocio(r.socio))}</span></div></div><button class="link" data-act="agdet" data-id="${r.id}">Detalle</button></div>`).join('') : '<p class="muted">No quedan ingresos para hoy.</p>'}</div></div>
+    <div class="card" style="margin-top:16px"><div class="sec-head"><h3>Uso de instalaciones este mes</h3><div class="chips"><button class="btn-sm" data-act="rep" data-p="${mes}">${ico('download', 16)} Reporte mensual</button><button class="btn-sm" data-act="rep" data-p="${anio}">${ico('download', 16)} Reporte anual</button></div></div>${bars(porInst)}</div>`;
   },
 
   pagos() {
@@ -506,15 +555,15 @@ const V = {
     const debe = G.pendiente.reduce((a, r) => a + (r.monto || 0), 0);
     const orden = tab === 'informado' ? (a, b) => (a.pagoInfo ? a.pagoInfo.t : 0) - (b.pagoInfo ? b.pagoInfo.t : 0) : tab === 'confirmado' ? (a, b) => b.fecha.localeCompare(a.fecha) : (a, b) => a.fecha.localeCompare(b.fecha);
     const lista = G[tab].filter(r => !q || norm(r.socio + ' ' + nombreSocio(r.socio) + ' ' + r.codigo).includes(q)).sort(orden);
-    return `<h2>Pagos</h2><p class="sub">Revisá los avisos de pago de los socios y confirmalos cuando el dinero esté acreditado.</p>
-    <div class="kpis"><div class="kpi"><b>${G.informado.length}</b><span>🕓 Por confirmar</span></div><div class="kpi"><b>${G.pendiente.length}</b><span>💲 Sin pagar (${pesos(debe)})</span></div><div class="kpi"><b>${pesos(cobrado)}</b><span>✅ Cobrado este mes</span></div><div class="kpi"><b>${G.rechazado.length}</b><span>⛔ Rechazados</span></div></div>
+    return `<div class="page-head"><h1>Pagos</h1><p class="sub">Cuando un socio avisa que pagó, aparece en “Por confirmar”. Revisá el comprobante y confirmalo si el dinero llegó.</p></div>
+    <div class="kpis"><div class="kpi ${G.informado.length ? 'dest' : ''}"><b>${G.informado.length}</b><span>Por confirmar</span></div><div class="kpi"><b>${G.pendiente.length}</b><span>Sin pagar · ${pesos(debe)}</span></div><div class="kpi"><b>${pesos(cobrado)}</b><span>Cobrado este mes</span></div><div class="kpi"><b>${G.rechazado.length}</b><span>Rechazados</span></div></div>
     <div class="seg" style="max-width:720px">${[['informado', 'Por confirmar'], ['pendiente', 'Sin pagar'], ['confirmado', 'Confirmados'], ['rechazado', 'Rechazados']].map(([k, l]) => `<button class="${tab === k ? 'on' : ''}" data-act="ptab" data-t="${k}">${l} (${G[k].length})</button>`).join('')}</div>
     <form data-form="pbuscar" class="row" style="max-width:720px;margin:0 0 12px"><input name="q" value="${esc(ui.pq || '')}" placeholder="Buscar por N° de socio, nombre o código"><button class="btn ghost">Buscar</button></form>
     ${lista.length ? `<div class="card scroll"><table class="tabla"><thead><tr><th>Socio</th><th>Reserva</th><th>Monto</th><th>Estado del pago</th><th></th></tr></thead><tbody>
     ${lista.slice(0, 150).map(r => `<tr><td><b>${esc(nombreSocio(r.socio))}</b><br><span class="small muted">Socio ${r.socio}</span></td><td>${ICON[r.instId] || ''} ${esc(instNombre(r.instId))}<br><span class="small muted">${fmtF(r.fecha)} · ${esc(r.turno)}</span></td><td><b>${pesos(r.monto || 0)}</b></td>
       <td>${badgePago(r.pago)}${r.pagoInfo ? `<br><span class="small muted">${esc(r.pagoInfo.metodo)}${r.pagoInfo.operacion ? ' · Op. ' + esc(r.pagoInfo.operacion) : ''}<br>Informado ${fmtDT(r.pagoInfo.t)}</span>` : ''}${r.pagoConf ? `<br><span class="small muted">Confirmado por ${esc(r.pagoConf.usuario)} · ${fmtDT(r.pagoConf.t)}</span>` : ''}</td>
       <td style="white-space:nowrap">${botonesPago(r)}</td></tr>`).join('')}</tbody></table>${lista.length > 150 ? '<p class="small muted">Se muestran los primeros 150. Usá el buscador.</p>' : ''}</div>`
-      : `<div class="card vacio"><div class="ic">✅</div><p>No hay pagos en esta lista.</p></div>`}`;
+      : `<div class="card vacio"><span class="vic">${ico('check', 28)}</span><p class="muted">No hay pagos en esta lista.</p></div>`}`;
   },
 
   disponibilidad() {
@@ -522,16 +571,16 @@ const V = {
     const libres = (i, f) => i.cupo > 1 ? i.turnos.reduce((a, t) => a + (turnoPasado(f, t) ? 0 : Math.max(0, i.cupo - ocup(i.id, f, t))), 0) : i.turnos.filter(t => !turnoPasado(f, t) && ocup(i.id, f, t) < i.cupo).length;
     const total = (i, f) => i.cupo > 1 ? i.turnos.filter(t => !turnoPasado(f, t)).length * i.cupo : i.turnos.filter(t => !turnoPasado(f, t)).length;
     const h = hoy();
-    const resumen = [['Quincho', '🍖', 'Quinchos', 'turnos'], ['Cancha', '⚽', 'Canchas', 'turnos'], ['Pileta', '🏊', 'Pileta', 'lugares']].map(([t, ic, n, u]) => {
+    const resumen = [['Quincho', 'flame', 'Quinchos', 'turnos'], ['Cancha', 'ball', 'Canchas', 'turnos'], ['Pileta', 'waves', 'Pileta', 'lugares']].map(([t, ic, n, u]) => {
       const v = S.inst.filter(i => i.tipo === t && i.activo).reduce((a, i) => a + libres(i, h), 0);
-      return `<div class="kpi"><b>${ic} ${v}</b><span>${n}: ${u} libres hoy</span></div>`;
+      return `<div class="kpi" style="display:flex;gap:14px;align-items:center"><span class="ii">${ico(ic)}</span><div><b>${v}</b><span>${n}: ${u} libres hoy</span></div></div>`;
     }).join('');
-    const filas = S.inst.map(i => `<tr><td>${ICON[i.id]} <b>${esc(i.nombre)}</b>${i.cupo > 1 ? '<br><span class="small muted">lugares por día</span>' : ''}</td>${dias.map(f => {
+    const filas = S.inst.map(i => `<tr><td><b>${esc(i.nombre)}</b>${i.cupo > 1 ? '<br><span class="small muted">lugares por día</span>' : ''}</td>${dias.map(f => {
       if (!i.activo) return `<td><button class="dc cerr" data-act="disp" data-f="${f}">—<small>mant.</small></button></td>`;
       const l = libres(i, f), tt = total(i, f), cls = !tt || !l ? 'llen' : l / tt < 0.4 ? 'poco' : 'libr';
       return `<td><button class="dc ${cls}" data-act="disp" data-f="${f}" title="${l} libres de ${tt}">${l}<small>de ${tt}</small></button></td>`;
     }).join('')}</tr>`).join('');
-    return `<h2>Lugares disponibles</h2><p class="sub">Próximos 14 días. Cada casilla indica cuántos turnos (o lugares, en la pileta) quedan libres. Tocá una para ver la agenda de ese día.</p>
+    return `<div class="page-head"><h1>Lugares disponibles</h1><p class="sub">Cuántos turnos quedan libres en los próximos 14 días. Tocá una casilla para ver quién reservó.</p></div>
     <div class="kpis" style="grid-template-columns:repeat(3,1fr)">${resumen}</div>
     <div class="card scroll"><table class="tabla disp"><thead><tr><th>Instalación</th>${dias.map((f, k) => { const d = new Date(f + 'T12:00'); return `<th>${k === 0 ? 'Hoy' : cap1(d.toLocaleDateString('es-AR', {weekday:'short'}).replace('.', ''))}<br>${d.getDate()}/${d.getMonth() + 1}</th>`; }).join('')}</tr></thead><tbody>${filas}</tbody></table></div>
     <div class="leyenda"><span><i style="background:var(--verdeb)"></i>Bastante lugar</span><span><i style="background:var(--amarillob)"></i>Pocos lugares</span><span><i style="background:var(--rojob)"></i>Completo</span><span><i style="background:#f3f4f6"></i>En mantenimiento</span></div>`;
@@ -545,17 +594,17 @@ const V = {
         const pas = turnoPasado(f, t);
         if (i.cupo > 1) { const o = ocup(i.id, f, t); return `<button class="slot ${pas || !i.activo ? 'pas' : o >= i.cupo ? 'ocu' : 'lib'}" data-act="agpileta" data-i="${i.id}" data-t="${esc(t)}"><b>${esc(t)}</b><span>${o} de ${i.cupo} grupos</span></button>`; }
         const r = S.reservas.find(x => x.instId === i.id && x.fecha === f && x.turno === t && x.estado !== 'cancelada');
-        if (r) return `<button class="slot ocu ${r.estado === 'utilizada' ? 'usada' : ''}" data-act="agdet" data-id="${r.id}" title="${esc(nombreSocio(r.socio))}"><b>${esc(t)}</b><span>${r.estado === 'utilizada' ? '✓ ' : icoPago(r.pago) + ' '}${esc(nombreSocio(r.socio))}</span></button>`;
+        if (r) return `<button class="slot ocu ${r.estado === 'utilizada' ? 'usada' : ''}" data-act="agdet" data-id="${r.id}" title="${esc(nombreSocio(r.socio))}"><b>${esc(t)}</b><span>${r.estado === 'utilizada' ? ico('check', 13) : icoPago(r.pago)}${esc(nombreSocio(r.socio))}</span></button>`;
         if (!i.activo) return `<div class="slot pas"><b>${esc(t)}</b><span>Suspendido</span></div>`;
         if (pas) return `<div class="slot pas"><b>${esc(t)}</b><span>Libre (pasado)</span></div>`;
         return `<button class="slot lib" data-act="agnueva" data-i="${i.id}" data-t="${esc(t)}"><b>${esc(t)}</b><span>+ Reservar</span></button>`;
       }).join('');
       const usados = i.turnos.filter(t => ocup(i.id, f, t) >= i.cupo).length;
-      return `<div class="agfila"><div class="agnom"><span style="font-size:22px">${ICON[i.id]}</span><div><b>${esc(i.nombre)}</b><br><span class="small muted">${i.activo ? `${usados} de ${i.turnos.length} ${i.cupo > 1 ? 'turnos completos' : 'ocupados'}` : '<span class="badge b-rojo">Mantenimiento</span>'}</span></div></div><div class="agslots">${celdas}</div></div>`;
+      return `<div class="agfila"><div class="agnom">${ICON[i.id]}<div><b>${esc(i.nombre)}</b><br><span class="small muted">${i.activo ? `${usados} de ${i.turnos.length} ${i.cupo > 1 ? 'turnos completos' : 'ocupados'}` : '<span class="badge b-rojo">Mantenimiento</span>'}</span></div></div><div class="agslots">${celdas}</div></div>`;
     }).join('');
-    return `<h2>Agenda del día</h2><p class="sub">Tocá un turno libre para reservarlo, o uno reservado para ver el detalle.</p>
+    return `<div class="page-head"><h1>Agenda del día</h1><p class="sub">Tocá un turno libre para reservarlo, o uno ocupado para ver el detalle.</p></div>
     <div class="card agbar"><button class="btn-sm" data-act="agdia" data-d="-1">‹ Día anterior</button><button class="btn-sm" data-act="aghoy">Hoy</button><button class="btn-sm" data-act="agdia" data-d="1">Día siguiente ›</button><input type="date" id="agfecha" value="${f}" style="width:auto"><b class="agtit">${fmtFL(f)}</b></div>
-    <div class="leyenda" style="margin:0 0 12px"><span><i style="background:var(--verdeb);border:1px solid #a7e0bd"></i>Libre</span><span><i style="background:#fff3d6;border:1px solid #f0d58c"></i>Reservado</span><span><i style="background:var(--celeste);border:1px solid #b9dcc4"></i>Ya ingresó</span><span><i style="background:#f3f4f6"></i>Pasado o suspendido</span><span>· 💲 sin pagar · 🕓 pago en revisión · ✅ pagado</span></div>
+    <div class="leyenda" style="margin:0 0 12px"><span><i style="background:var(--verdeb);border:1px solid #a7e0bd"></i>Libre</span><span><i style="background:#fff3d6;border:1px solid #f0d58c"></i>Reservado</span><span><i style="background:var(--celeste);border:1px solid #b9dcc4"></i>Ya ingresó</span><span><i style="background:#f3f4f6"></i>Pasado o suspendido</span><span>Pago: <i class="dot d-amarillo"></i> pendiente <i class="dot d-azul"></i> en revisión <i class="dot d-verde"></i> pagado</span></div>
     <div class="card">${filas}</div>`;
   },
 
@@ -565,7 +614,7 @@ const V = {
     const f = ui.f;
     const rs = filtrarReservas();
     const rap = [['hoy', 'Hoy'], ['semana', 'Próximos 7 días'], ['mes', 'Este mes'], ['futuras', 'Todas las próximas'], ['canceladas', 'Canceladas']];
-    return `<h2>Reservas</h2><p class="sub">Buscá por socio, código o fecha. Tocá “Detalle” para ver, modificar o cancelar.</p>
+    return `<div class="page-head"><h1>Reservas</h1><p class="sub">Buscá por socio, código o fecha.</p></div>
     <div class="chips" style="margin-bottom:12px">${rap.map(([k, l]) => `<button class="chip ${ui.frap === k ? 'on' : ''}" data-act="frap" data-k="${k}">${l}</button>`).join('')}</div>
     <div class="card"><form data-form="filtro" class="filtros">
       <div><label>Desde</label><input type="date" name="desde" value="${f.desde}"></div>
@@ -584,20 +633,20 @@ const V = {
   nueva() {
     const p = ui.pref || {}; ui.pref = null;
     const inst = getInst(p.inst || S.inst[0].id), fecha = p.fecha || hoy();
-    return `<h2>Nueva reserva</h2><p class="sub">Para socios que reservan por teléfono o en persona. Se aplican las mismas reglas que en la web.</p>
+    return `<div class="page-head"><h1>Nueva reserva</h1><p class="sub">Para socios que reservan por teléfono o en persona. Se aplican las mismas reglas que en la web.</p></div>
     <div class="grid2" style="align-items:start"><div class="card"><form data-form="nueva">
       <label style="margin-top:0">1. N° de socio</label><input name="nro" id="n_nro" required inputmode="numeric" placeholder="Ej: 1001" autocomplete="off"><div id="n_socio" class="small muted" style="margin-top:6px">Escribí el número para buscar al socio.</div>
-      <label>2. Instalación</label><select name="inst" id="n_inst">${S.inst.map(i => `<option value="${i.id}" ${i.id === inst.id ? 'selected' : ''} ${i.activo ? '' : 'disabled'}>${ICON[i.id]} ${esc(i.nombre)}${i.activo ? '' : ' (mantenimiento)'}</option>`).join('')}</select>
+      <label>2. Instalación</label><select name="inst" id="n_inst">${S.inst.map(i => `<option value="${i.id}" ${i.id === inst.id ? 'selected' : ''} ${i.activo ? '' : 'disabled'}>${esc(i.nombre)}${i.activo ? '' : ' (mantenimiento)'}</option>`).join('')}</select>
       <label>3. Fecha</label><input type="date" name="fecha" id="n_fecha" required min="${hoy()}" value="${fecha}">
       <label>4. Turno</label><select name="turno" id="n_turno">${turnoOpts(inst, fecha, p.turno)}</select>
       <label class="check" style="margin-top:14px"><input type="checkbox" name="efec" value="1"> <span>El socio ya pagó en efectivo</span></label>
-      <button class="btn grande" style="margin-top:14px">✔ Registrar reserva</button></form></div>
+      <button class="btn grande" style="margin-top:14px">Registrar reserva</button></form></div>
     <div class="card"><h3>Cómo funciona</h3><ul class="small" style="padding-left:18px;line-height:1.7"><li>Al escribir el número se muestra el nombre del socio y si su cuenta está activa.</li><li>Los turnos ocupados o pasados aparecen como “no disponible”.</li><li>Se permite una reserva por tipo de instalación y por día para cada socio.</li><li>Al registrar se genera el comprobante con QR para imprimir o enviar al socio.</li></ul>
-      <button class="btn ghost full" data-act="nav" data-v="agenda">📆 Ver la agenda del día</button></div></div>`;
+      <button class="btn ghost full" data-act="nav" data-v="agenda">${ico('clock', 18)} Ver la agenda del día</button></div></div>`;
   },
 
   instalaciones() {
-    return `<h2>Instalaciones y disponibilidad</h2>
+    return `<div class="page-head"><h1>Instalaciones</h1></div>
     <div class="card scroll"><table class="tabla"><thead><tr><th>Instalación</th><th>Tipo</th><th>Turnos</th><th>Tarifa</th><th>Estado</th></tr></thead><tbody>
     ${S.inst.map(i => `<tr><td><b>${esc(i.nombre)}</b><br><span class="small muted">${esc(i.cap)}</span></td><td>${i.tipo}</td><td>${i.turnos.length}${i.cupo > 1 ? ` (cupo ${i.cupo})` : ''}</td>
       <td><input type="number" style="width:120px" data-tarifa="${i.id}" value="${i.tarifa}" min="0" step="500"></td>
@@ -606,7 +655,7 @@ const V = {
   },
 
   comunicados() {
-    return `<h2>Comunicación institucional</h2>
+    return `<div class="page-head"><h1>Comunicados</h1></div>
     <div class="card"><h3>Nueva publicación</h3><form data-form="noticia">
       <div class="grid2"><div><label>Tipo</label><select name="tipo">${TIPOS_NOT.map(t => `<option>${t}</option>`).join('')}</select></div><div><label>Título</label><input name="titulo" required maxlength="120"></div></div>
       <label>Texto</label><textarea name="texto" required></textarea>
@@ -620,7 +669,7 @@ const V = {
     const q = norm(ui.q || '');
     const lista = S.socios.filter(s => !q || norm(s.nombre + ' ' + s.nro + ' ' + s.dni).includes(q));
     const sinCuenta = S.padron.filter(p => !S.socios.some(s => s.nro === p.nro)).length;
-    return `<h2>Socios y perfiles de usuario</h2>
+    return `<div class="page-head"><h1>Socios</h1></div>
     <div class="card"><h3>Solicitudes de grupo familiar (${pend.length})</h3>${pend.length ? pend.map(p => `<div class="item"><div><b>${esc(p.g.nombre)}</b> · ${esc(p.g.parentesco)} · DNI ${esc(p.g.dni)}<br><span class="small muted">Titular: ${esc(p.s.nombre)} (socio ${p.s.nro})</span></div><div class="acc"><button class="btn-sm" data-act="aprobar" data-n="${p.s.nro}" data-i="${p.gi}">Aprobar</button><button class="btn-sm rojo" data-act="rechazar" data-n="${p.s.nro}" data-i="${p.gi}">Rechazar</button></div></div>`).join('') : '<p class="muted">No hay solicitudes pendientes.</p>'}</div>
     <div class="card"><div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;align-items:center"><h3 style="margin:0">Socios con cuenta (${S.socios.length})</h3><span class="small muted">En padrón sin cuenta: ${sinCuenta}</span></div>
     <form data-form="buscarsocio" class="row"><input name="q" value="${esc(ui.q || '')}" placeholder="Buscar por nombre, N° o DNI"><button class="btn ghost">Buscar</button></form>
@@ -633,7 +682,7 @@ const V = {
   seguridad() {
     let bks = []; try { bks = JSON.parse(localStorage.getItem(KEY + '_bk') || '[]'); } catch (e) {}
     const fallos = S.auditoria.filter(a => /fallido|Bloqueo|inexistente|inactividad/.test(a.accion)).slice(-10).reverse();
-    return `<h2>Seguridad y copias de seguridad</h2>
+    return `<div class="page-head"><h1>Seguridad</h1></div>
     <div class="grid2"><div class="card"><h3>Copias de seguridad automáticas</h3><p class="small muted">El sistema genera una copia diaria automática y guarda las últimas 3.</p>
       ${bks.length ? bks.slice().reverse().map((b, i) => `<div class="item"><div><b>${fmtDT(b.t)}</b><br><span class="small muted">${Math.round(b.data.length / 1024)} KB</span></div><button class="btn-sm" data-act="restbk" data-i="${bks.length - 1 - i}">Restaurar</button></div>`).join('') : '<p class="muted">Sin copias todavía.</p>'}
       <div class="chips" style="margin-top:12px"><button class="btn" data-act="backup">Crear copia ahora</button><button class="btn ghost" data-act="descbk">Descargar copia (.json)</button></div>
@@ -650,7 +699,7 @@ const V = {
 
   auditoria() {
     const a = S.auditoria.slice().reverse().slice(0, 300);
-    return `<h2>Registro de auditoría</h2><div class="card scroll"><p class="small muted">Cada operación queda registrada con fecha, hora y usuario.</p>
+    return `<div class="page-head"><h1>Auditoría</h1></div><div class="card scroll"><p class="small muted">Cada operación queda registrada con fecha, hora y usuario.</p>
     <table class="tabla"><thead><tr><th>Fecha y hora</th><th>Usuario</th><th>Operación</th></tr></thead><tbody>
     ${a.map(x => `<tr><td style="white-space:nowrap">${fmtDT(x.t)}</td><td>${esc(x.usuario)}</td><td>${esc(x.accion)}</td></tr>`).join('')}</tbody></table></div>`;
   }
@@ -695,18 +744,22 @@ function render() {
   const app = $('#app');
   document.body.classList.toggle('con-bottom', !!ses && ses.rol === 'socio');
   if (!ses) { app.innerHTML = vistaAcceso(); return; }
-  const navAct = {familia:'perfil', credencial:'perfil', info:'inicio', novedades:'inicio'}[ui.view] || ui.view;
-  const nom = ses.rol === 'socio' ? socioActual().nombre + ' · Socio ' + ses.nro : S.staff.find(s => s.user === ses.user).nombre;
+  const navAct = {familia:'perfil', credencial:'perfil', info:'perfil', novedades:'inicio', asistente:'', nueva:'reservas'}[ui.view] ?? ui.view;
   const nomCorto = ses.rol === 'socio' ? socioActual().nombre : S.staff.find(s => s.user === ses.user).nombre;
   const rolTxt = ses.rol === 'socio' ? 'Socio N° ' + ses.nro : ses.rol === 'admin' ? 'Administrador' : 'Portería';
   const ini = nomCorto.split(' ').map(x => x[0]).slice(0, 2).join('');
-  const side = `<aside class="side"><div class="marca"><div class="logo">CPA</div><div><b>Complejo Policial Almudena</b><small>Sistema de Gestión <span class="badge-proto">PROTOTIPO</span></small></div></div>
-    <nav class="snav">${NAV[ses.rol].map(([k, l]) => k === '_' ? `<div class="sgrupo">${l}</div>` : `<button class="sitem ${navAct === k ? 'on' : ''}" data-act="nav" data-v="${k}"><span>${ICONOS[k] || '•'}</span>${l}</button>`).join('')}</nav>
-    <div class="suser"><div class="avatar sm">${esc(ini)}</div><div><b>${esc(nomCorto)}</b><small>${rolTxt}</small></div></div><button class="btn ghost full" data-act="salir">Cerrar sesión</button></aside>`;
-  app.innerHTML = `<div class="layout">${side}<div class="contenido"><header class="top"><div class="marca"><div class="logo">CPA</div><div><b>Complejo Policial Almudena</b> <span class="badge-proto">PROTOTIPO</span><small>Sistema de Gestión Integral</small></div></div>
-    <div class="who"><span>${esc(nom)}</span><button class="btn-sm ghost" data-act="salir">Salir</button></div></header>
-    <nav class="tabs ${ses.rol === 'socio' ? 'socio' : ''}">${NAV[ses.rol].filter(n => n[0] !== '_').map(([k, l, ic]) => `<button class="tab ${navAct === k ? 'on' : ''}" data-act="nav" data-v="${k}"><span class="tic">${ICONOS[k] || ''}</span>${l}</button>`).join('')}</nav>
-    <main><div class="ptitulo"><span>${new Date().toLocaleDateString('es-AR', {weekday:'long', day:'numeric', month:'long', year:'numeric'})}</span><span>${esc(rolTxt)}</span></div>${V[ui.view]()}</main></div></div>${ses.rol === 'socio' && ui.view !== 'asistente' ? '<button class="fab" data-act="nav" data-v="asistente" title="Asistente virtual" aria-label="Asistente virtual">💬</button>' : ''}`;
+  const items = NAV[ses.rol];
+  const pend = ses.rol === 'admin' ? S.reservas.filter(r => r.pago === 'informado' && r.estado !== 'cancelada').length : 0;
+  const cnt = k => k === 'pagos' && pend ? `<span class="cnt">${pend}</span>` : '';
+  const logo = `<div class="logo">${ico('shield')}</div>`;
+  const cta = ses.rol === 'admin' ? `<button class="btn full side-cta" data-act="nav" data-v="nueva">${ico('plus', 18)} Nueva reserva</button>` : '';
+  const side = `<aside class="side"><div class="marca">${logo}<div><b>Complejo Almudena</b><small>${ses.rol === 'socio' ? 'Reservas para socios' : 'Administración'}</small></div></div>${cta}
+    <nav class="snav">${items.map(([k, l]) => k === '_' ? `<div class="sgrupo">${l}</div>` : `<button class="sitem ${navAct === k ? 'on' : ''}" data-act="nav" data-v="${k}">${ico(ICONOS[k])}<span>${l}</span>${cnt(k)}</button>`).join('')}</nav>
+    <div class="suser"><div class="avatar sm">${esc(ini)}</div><div class="suser-t"><b>${esc(nomCorto)}</b><small>${rolTxt}</small></div><button class="icon-btn" data-act="salir" title="Cerrar sesión" aria-label="Cerrar sesión">${ico('logout', 18)}</button></div></aside>`;
+  const top = `<header class="top"><div class="marca">${logo}<div><b>Complejo Almudena</b><small>${esc(rolTxt)}</small></div></div>${ses.rol !== 'socio' ? `<button class="icon-btn" data-act="salir" aria-label="Cerrar sesión">${ico('logout', 18)}</button>` : ''}</header>`;
+  const tabs = `<nav class="tabs ${ses.rol === 'socio' ? 'socio' : ''}">${items.filter(n => n[0] !== '_').map(([k, l]) => `<button class="tab ${navAct === k ? 'on' : ''}" data-act="nav" data-v="${k}">${ico(ICONOS[k], 22)}<span>${l}</span>${cnt(k)}</button>`).join('')}</nav>`;
+  const fab = ses.rol === 'socio' && ui.view !== 'asistente' ? `<button class="fab" data-act="nav" data-v="asistente" aria-label="Ayuda">${ico('chat', 22)}<span>¿Necesitás ayuda?</span></button>` : '';
+  app.innerHTML = `<div class="layout">${side}<div class="contenido">${top}${tabs}<main>${V[ui.view]()}</main></div></div>${fab}`;
   pintarQR();
   const m = $('#msgs'); if (m) m.scrollTop = m.scrollHeight;
 }
@@ -733,7 +786,7 @@ function responder(qRaw) {
     return h + '<button class="btn" data-act="nuevares">Reservar</button>';
   }
   if (has(/reserv|como (hago|alquilo)|quiero (un|una|el|la)|alquil|turno/)) return 'Reservar es muy simple:<ol><li>Entrá a <b>Reservar</b>.</li><li>Elegí la instalación (quincho, cancha o pileta).</li><li>Elegí el día en el calendario: verde es libre, amarillo quedan pocos turnos, rojo completo.</li><li>Tocá el horario disponible, aceptá el reglamento y confirmá.</li><li>Recibís al instante tu <b>comprobante con código QR</b>, que mostrás en la entrada.</li></ol>Se permite una reserva por tipo de instalación y por día, con hasta 30 días de anticipación.<br><button class="btn" data-act="nuevares">Empezar a reservar</button>';
-  if (has(/pago|pagar|transfer|alias|cbu|mercado ?pago|abonar|comprobante de pago/)) return `Podés pagar por transferencia o Mercado Pago:<ul><li>Alias: <b>${PAGO.alias}</b></li><li>CBU: ${PAGO.cbu}</li><li>Titular: ${esc(PAGO.titular)}</li></ul>Plazo: ${PAGO.plazo}. Después entrá a <b>Mis reservas</b>, tocá “💲 Pagar” y enviá la foto del comprobante. La administración lo confirma y tu reserva queda como “✅ Pagado”.<br><button class="btn" data-act="nav" data-v="mis">Ir a Mis reservas</button>`;
+  if (has(/pago|pagar|transfer|alias|cbu|mercado ?pago|abonar|comprobante de pago/)) return `Podés pagar por transferencia o Mercado Pago:<ul><li>Alias: <b>${PAGO.alias}</b></li><li>CBU: ${PAGO.cbu}</li><li>Titular: ${esc(PAGO.titular)}</li></ul>Plazo: ${PAGO.plazo}. Después entrá a <b>Mis reservas</b>, tocá “Pagar” y enviá la foto del comprobante. La administración lo confirma y tu reserva queda como “Pagado”.<br><button class="btn" data-act="nav" data-v="mis">Ir a Mis reservas</button>`;
   if (has(/tarifa|precio|cuesta|costo|valor|sale/)) return 'Tarifas vigentes:' + lista(S.inst.map(i => `${i.nombre}: ${pesos(i.tarifa)}${i.tipo === 'Cancha' ? ' por hora' : i.tipo === 'Pileta' ? ' por grupo y turno' : ' por turno'}`)) + 'Por ahora se abonan en la administración del complejo.';
   if (has(/horario|hora|abre|abren|cierra|atencion/)) return esc(INFO.horarios);
   if (has(/reglamento|norma|regla|permit|mascota|perro|alcohol|prohib/)) return 'Puntos principales del reglamento:' + lista(INFO.reglamento) + 'El reglamento completo está publicado en Comunicados.';
@@ -794,7 +847,7 @@ function validar(codigo) {
       r.estado = 'utilizada'; r.ingreso = Date.now();
       const s = S.socios.find(x => x.nro === r.socio);
       const fam = s && s.grupo.filter(g => g.estado === 'habilitado').length ? '<br><span class="small">Grupo familiar habilitado: ' + s.grupo.filter(g => g.estado === 'habilitado').map(g => esc(g.nombre)).join(', ') + '</span>' : '';
-      v = {tipo:'ok', titulo:'Ingreso autorizado', html:det + fam + (r.pago !== 'confirmado' ? `<br><b style="color:var(--amarillo)">⚠ ${r.pago === 'informado' ? 'Pago informado, todavía sin confirmar' : 'Pago pendiente'}: cobrar ${pesos(r.monto || 0)} o verificar en administración</b>` : '<br><span class="small">✅ Pago confirmado</span>')};
+      v = {tipo:'ok', titulo:'Ingreso autorizado', html:det + fam + (r.pago !== 'confirmado' ? `<br><b style="color:var(--amarillo)">Atención: ${r.pago === 'informado' ? 'Pago informado, todavía sin confirmar' : 'Pago pendiente'}: cobrar ${pesos(r.monto || 0)} o verificar en administración</b>` : '<br><span class="small">Pago confirmado</span>')};
       log('Ingreso registrado: ' + c);
     }
   }
@@ -845,23 +898,23 @@ const ACT = {
   ir: b => { const el = document.getElementById(b.dataset.id); if (el) el.scrollIntoView({behavior:'smooth', block:'start'}); },
   pagar: b => {
     const r = S.reservas.find(x => x.id === b.dataset.id);
-    showModal(`<h3>💲 Pagar reserva</h3><p class="small muted" style="margin-top:-6px">${ICON[r.instId] || ''} ${esc(instNombre(r.instId))} · ${fmtFL(r.fecha)} · ${esc(r.turno)}</p>
+    showModal(`<h3>Pagar reserva</h3><p class="small muted" style="margin-top:-6px">${esc(instNombre(r.instId))} · ${fmtFL(r.fecha)} · ${esc(r.turno)}</p>
       <div class="resumen" style="text-align:center;padding:14px"><span class="small muted">Monto a pagar</span><div style="font-size:30px;font-weight:800;color:var(--azul)">${pesos(r.monto || 0)}</div><span class="small muted">Plazo: ${PAGO.plazo}</span></div>
       ${r.pago === 'rechazado' ? '<div class="err">El pago anterior fue rechazado. Revisá los datos y volvé a informarlo.</div>' : ''}
-      <h3 style="margin-top:16px">1. Transferí a esta cuenta</h3>
+      <h3 style="margin-top:18px">Paso 1 · Transferí a esta cuenta</h3>
       <table class="kv"><tr><td>Alias</td><td><b>${PAGO.alias}</b> <button type="button" class="btn-sm" data-act="copiar" data-txt="${PAGO.alias}">Copiar</button></td></tr><tr><td>CBU</td><td style="font-family:monospace">${PAGO.cbu} <button type="button" class="btn-sm" data-act="copiar" data-txt="${PAGO.cbu}">Copiar</button></td></tr><tr><td>Titular</td><td>${esc(PAGO.titular)}</td></tr></table>
       <p class="small muted">Datos de ejemplo del prototipo.</p>
-      <h3>2. Avisanos que pagaste</h3>
+      <h3 style="margin-top:18px">Paso 2 · Avisanos que pagaste</h3>
       <form data-form="infopago" data-id="${r.id}"><label>Medio de pago</label><select name="metodo"><option>Transferencia</option><option>Mercado Pago</option></select>
         <label>N° de operación (opcional)</label><input name="op" inputmode="numeric" autocomplete="off">
         <label>Foto o captura del comprobante</label><input type="file" name="img" accept="image/*">
         <div class="acciones"><button type="button" class="btn ghost" data-act="cerrar">Más tarde</button><button class="btn">Enviar aviso de pago</button></div></form>`);
   },
   copiar: b => { try { navigator.clipboard.writeText(b.dataset.txt); toast('Copiado: ' + b.dataset.txt); } catch (e) { toast(b.dataset.txt); } },
-  pconf: b => { const r = S.reservas.find(x => x.id === b.dataset.id); r.pago = 'confirmado'; r.pagoConf = {t:Date.now(), usuario:usuarioLog()}; log(`Confirmó el pago de ${r.codigo} (${pesos(r.monto || 0)}, socio ${r.socio})`); closeModal(); toast('Pago confirmado ✅'); render(); },
+  pconf: b => { const r = S.reservas.find(x => x.id === b.dataset.id); r.pago = 'confirmado'; r.pagoConf = {t:Date.now(), usuario:usuarioLog()}; log(`Confirmó el pago de ${r.codigo} (${pesos(r.monto || 0)}, socio ${r.socio})`); closeModal(); toast('Pago confirmado'); render(); },
   prech: b => { const r = S.reservas.find(x => x.id === b.dataset.id); if (!confirm('¿Rechazar este aviso de pago? El socio va a ver que tiene que informarlo de nuevo.')) return; r.pago = 'rechazado'; log(`Rechazó el aviso de pago de ${r.codigo} (socio ${r.socio})`); closeModal(); toast('Pago rechazado'); render(); },
-  pefec: b => { const r = S.reservas.find(x => x.id === b.dataset.id); if (!confirm(`¿Registrar el pago en efectivo de ${pesos(r.monto || 0)}?`)) return; r.pago = 'confirmado'; r.pagoInfo = {metodo:'Efectivo en administración', operacion:'', t:Date.now(), img:null}; r.pagoConf = {t:Date.now(), usuario:usuarioLog()}; log(`Registró pago en efectivo de ${r.codigo} (${pesos(r.monto || 0)})`); closeModal(); toast('Pago registrado ✅'); render(); },
-  pimg: b => { const r = S.reservas.find(x => x.id === b.dataset.id); showModal(`<h3>🧾 Comprobante de pago</h3><p class="small muted">${esc(nombreSocio(r.socio))} · ${pesos(r.monto || 0)} · ${esc(r.pagoInfo.metodo)}</p><img src="${r.pagoInfo.img}" alt="Comprobante" style="width:100%;border-radius:10px;border:1px solid var(--borde)"><div class="acciones">${r.pago === 'informado' ? `<button class="btn rojo" data-act="prech" data-id="${r.id}">Rechazar</button><button class="btn" data-act="pconf" data-id="${r.id}">✔ Confirmar pago</button>` : '<button class="btn" data-act="cerrar">Cerrar</button>'}</div>`); },
+  pefec: b => { const r = S.reservas.find(x => x.id === b.dataset.id); if (!confirm(`¿Registrar el pago en efectivo de ${pesos(r.monto || 0)}?`)) return; r.pago = 'confirmado'; r.pagoInfo = {metodo:'Efectivo en administración', operacion:'', t:Date.now(), img:null}; r.pagoConf = {t:Date.now(), usuario:usuarioLog()}; log(`Registró pago en efectivo de ${r.codigo} (${pesos(r.monto || 0)})`); closeModal(); toast('Pago registrado'); render(); },
+  pimg: b => { const r = S.reservas.find(x => x.id === b.dataset.id); showModal(`<h3>Comprobante de pago</h3><p class="small muted">${esc(nombreSocio(r.socio))} · ${pesos(r.monto || 0)} · ${esc(r.pagoInfo.metodo)}</p><img src="${r.pagoInfo.img}" alt="Comprobante" style="width:100%;border-radius:10px;border:1px solid var(--borde)"><div class="acciones">${r.pago === 'informado' ? `<button class="btn rojo" data-act="prech" data-id="${r.id}">Rechazar</button><button class="btn" data-act="pconf" data-id="${r.id}">Confirmar pago</button>` : '<button class="btn" data-act="cerrar">Cerrar</button>'}</div>`); },
   ptab: b => { ui.ptab = b.dataset.t; render(); },
   disp: b => { ui.ag = b.dataset.f; ui.view = 'agenda'; render(); window.scrollTo(0, 0); },
   agdia: b => { ui.ag = addDays(ui.ag || hoy(), Number(b.dataset.d)); render(); },
@@ -931,11 +984,11 @@ const ACT = {
 };
 
 function comprobante(r, nueva) {
-  showModal(`${nueva ? '<div class="ok" style="text-align:center;margin:0 0 12px;font-weight:700">✅ ¡Listo! Tu reserva está confirmada</div>' : ''}<div class="comprobante"><div class="cmp-head"><div class="logo">CPA</div><div><b>Complejo Policial Almudena</b><small>Comprobante digital de reserva</small></div></div>
+  showModal(`${nueva ? `<div class="exito">${ico('checkcircle', 20)} ¡Listo! Tu reserva está confirmada</div>` : ''}<div class="comprobante"><div class="cmp-head"><div class="logo">${ico('shield')}</div><div><b>Complejo Policial Almudena</b><small>Comprobante digital de reserva</small></div></div>
     <div class="qr" data-qr="${r.codigo}"></div><div class="codigo">${r.codigo}</div>
     <table class="kv"><tr><td>Socio</td><td>${esc(nombreSocio(r.socio))} (N° ${r.socio})</td></tr><tr><td>Instalación</td><td>${esc(instNombre(r.instId))}</td></tr><tr><td>Fecha</td><td>${fmtFL(r.fecha)}</td></tr><tr><td>Horario</td><td>${esc(r.turno)}</td></tr><tr><td>Estado</td><td>${badgeEstado(r.estado)}</td></tr><tr><td>Pago</td><td>${badgePago(r.pago)} ${pesos(r.monto || 0)}</td></tr><tr><td>Emitido</td><td>${fmtDT(r.creada)}</td></tr>${r.ingreso ? `<tr><td>Ingreso</td><td>${fmtDT(r.ingreso)}</td></tr>` : ''}</table>
     <p class="small muted">Presentá este QR en el ingreso. Es único e intransferible y solo es válido una vez.</p></div>
-    <div class="acciones no-print" style="flex-wrap:wrap"><button class="btn ghost" data-act="cerrar">Cerrar</button><button class="btn ${MODO === 'socio' && r.estado === 'confirmada' && ['pendiente', 'rechazado'].includes(r.pago) ? 'ghost' : ''}" data-act="imprimir">Descargar / imprimir</button>${MODO === 'socio' && r.estado === 'confirmada' && ['pendiente', 'rechazado'].includes(r.pago) ? `<button class="btn" data-act="pagar" data-id="${r.id}">💲 Pagar ahora</button>` : ''}</div>`);
+    <div class="acciones no-print" style="flex-wrap:wrap"><button class="btn ghost" data-act="cerrar">Cerrar</button><button class="btn ${MODO === 'socio' && r.estado === 'confirmada' && ['pendiente', 'rechazado'].includes(r.pago) ? 'ghost' : ''}" data-act="imprimir">Descargar / imprimir</button>${MODO === 'socio' && r.estado === 'confirmada' && ['pendiente', 'rechazado'].includes(r.pago) ? `<button class="btn" data-act="pagar" data-id="${r.id}">Pagar ahora</button>` : ''}</div>`);
 }
 
 const FORM = {
@@ -1007,10 +1060,10 @@ document.addEventListener('input', e => {
     const n = e.target.value.trim(), el = $('#n_socio'); if (!el) return;
     const s = S.socios.find(x => x.nro === n), pd = S.padron.find(x => x.nro === n);
     if (!n) el.innerHTML = 'Escribí el número para buscar al socio.';
-    else if (s && s.activo === false) el.innerHTML = `<span style="color:var(--rojo)">⛔ ${esc(s.nombre)}: cuenta suspendida</span>`;
-    else if (s) el.innerHTML = `<span style="color:var(--verde);font-weight:600">✅ ${esc(s.nombre)}</span> · ${s.grupo.filter(g => g.estado === 'habilitado').length} familiares habilitados`;
-    else if (pd) el.innerHTML = `<span style="color:var(--verde);font-weight:600">✅ ${esc(pd.nombre)}</span> · socio sin cuenta web`;
-    else el.innerHTML = '<span style="color:var(--rojo)">❌ No existe un socio con ese número</span>';
+    else if (s && s.activo === false) el.innerHTML = `<span style="color:var(--rojo)">${esc(s.nombre)}: cuenta suspendida</span>`;
+    else if (s) el.innerHTML = `<span style="color:var(--verde);font-weight:600">${esc(s.nombre)}</span> · ${s.grupo.filter(g => g.estado === 'habilitado').length} familiares habilitados`;
+    else if (pd) el.innerHTML = `<span style="color:var(--verde);font-weight:600">${esc(pd.nombre)}</span> · socio sin cuenta web`;
+    else el.innerHTML = '<span style="color:var(--rojo)">No existe un socio con ese número</span>';
   }
 });
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
