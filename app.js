@@ -69,6 +69,12 @@ const ico = (n, s) => `<svg class="i" width="${s || 20}" height="${s || 20}" vie
 const ICONK = {q1:'flame', q2:'flame', q3:'flame', f1:'ball', f2:'ball', pd:'racket', vo:'volley', pi:'waves'};
 const ICON = Object.fromEntries(Object.entries(ICONK).map(([k, v]) => [k, `<span class="ii">${ico(v)}</span>`]));
 const ICON_T = {Quincho:'flame', Cancha:'ball', Pileta:'waves'};
+/* Fotos reales del complejo (carpeta fotos/) */
+const GALERIA = [['pileta-1', 'Pileta con juegos de agua'], ['pileta-2', 'Toboganes'], ['pileta-3', 'Pileta y juegos infantiles'], ['quincho', 'Quincho con asador'], ['cancha-futbol', 'Cancha de fútbol'], ['cancha-voley', 'Cancha de vóley'], ['predio', 'El predio'], ['estacionamiento', 'Estacionamiento techado']];
+const FOTO_T = {Quincho:'quincho', Cancha:'cancha-futbol', Pileta:'pileta-1'};
+const FOTO_I = {q1:'quincho', q2:'quincho', q3:'quincho', f1:'cancha-futbol', f2:'cancha-futbol', vo:'cancha-voley', pi:'pileta-3'};
+const foto = n => 'fotos/' + n + '.jpg';
+const galeria = () => `<div class="galeria">${GALERIA.map(([f, c]) => `<button data-act="verfoto" data-f="${f}" aria-label="${esc(c)}"><img src="${foto(f)}" alt="${esc(c)}" loading="lazy"><span>${esc(c)}</span></button>`).join('')}</div>`;
 
 /* ===================== Datos de ejemplo ===================== */
 const INFO = {
@@ -253,18 +259,19 @@ function vistaSitio() {
   const desc = {Quincho:'Equipados para asados y reuniones familiares de hasta 60 personas.', Cancha:'Fútbol 5, pádel y vóley. Se reservan por hora, de 9 a 22 h.', Pileta:'Turnos de mañana y tarde durante la temporada de verano.'};
   return `<div class="sitio">
   <header class="s-head"><div class="marca"><div class="logo">${ico('shield')}</div><div><b>Complejo Policial Almudena</b><small>Reservas para socios</small></div></div>
-    <nav class="s-nav"><a data-act="ir" data-id="s-como">Cómo funciona</a><a data-act="ir" data-id="s-inst">Instalaciones y tarifas</a><a data-act="ir" data-id="s-info">Información</a></nav>
+    <nav class="s-nav"><a data-act="ir" data-id="s-como">Cómo funciona</a><a data-act="ir" data-id="s-inst">Instalaciones</a><a data-act="ir" data-id="s-fotos">Fotos</a><a data-act="ir" data-id="s-info">Información</a></nav>
     <div class="s-acc"><button class="btn ghost" data-act="acceso" data-v="registro">Crear cuenta</button><button class="btn" data-act="acceso" data-v="login">Ingresar</button></div></header>
   <section class="hero"><div><span class="eyebrow">Para socios del complejo</span><h1>Reservá quinchos, canchas y pileta desde tu casa</h1>
     <p>Sin llamadas ni filas. Elegí el día, mirá qué hay libre en el momento y recibí tu comprobante con código QR.</p>
     <div class="chips"><button class="btn" data-act="acceso" data-v="login">Ingresar y reservar ${ico('chevron', 18)}</button><button class="btn ghost" data-act="acceso" data-v="registro">Es mi primera vez</button></div></div>
-    <div class="hero-card"><h3 style="margin-bottom:2px">Disponible hoy</h3><p class="small muted">${fmtFL(h)}</p>${dispo}</div></section>
+    <div class="hero-card"><img class="hero-foto" src="${foto('pileta-1')}" alt="Pileta del complejo"><h3 style="margin-bottom:2px">Disponible hoy</h3><p class="small muted">${fmtFL(h)}</p>${dispo}</div></section>
   <section class="s-sec" id="s-como"><h2>Así de fácil</h2><p class="sub">Tres pasos, desde la computadora o el celular.</p><div class="grid3">
     <div class="card"><span class="num">1</span><h3>Ingresá</h3><p class="muted">Con tu número de socio o DNI. Si es tu primera vez, creá tu cuenta en un minuto.</p></div>
     <div class="card"><span class="num">2</span><h3>Elegí lugar, día y horario</h3><p class="muted">Solo te mostramos lo que está libre, así no hay confusiones.</p></div>
     <div class="card"><span class="num">3</span><h3>Pagá y mostrá tu QR</h3><p class="muted">Transferís, avisás con una foto del comprobante y en la entrada escanean tu QR.</p></div></div></section>
   <section class="s-sec" id="s-inst"><h2>Instalaciones y tarifas</h2><p class="sub">Valores vigentes para socios.</p><div class="grid3">
-    ${T.map(([t, n]) => { const is = S.inst.filter(i => i.tipo === t); return `<div class="card"><span class="ii" style="margin-bottom:14px">${ico(ICON_T[t])}</span><h3>${n}</h3><p class="muted">${desc[t]}</p>${is.map(i => `<div class="rl"><span>${esc(i.nombre)}</span><b>${i.activo ? pesos(i.tarifa) : 'En mantenimiento'}</b></div>`).join('')}</div>`; }).join('')}</div></section>
+    ${T.map(([t, n]) => { const is = S.inst.filter(i => i.tipo === t); return `<div class="card card-foto"><img src="${foto(FOTO_T[t])}" alt="${n}" loading="lazy" data-act="verfoto" data-f="${FOTO_T[t]}"><div class="cf-body"><h3>${n}</h3><p class="muted">${desc[t]}</p>${is.map(i => `<div class="rl"><span>${esc(i.nombre)}</span><b>${i.activo ? pesos(i.tarifa) : 'En mantenimiento'}</b></div>`).join('')}</div></div>`; }).join('')}</div></section>
+  <section class="s-sec" id="s-fotos"><h2>Conocé el complejo</h2><p class="sub">Tocá una foto para verla más grande.</p>${galeria()}</section>
   <section class="s-sec" id="s-info"><h2>Antes de venir</h2><p class="sub">Lo importante, en pocas palabras.</p><div class="grid3">
     <div class="card"><span class="ii" style="margin-bottom:14px">${ico('clock')}</span><h3>Horarios</h3><p class="muted">${esc(INFO.horarios)}</p></div>
     <div class="card"><span class="ii" style="margin-bottom:14px">${ico('pin')}</span><h3>Ubicación</h3><p class="muted">${esc(INFO.ubicacion)}</p></div>
@@ -375,12 +382,12 @@ const V = {
       const T = [['Quincho', ico('flame', 26), 'Quinchos', 'Para asados y reuniones'], ['Cancha', ico('ball', 26), 'Canchas', 'Fútbol 5, pádel y vóley, por hora'], ['Pileta', ico('waves', 26), 'Pileta', 'Turno mañana o tarde, en temporada']];
       c = `<h2 class="wtit">¿Qué querés reservar?</h2><p class="sub">Elegí una opción.</p><div class="opciones">${T.map(([t, ic, n, d]) => {
         const is = S.inst.filter(i => i.tipo === t), act = is.some(i => i.activo), min = Math.min(...is.map(i => i.tarifa));
-        return `<button class="opcion" data-act="wtipo" data-t="${t}" ${act ? '' : 'disabled'}><span class="ic">${ic}</span><span><b>${n}</b><span class="d">${d}</span><span class="p">${act ? 'Desde ' + pesos(min) : 'Suspendido por mantenimiento'}</span></span></button>`;
+        return `<button class="opcion opcion-foto" data-act="wtipo" data-t="${t}" ${act ? '' : 'disabled'}><img src="${foto(FOTO_T[t])}" alt="${n}"><span class="of-body"><span class="ic">${ic}</span><span><b>${n}</b><span class="d">${d}</span><span class="p">${act ? 'Desde ' + pesos(min) : 'Suspendido por mantenimiento'}</span></span></span></button>`;
       }).join('')}</div>`;
     }
     if (w.paso === 2) {
       const is = S.inst.filter(i => i.tipo === w.tipo);
-      c = `<h2 class="wtit">¿Cuál ${w.tipo === 'Quincho' ? 'quincho' : 'cancha'} preferís?</h2><p class="sub">Elegí el lugar.</p><div class="opciones">${is.map(i => `<button class="opcion" data-act="winst" data-id="${i.id}" ${i.activo ? '' : 'disabled'}><span class="ic">${ICON[i.id]}</span><span><b>${esc(i.nombre)}</b><span class="d">${esc(i.cap)}</span><span class="p">${i.activo ? pesos(i.tarifa) + ' ' + unidad(i) : 'En mantenimiento'}</span></span></button>`).join('')}</div>`;
+      c = `<h2 class="wtit">¿Cuál ${w.tipo === 'Quincho' ? 'quincho' : 'cancha'} preferís?</h2><p class="sub">Elegí el lugar.</p><div class="opciones">${is.map(i => `<button class="opcion opcion-foto" data-act="winst" data-id="${i.id}" ${i.activo ? '' : 'disabled'}>${FOTO_I[i.id] ? `<img src="${foto(FOTO_I[i.id])}" alt="${esc(i.nombre)}">` : `<span class="foto-ph">${ico(ICONK[i.id], 40)}</span>`}<span class="of-body"><span class="ic">${ICON[i.id]}</span><span><b>${esc(i.nombre)}</b><span class="d">${esc(i.cap)}</span><span class="p">${i.activo ? pesos(i.tarifa) + ' ' + unidad(i) : 'En mantenimiento'}</span></span></span></button>`).join('')}</div>`;
     }
     if (w.paso === 3) {
       const inst = getInst(w.inst);
@@ -461,7 +468,8 @@ const V = {
     const ul = a => '<ul>' + a.map(x => '<li>' + esc(x) + '</li>').join('') + '</ul>';
     const docs = S.noticias.filter(n => ['Reglamento', 'Documentación'].includes(n.tipo));
     return `<button class="back" data-act="nav" data-v="perfil">${ico('back', 18)} Mi cuenta</button><div class="page-head"><h1>Información del complejo</h1><p class="sub">Tocá un tema para ver el detalle.</p></div>
-    ${acc('clock', 'Horarios', esc(INFO.horarios), true)}
+    ${acc('camera', 'Fotos del complejo', galeria(), true)}
+    ${acc('clock', 'Horarios', esc(INFO.horarios))}
     ${acc('money', 'Tarifas', ul(S.inst.map(i => `${i.nombre}: ${pesos(i.tarifa)} ${unidad(i)}${i.activo ? '' : ' (suspendida)'}`)))}
     ${acc('card', 'Cómo pagar', `<p>Transferencia o Mercado Pago a:</p>${ul(['Alias: ' + PAGO.alias, 'CBU: ' + PAGO.cbu, 'Titular: ' + PAGO.titular])}<p>Plazo: ${PAGO.plazo}. Después informá el pago desde “Mis reservas”.</p>`)}
     ${acc('pin', 'Ubicación', esc(INFO.ubicacion))}
@@ -648,7 +656,7 @@ const V = {
   instalaciones() {
     return `<div class="page-head"><h1>Instalaciones</h1></div>
     <div class="card scroll"><table class="tabla"><thead><tr><th>Instalación</th><th>Tipo</th><th>Turnos</th><th>Tarifa</th><th>Estado</th></tr></thead><tbody>
-    ${S.inst.map(i => `<tr><td><b>${esc(i.nombre)}</b><br><span class="small muted">${esc(i.cap)}</span></td><td>${i.tipo}</td><td>${i.turnos.length}${i.cupo > 1 ? ` (cupo ${i.cupo})` : ''}</td>
+    ${S.inst.map(i => `<tr><td style="display:flex;align-items:center;gap:12px">${FOTO_I[i.id] ? `<img class="thumb" src="${foto(FOTO_I[i.id])}" alt="">` : `<span class="thumb foto-ph">${ico(ICONK[i.id], 18)}</span>`}<div><b>${esc(i.nombre)}</b><br><span class="small muted">${esc(i.cap)}</span></div></td><td>${i.tipo}</td><td>${i.turnos.length}${i.cupo > 1 ? ` (cupo ${i.cupo})` : ''}</td>
       <td><input type="number" style="width:120px" data-tarifa="${i.id}" value="${i.tarifa}" min="0" step="500"></td>
       <td>${i.activo ? '<span class="badge b-verde">Habilitada</span>' : '<span class="badge b-rojo">Mantenimiento</span>'}<br><button class="btn-sm" style="margin-top:6px" data-act="toggleinst" data-id="${i.id}">${i.activo ? 'Suspender' : 'Habilitar'}</button></td></tr>`).join('')}
     </tbody></table><p class="small muted">Al suspender una instalación se bloquean automáticamente las nuevas reservas y podés publicar el aviso en Comunicados.</p></div>`;
@@ -895,6 +903,11 @@ const ACT = {
   wcal: () => { ui.verCal = !ui.verCal; if (ui.verCal) ui.mes = (ui.wiz.dia || hoy()).slice(0, 7); render(); },
   mes: b => { const [y, m] = ui.mes.split('-').map(Number); const d = new Date(y, m - 1 + Number(b.dataset.d), 1); ui.mes = d.getFullYear() + '-' + z(d.getMonth() + 1); render(); },
   mtab: b => { ui.mtab = b.dataset.t; render(); },
+  verfoto: b => {
+    const k = GALERIA.findIndex(g => g[0] === b.dataset.f), [f, c] = GALERIA[k < 0 ? 0 : k];
+    const prev = GALERIA[(k - 1 + GALERIA.length) % GALERIA.length][0], next = GALERIA[(k + 1) % GALERIA.length][0];
+    showModal(`<img class="foto-grande" src="${foto(f)}" alt="${esc(c)}"><div class="acciones" style="justify-content:space-between;align-items:center"><button class="icon-btn" data-act="verfoto" data-f="${prev}" aria-label="Anterior">${ico('back')}</button><b>${esc(c)}</b><button class="icon-btn" data-act="verfoto" data-f="${next}" aria-label="Siguiente">${ico('chevron')}</button></div><div class="acciones" style="margin-top:8px"><button class="btn ghost full" data-act="cerrar">Cerrar</button></div>`);
+  },
   ir: b => { const el = document.getElementById(b.dataset.id); if (el) el.scrollIntoView({behavior:'smooth', block:'start'}); },
   pagar: b => {
     const r = S.reservas.find(x => x.id === b.dataset.id);
